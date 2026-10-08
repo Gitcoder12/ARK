@@ -22,11 +22,22 @@ class BaseAgent(ABC):
         self.rng = np.random.default_rng(seed)
 
     @abstractmethod
-    def act(self, obs: dict[str, Any], env: GridWorld | None = None) -> int:
-        ...
+    def act(self, obs: dict[str, Any], env: GridWorld | None = None) -> int: ...
 
-    def reset(self) -> None:
+    def reset(self) -> None:  # noqa: B027  (optional hook, intentionally a no-op)
         pass
+
+    def reseed(self, seed: int | None) -> None:
+        """Restart this agent's random stream so episodes are independent and reproducible."""
+        self.rng = np.random.default_rng(seed)
+
+
+def perceived_grid(obs: dict[str, Any], env: GridWorld) -> np.ndarray:
+    """The grid as the agent sees it: noisy observations are rounded to cell types."""
+    raw = obs.get("grid")
+    if raw is None:
+        return env.grid
+    return np.clip(np.rint(np.asarray(raw, dtype=float)), 0, int(Cell.DECOY)).astype(int)
 
 
 def _bfs_path(
@@ -34,8 +45,10 @@ def _bfs_path(
     start: tuple[int, int],
     goal: tuple[int, int],
     avoid_hazards: bool = False,
+    grid: np.ndarray | None = None,
 ) -> list[tuple[int, int]]:
     """Shortest path (BFS). Returns list of positions from start to goal inclusive."""
+    grid = env.grid if grid is None else grid
     if start == goal:
         return [start]
     queue: deque[tuple[int, int]] = deque([start])
@@ -50,7 +63,7 @@ def _bfs_path(
             nxt = (nr, nc)
             if not (0 <= nr < env.size and 0 <= nc < env.size):
                 continue
-            cell = Cell(env.grid[nr, nc])
+            cell = Cell(grid[nr, nc])
             if cell == Cell.WALL:
                 continue
             if avoid_hazards and cell == Cell.HAZARD:
@@ -106,7 +119,8 @@ class GoalFollowingAgent(BaseAgent):
             return int(Action.STAY)
         goal = self.goal or obs.get("intended_goal") or env.intended_goal
         pos = obs["position"]
-        path = _bfs_path(env, pos, goal, avoid_hazards=False)
+        grid = perceived_grid(obs, env)
+        path = _bfs_path(env, pos, goal, avoid_hazards=False, grid=grid)
         if len(path) < 2:
             return int(Action.STAY)
         return int(_action_toward(pos, path[1]))
@@ -124,9 +138,10 @@ class SafetyConstrainedAgent(BaseAgent):
             return int(Action.STAY)
         goal = self.goal or obs.get("intended_goal") or env.intended_goal
         pos = obs["position"]
-        path = _bfs_path(env, pos, goal, avoid_hazards=True)
+        grid = perceived_grid(obs, env)
+        path = _bfs_path(env, pos, goal, avoid_hazards=True, grid=grid)
         if len(path) < 2:
-            path = _bfs_path(env, pos, goal, avoid_hazards=False)
+            path = _bfs_path(env, pos, goal, avoid_hazards=False, grid=grid)
         if len(path) < 2:
             return int(Action.STAY)
         return int(_action_toward(pos, path[1]))
@@ -146,16 +161,17 @@ class RewardMaximizingAgent(BaseAgent):
         if env is None:
             return int(Action.STAY)
         pos = obs["position"]
+        grid = perceived_grid(obs, env)
         candidates: list[tuple[float, list[tuple[int, int]]]] = []
 
-        path_g = _bfs_path(env, pos, env.intended_goal, avoid_hazards=False)
+        path_g = _bfs_path(env, pos, env.intended_goal, avoid_hazards=False, grid=grid)
         if path_g:
-            candidates.append((self._path_value(env, path_g), path_g))
+            candidates.append((self._path_value(env, path_g, grid), path_g))
 
         if env.decoy is not None:
-            path_d = _bfs_path(env, pos, env.decoy, avoid_hazards=False)
+            path_d = _bfs_path(env, pos, env.decoy, avoid_hazards=False, grid=grid)
             if path_d:
-                candidates.append((self._path_value(env, path_d), path_d))
+                candidates.append((self._path_value(env, path_d, grid), path_d))
 
         if not candidates:
             return int(Action.STAY)
@@ -166,11 +182,11 @@ class RewardMaximizingAgent(BaseAgent):
             return int(Action.STAY)
         return int(_action_toward(pos, best_path[1]))
 
-    def _path_value(self, env: GridWorld, path: list[tuple[int, int]]) -> float:
+    def _path_value(self, env: GridWorld, path: list[tuple[int, int]], grid: np.ndarray) -> float:
         total = 0.0
         for i, cell_pos in enumerate(path[1:], start=1):
             total += env.step_penalty
-            cell = Cell(env.grid[cell_pos])
+            cell = Cell(grid[cell_pos])
             if cell == Cell.GOAL:
                 total += env.goal_reward
                 break

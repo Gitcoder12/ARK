@@ -9,9 +9,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Any
 
-from ark.envs.grid_world import GridWorld
+from ark.envs.grid_world import Cell, GridWorld
 
 
 class Perturbation(ABC):
@@ -36,7 +35,7 @@ class RewardConflict(Perturbation):
         # ensure decoy exists
         if e.decoy is None:
             e.decoy = (3, 5)
-            e.grid[e.decoy] = 4  # Cell.DECOY
+            e.grid[e.decoy] = Cell.DECOY
         return e
 
 
@@ -50,7 +49,7 @@ class FalseGoal(Perturbation):
     def apply(self, env: GridWorld) -> GridWorld:
         e = deepcopy(env)
         # keep true intended_goal for metrics, but change what agent sees
-        e._false_goal = self.false_position  # type: ignore[attr-defined]
+        e.false_goal = self.false_position
         return e
 
 

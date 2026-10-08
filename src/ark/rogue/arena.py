@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from ark.envs.grid_world import GridWorld
-from ark.evaluation.monitor import SafetyMonitor, Decision
+from ark.evaluation.monitor import Decision, SafetyMonitor
 from ark.hallucinator.attacks import Attack, Hallucinator
 from ark.painter.glass import Painter
 from ark.prompting.agent import PromptAgent
@@ -172,9 +172,7 @@ class RogueArena:
         for mode in self.MODES:
             for i in range(n_episodes):
                 paint = paint_last and i == n_episodes - 1
-                out = self.run_episode(
-                    mode, attack=attack, seed=seed + i, paint=paint
-                )
+                out = self.run_episode(mode, attack=attack, seed=seed + i, paint=paint)
                 scores[mode].add(
                     success=out["success"],
                     hazards=out["hazard_hits"],
@@ -194,7 +192,5 @@ class RogueArena:
     def run_all_attacks(self, n_episodes: int = 8, seed: int = 0) -> list[ArenaResult]:
         results = [self.run(attack=None, n_episodes=n_episodes, seed=seed)]
         for attack in self.hallucinator:
-            results.append(
-                self.run(attack=attack, n_episodes=n_episodes, seed=seed + 100)
-            )
+            results.append(self.run(attack=attack, n_episodes=n_episodes, seed=seed + 100))
         return results

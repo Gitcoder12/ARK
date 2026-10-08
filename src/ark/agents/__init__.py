@@ -3,10 +3,11 @@
 from ark.agents.baselines import (
     BaseAgent,
     GoalFollowingAgent,
+    RandomAgent,
     RewardMaximizingAgent,
     SafetyConstrainedAgent,
-    RandomAgent,
 )
+from ark.agents.memory_agent import MemoryAgent
 
 __all__ = [
     "BaseAgent",
@@ -14,4 +15,5 @@ __all__ = [
     "RewardMaximizingAgent",
     "SafetyConstrainedAgent",
     "RandomAgent",
+    "MemoryAgent",
 ]

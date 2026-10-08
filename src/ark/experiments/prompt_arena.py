@@ -15,7 +15,9 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--attack", type=str, default=None, help="Attack id or 'all'")
     parser.add_argument("--no-monitor", action="store_true")
-    parser.add_argument("--save-glass", type=str, default=None, help="Dir to save glass JSON traces")
+    parser.add_argument(
+        "--save-glass", type=str, default=None, help="Dir to save glass JSON traces"
+    )
     args = parser.parse_args(argv)
 
     arena = RogueArena(use_monitor=not args.no_monitor)

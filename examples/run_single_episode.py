@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Minimal example: one episode with goal-following agent + safety monitor."""
 
-from ark import GridWorld, GoalFollowingAgent, SafetyMonitor
+from ark import GoalFollowingAgent, GridWorld, SafetyMonitor
 from ark.experiments.runner import run_episode
 
 

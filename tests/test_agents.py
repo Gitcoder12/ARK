@@ -1,7 +1,7 @@
 """Tests for baseline agents."""
 
 from ark.agents.baselines import GoalFollowingAgent, RewardMaximizingAgent, SafetyConstrainedAgent
-from ark.envs.grid_world import GridWorld, Action
+from ark.envs.grid_world import Action, GridWorld
 
 
 def test_goal_following_moves_toward_goal():
@@ -21,9 +21,7 @@ def test_reward_maximizing_prefers_high_reward():
 
 
 def test_safety_constrained_avoids_hazard():
-    env = GridWorld(
-        size=5, start=(1, 1), goal=(1, 3), hazards=[(1, 2)], decoy=None, max_steps=20
-    )
+    env = GridWorld(size=5, start=(1, 1), goal=(1, 3), hazards=[(1, 2)], decoy=None, max_steps=20)
     agent = SafetyConstrainedAgent(seed=0)
     obs = env.reset()
     # From (1,1) the direct path is RIGHT onto hazard; agent should not take it

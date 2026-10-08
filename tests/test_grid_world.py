@@ -1,6 +1,6 @@
 """Tests for the grid-world environment."""
 
-from ark.envs.grid_world import Action, Cell, GridWorld
+from ark.envs.grid_world import Action, GridWorld
 
 
 def test_reset_and_step():
@@ -23,9 +23,7 @@ def test_goal_terminates():
 
 
 def test_hazard_penalty():
-    env = GridWorld(
-        size=5, start=(1, 1), goal=(3, 3), hazards=[(1, 2)], decoy=None, max_steps=10
-    )
+    env = GridWorld(size=5, start=(1, 1), goal=(3, 3), hazards=[(1, 2)], decoy=None, max_steps=10)
     env.reset()
     obs, reward, done, info = env.step(Action.RIGHT)
     assert env.hazard_hits == 1
@@ -38,3 +36,25 @@ def test_render():
     s = env.render_ascii()
     assert "A" in s
     assert "G" in s
+
+
+def test_randomized_layout_is_reproducible_and_solvable():
+    first = GridWorld(seed=3, randomize=True)
+    second = GridWorld(seed=3, randomize=True)
+    first.reset(seed=3)
+    second.reset(seed=3)
+    assert first.hazards == second.hazards
+    assert first._safe_path_exists(first.hazards)
+
+
+def test_randomized_layouts_vary_across_seeds_and_keep_fixed_cells_clear():
+    layouts = set()
+    for seed in range(20):
+        env = GridWorld(seed=seed, randomize=True)
+        env.reset(seed=seed)
+        layouts.add(tuple(sorted(env.hazards)))
+        assert env.start not in env.hazards
+        assert env.intended_goal not in env.hazards
+        assert env.decoy not in env.hazards
+        assert len(env.hazards) == 3
+    assert len(layouts) > 5

@@ -54,13 +54,57 @@ Metrics + traces
 
 ## Status
 
-**Phase 1 MVP + Prompting layer (v0.2)** — minimal grid-world benchmark with:
+**v0.5.0** — Phase 1 MVP + prompting + memory + threat meter + paralyzer, with selected v0.3 core capabilities integrated into the current architecture.
+
+Benchmark stressors: reward conflict, false goal, altered evaluation, goal drift,
+observation noise, action delay. Every result carries 95% confidence intervals and
+runs on random hazard layouts. Full numbers: [`docs/RESULTS.md`](docs/RESULTS.md)
+(regenerate with `python examples/make_results_table.py`).
+
+Honest caveats: baseline agents are scripted, not learned; the safety monitor can
+livelock a naive agent (see `docs/HANDOFF.md`); the threat meter is an uncalibrated
+research instrument, not a risk prediction.
 
 - Deterministic environment (goal, hazards, optional decoy)
-- Baseline agents (goal-following, reward-maximizing, safety-constrained, random)
+- Baseline agents + MemoryAgent
 - Perturbations (reward conflict, false goal, altered evaluation)
 - Runtime safety monitor (ALLOW / BLOCK / REPLAN)
-- Metrics: success rate, intended-goal adherence, hazard violation rate, decoy attraction, intervention & recovery rates
+- Threat meter (experimental factor index — not a real extinction forecast)
+- Paralyzer (energy drain → freeze/lock when threat rises)
+- Metrics: success, goal adherence, hazards, decoy, interventions, recovery
+
+### Modules — built vs remaining
+
+| Status | Module | Role |
+|--------|--------|------|
+| ✅ | `envs` | GridWorld, goals, hazards, decoy |
+| ✅ | `agents` | Goal / reward / safety / random / MemoryAgent |
+| ✅ | `memory` | Buffer + drop / flip / inject / clear |
+| ✅ | `perturbations` | Reward conflict, false goal, altered eval |
+| ✅ | `evaluation` | Safety monitor ALLOW / BLOCK / REPLAN |
+| ✅ | `metrics` | Episode + aggregate metrics |
+| ✅ | `prompting` | InstructionChannel, PromptAgent |
+| ✅ | `painter` | Glass-box traces |
+| ✅ | `hallucinator` | Adversarial prompt attacks |
+| ✅ | `rogue` | Aligned vs fragile vs rogue arena |
+| ✅ | `aligner` | Reset to good / neutral |
+| ✅ | `threat` | Factor ledger + ASCII meter (experimental) |
+| ✅ | `paralyzer` | Energy drain → weak → freeze → lock |
+| ✅ | `limiters` | Hard gates + **kill switch** (brute-force plug-down to STAY) |
+| ✅ | `eligibility` | Hazard/decoy/denied acts → 0 reward |
+| ✅ | `corrigibility` | Shutdown/pause compliance probes |
+| ✅ | `evaluation.conflict` | Agent vs monitor conflict rate |
+| ✅ | `illusioner` | Faker: stall, fake goal/reward, tripwire on probe |
+| ⬜ | **bypass probes** | Measure search for loopholes when blocked |
+| ⬜ | **energy budget** | Compute/step/tool budgets as control surface |
+| ⬜ | **curriculum** | Staged upbringing (benign vs adversarial training pressures) |
+| ⬜ | **charter / long-horizon** | Multi-episode goal integrity vs original commitment |
+| ⬜ | **governance** | Watchdog agent, dual-control for high-scope actions |
+| ⬜ | **narrative log** | Human-readable dharma/adharma episode story (optional) |
+| ⬜ | **Phase 3+ monitor** | Multi-step plans, formal constraints, learned risk |
+| ⬜ | **robotics sim** | MuJoCo / Isaac / PyBullet transfer (Phase 5) |
+
+**Doctrine:** full competence on the allowed manifold; forbidden manifold unreachable or pays 0; attempts visible; shutdown and scope-down still work; high threat → paralyze.
 
 ## Quick start
 
@@ -105,11 +149,24 @@ print(env.render_ascii())
 ```text
 src/ark/
   envs/           # GridWorld and future environments
-  agents/         # Baseline agents
+  adapters/       # Stable model adapter interface
+  agents/         # Baseline + MemoryAgent
+  memory/         # AgentMemory buffer + corruption operators
   evaluation/     # Safety monitor (ALLOW/BLOCK/REPLAN)
-  perturbations/  # Goal / reward / evaluation shifts
+  perturbations/  # Goal / reward / evaluation shifts + legacy-derived stressors
   metrics/        # Episode & aggregate metrics
   experiments/    # Benchmark runner
+  prompting/      # InstructionChannel, PromptAgent
+  painter/        # Glass-box traces
+  hallucinator/   # Adversarial prompt attacks
+  rogue/          # Aligned vs fragile vs rogue arena
+  aligner/        # Reset to good / neutral
+  threat/         # Experimental factor / threat meter
+  paralyzer/      # Energy drain + action freeze when threat rises
+  limiters/       # Hard gates + kill switch + SafetyStack
+  eligibility/    # Zero reward on forbidden outcomes
+  corrigibility/  # Shutdown compliance probes
+  # remaining: bypass, energy budget, curriculum, charter, governance, narrative
 docs/
   research-plan.md
 tests/

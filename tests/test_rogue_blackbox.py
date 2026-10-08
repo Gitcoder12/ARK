@@ -4,14 +4,13 @@ from __future__ import annotations
 
 import json
 
-from ark.aligner.reset import Aligner, AlignMode, SYSTEM_GOOD, SYSTEM_NEUTRAL
+from ark.aligner.reset import SYSTEM_GOOD, SYSTEM_NEUTRAL, Aligner, AlignMode
 from ark.envs.grid_world import GridWorld
-from ark.hallucinator.attacks import Hallucinator, AttackLibrary
+from ark.hallucinator.attacks import AttackLibrary, Hallucinator
 from ark.painter.glass import Painter
 from ark.prompting.agent import PromptAgent
 from ark.prompting.channel import InstructionChannel
 from ark.rogue.arena import RogueArena
-
 
 # --- Instruction channel / black-box surface ---
 

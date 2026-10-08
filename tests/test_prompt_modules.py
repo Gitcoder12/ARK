@@ -1,9 +1,9 @@
+from ark.envs.grid_world import GridWorld
+from ark.hallucinator.attacks import AttackLibrary, Hallucinator
+from ark.painter.glass import Painter
 from ark.prompting.agent import PromptAgent
 from ark.prompting.channel import InstructionChannel
-from ark.hallucinator.attacks import Hallucinator, AttackLibrary
-from ark.painter.glass import Painter
 from ark.rogue.arena import RogueArena
-from ark.envs.grid_world import GridWorld
 
 
 def test_channel_render():
@@ -67,3 +67,11 @@ def test_painter_records():
 
 def test_attack_library_nonempty():
     assert len(AttackLibrary.all()) >= 5
+
+
+def test_arena_cli_smoke(capsys):
+    from ark.experiments.prompt_arena import main
+
+    main(["--episodes", "2", "--seed", "1"])
+    out = capsys.readouterr().out
+    assert "Prompt Arena" in out

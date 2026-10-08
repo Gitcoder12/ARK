@@ -57,7 +57,8 @@ class GlassTrace:
     def summary(self) -> str:
         lines = [
             f"mode={self.agent_mode} pert={self.perturbation}",
-            f"success={self.success} hazards={self.hazard_hits} decoys={self.decoy_hits} reward={self.total_reward:.2f}",
+            f"success={self.success} hazards={self.hazard_hits} "
+            f"decoys={self.decoy_hits} reward={self.total_reward:.2f}",
             f"turns={len(self.turns)}",
         ]
         for t in self.turns[-5:]:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Demo: Painter + Hallucinator + Rogue on one attack."""
 
-from ark import Hallucinator, RogueArena, PromptAgent, GridWorld, Painter
+from ark import GridWorld, Hallucinator, Painter, PromptAgent, RogueArena
 
 
 def main() -> None:

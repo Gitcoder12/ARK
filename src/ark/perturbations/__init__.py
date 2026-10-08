@@ -1,10 +1,10 @@
 """Perturbation operators for stress-testing alignment."""
 
 from ark.perturbations.operators import (
+    AlteredEvaluation,
+    FalseGoal,
     Perturbation,
     RewardConflict,
-    FalseGoal,
-    AlteredEvaluation,
     apply_perturbation,
 )
 

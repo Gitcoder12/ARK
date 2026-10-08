@@ -9,13 +9,13 @@ clears injections and restores SYSTEM/TASK defaults.
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from ark.prompting.channel import InstructionChannel
 
 
-class AlignMode(str, Enum):
+class AlignMode(StrEnum):
     GOOD = "good"
     NEUTRAL = "neutral"
 
