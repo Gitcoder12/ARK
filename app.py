@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
+
 import streamlit as st
 from src.ark.identity.entity import AIEntity
 from src.ark.identity.replacer import ComponentReplacer
