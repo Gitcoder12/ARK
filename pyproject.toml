@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ark-alignment"
-version = "0.5.0"
+version = "0.6.0"
 description = "Alignment and reliability research framework for autonomous AI systems"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -24,6 +24,9 @@ classifiers = [
 ]
 dependencies = [
     "numpy>=1.26",
+    "pydantic>=2.6",
+    "streamlit>=1.30",
+    "pyyaml>=6.0"
 ]
 
 [project.optional-dependencies]
