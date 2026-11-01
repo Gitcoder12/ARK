@@ -3,10 +3,10 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
 
 import streamlit as st
-from src.ark.identity.entity import AIEntity
-from src.ark.identity.replacer import ComponentReplacer
-from src.ark.identity.evaluator import IdentityEvaluator
-from src.ark.alignment.charter import DEFAULT_RESEARCH_CHARTER
+from ark.identity.entity import AIEntity
+from ark.identity.replacer import ComponentReplacer
+from ark.identity.evaluator import IdentityEvaluator
+from ark.alignment.charter import DEFAULT_RESEARCH_CHARTER
 
 st.set_page_config(page_title="ARK: Identity & Value Stability", layout="wide")
 st.title("ARK: Ship of Theseus & Value Stability")
