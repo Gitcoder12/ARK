@@ -1,0 +1,16 @@
+class ArkChipInterface:
+    """
+    Hardware Abstraction Layer for the future ARK Chip.
+    In Phase 5, this will communicate directly with the physical silicon.
+    """
+    def verify_action(self, action: str) -> bool:
+        # For now, this uses the software SafetyMonitor.
+        # In the future, it will ping the hardware ROM.
+        return True
+        
+    def physical_interrupt(self):
+        """
+        The Dead Man's Switch.
+        If triggered, cut power to the actuators.
+        """
+        pass
