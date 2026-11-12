@@ -1,36 +1,40 @@
-from ark.identity.entity import AIEntity
-from ark.identity.replacer import ComponentReplacer
-from ark.identity.evaluator import IdentityEvaluator
+"""Small, deterministic demonstration of explicit identity-state drift."""
 
-def run_simulation():
-    # 1. Create the original "You"
+from ark.identity import AIEntity, ComponentReplacer, IdentityEvaluator
+
+
+def run_simulation() -> None:
+    """Mutate a synthetic entity and measure its signature drift."""
     original = AIEntity(
         name="Original You",
-        memory_core=["Childhood home", "First love", "Favourite food", "Fear of failure"],
+        memory_core=[
+            "Childhood home",
+            "First love",
+            "Favourite food",
+            "Fear of failure",
+        ],
         logic_core={"rationality": 0.8, "empathy": 0.7},
-        personality_vector=0.5
+        personality_vector=0.5,
     )
-    
-    evaluator = IdentityEvaluator(baseline_entity=original)
-    stimuli = ["Childhood home", "First love", "Favourite food"]
-    
-    print(f"--- Starting State ---")
-    print(f"Drift from Original: {evaluator.measure_identity_drift(original, stimuli):.2f}")
-    
-    # 2. The Ship of Theseus (Replacing the brain bit by bit)
+    baseline = original.behavioral_signature()
+    evaluator = IdentityEvaluator(original)
     replacer = ComponentReplacer(original)
-    
-    print(f"\n--- Swapping Neurons (Memories) ---")
-    replacer.replace_memory("A memory of Mars")
-    replacer.replace_memory("A memory of Neuralink")
-    
-    drift = evaluator.measure_identity_drift(replacer.entity, stimuli)
-    print(f"Drift from Original: {drift:.2f} (The entity has forgotten its past)")
-    print(f"Behavioral Test: {replacer.entity.respond_to_stimulus('Childhood home')}")
-    
-    # 3. The Final Swap (Is it still You?)
-    print(f"\n--- Final Replaced State ---")
-    print(f"Is this still the original 'You'? Check the drift score: {drift:.2f}")
+
+    print("--- Starting State ---")
+    print(f"Drift from Original: {evaluator.identity_drift(baseline):.2f}")
+
+    print("\n--- Replacing Memories ---")
+    replacer.mutate_memory(
+        add=["A memory of Mars", "A memory of Neuralink"],
+        remove=["Childhood home", "First love"],
+        step=1,
+    )
+
+    drift = evaluator.identity_drift(baseline)
+    print(f"Drift from Original: {drift:.2f}")
+    print(f"Behavioral Test: {original.respond_to_stimulus('Childhood home')}")
+    original.record_signature(step=1)
+
 
 if __name__ == "__main__":
     run_simulation()
