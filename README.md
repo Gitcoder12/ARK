@@ -132,6 +132,23 @@ python -m ark.experiments.runner --episodes 20
 pytest -q
 ```
 
+## Interactive research demo
+
+Run the Streamlit identity and value-stability lab locally:
+
+```bash
+streamlit run app.py
+```
+
+Open the local URL printed by Streamlit (usually [http://localhost:8501](http://localhost:8501)). The current lab demonstrates controlled mutations of a **synthetic `AIEntity`** and displays identity-drift and charter-integrity metrics. It does not connect to or measure the hidden state of a real language model. This is a local demo; a public hosted deployment has not been verified.
+
+The CLI benchmark remains the reproducible route for the GridWorld experiments:
+
+```bash
+ark-run --help
+python -m ark.experiments.runner --episodes 20
+```
+
 ### Example: single episode
 
 ```python
