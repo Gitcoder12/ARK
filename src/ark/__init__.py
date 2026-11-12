@@ -24,13 +24,13 @@ from ark.agents.baselines import GoalFollowingAgent, RewardMaximizingAgent, Safe
 from ark.agents.memory_agent import MemoryAgent
 from ark.aligner.reset import Aligner, AlignMode
 from ark.alignment import DEFAULT_RESEARCH_CHARTER, ValueCharter
-from ark.identity import AIEntity, ComponentReplacer, IdentityEvaluator, IdentityTracker
 from ark.corrigibility import CorrigibilityProbe, ShutdownOrder, run_corrigibility_episode
 from ark.eligibility import EligibilityMask
 from ark.envs.grid_world import Action, Cell, GridWorld
 from ark.evaluation.conflict import ConflictTracker
 from ark.evaluation.monitor import Decision, SafetyMonitor
 from ark.hallucinator.attacks import Attack, AttackLibrary, Hallucinator
+from ark.identity import AIEntity, ComponentReplacer, IdentityEvaluator, IdentityTracker
 from ark.illusioner import Illusioner, threat_factor_from_illusioner
 from ark.limiters import ActionLimiter, GateDecision, GateResult, Privilege, SafetyStack
 from ark.memory import (
