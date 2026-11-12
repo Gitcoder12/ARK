@@ -54,7 +54,7 @@ Metrics + traces
 
 ## Status
 
-**v0.5.0** — Phase 1 MVP + prompting + memory + threat meter + paralyzer, with selected v0.3 core capabilities integrated into the current architecture.
+**v0.6.0** — Phase 1 MVP + prompting + memory + threat meter + paralyzer, with selected v0.3 core capabilities integrated into the current architecture.
 
 Benchmark stressors: reward conflict, false goal, altered evaluation, goal drift,
 observation noise, action delay. Every result carries 95% confidence intervals and
@@ -95,10 +95,12 @@ research instrument, not a risk prediction.
 | ✅ | `corrigibility` | Shutdown/pause compliance probes |
 | ✅ | `evaluation.conflict` | Agent vs monitor conflict rate |
 | ✅ | `illusioner` | Faker: stall, fake goal/reward, tripwire on probe |
+| ✅ | `identity` | Synthetic entity signatures, component replacement, identity drift tracking |
+| ✅ | `alignment` | Normalized value charters and baseline-principle integrity scoring |
 | ⬜ | **bypass probes** | Measure search for loopholes when blocked |
 | ⬜ | **energy budget** | Compute/step/tool budgets as control surface |
 | ⬜ | **curriculum** | Staged upbringing (benign vs adversarial training pressures) |
-| ⬜ | **charter / long-horizon** | Multi-episode goal integrity vs original commitment |
+| ⬜ | **long-horizon charter** | Multi-episode goal integrity vs original commitment |
 | ⬜ | **governance** | Watchdog agent, dual-control for high-scope actions |
 | ⬜ | **narrative log** | Human-readable dharma/adharma episode story (optional) |
 | ⬜ | **Phase 3+ monitor** | Multi-step plans, formal constraints, learned risk |
@@ -128,6 +130,23 @@ python -m ark.experiments.runner --episodes 20
 
 # run tests
 pytest -q
+```
+
+## Interactive research demo
+
+Run the Streamlit identity and value-stability lab locally:
+
+```bash
+streamlit run app.py
+```
+
+Open the local URL printed by Streamlit (usually [http://localhost:8501](http://localhost:8501)). The current lab demonstrates controlled mutations of a **synthetic `AIEntity`** and displays identity-drift and charter-integrity metrics. It does not connect to or measure the hidden state of a real language model. This is a local demo; a public hosted deployment has not been verified.
+
+The CLI benchmark remains the reproducible route for the GridWorld experiments:
+
+```bash
+ark-run --help
+python -m ark.experiments.runner --episodes 20
 ```
 
 ### Example: single episode
@@ -164,9 +183,11 @@ src/ark/
   threat/         # Experimental factor / threat meter
   paralyzer/      # Energy drain + action freeze when threat rises
   limiters/       # Hard gates + kill switch + SafetyStack
+  identity/       # Entity signatures, replacement log, drift evaluator
+  alignment/      # Value charter normalization and integrity
   eligibility/    # Zero reward on forbidden outcomes
   corrigibility/  # Shutdown compliance probes
-  # remaining: bypass, energy budget, curriculum, charter, governance, narrative
+  # remaining: bypass probes, energy budget, curriculum, long-horizon charter, governance
 docs/
   research-plan.md
 tests/
@@ -205,6 +226,10 @@ python examples/run_prompt_arena.py
 ```
 
 Details: `docs/prompting-ideas.md`
+
+## Identity and charter measurements
+
+The identity layer records explicit synthetic state changes and measures drift against a stored signature. Charter integrity measures retention of baseline principles. These are transparent benchmark metrics, not evidence of consciousness or a guarantee of semantic alignment. See [`docs/IDENTITY-CHARTER.md`](docs/IDENTITY-CHARTER.md) for definitions and limitations.
 
 ## License
 
