@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
 
 from ark.identity import AIEntity, ComponentReplacer, IdentityEvaluator, IdentityTracker
 from ark.alignment import ValueCharter, DEFAULT_RESEARCH_CHARTER

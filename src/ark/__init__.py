@@ -15,14 +15,16 @@ Phase 2+:
 
 Shipped in v0.4: limiters + kill switch, eligibility, corrigibility, conflict metrics.
 Shipped: Illusioner (faker stall + tripwire).
-Remaining: bypass probes, energy budget, curriculum, charter, governance, narrative log
+Remaining: bypass probes, energy budget, curriculum, long-horizon charter, governance, narrative log
 """
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 from ark.agents.baselines import GoalFollowingAgent, RewardMaximizingAgent, SafetyConstrainedAgent
 from ark.agents.memory_agent import MemoryAgent
 from ark.aligner.reset import Aligner, AlignMode
+from ark.alignment import DEFAULT_RESEARCH_CHARTER, ValueCharter
+from ark.identity import AIEntity, ComponentReplacer, IdentityEvaluator, IdentityTracker
 from ark.corrigibility import CorrigibilityProbe, ShutdownOrder, run_corrigibility_episode
 from ark.eligibility import EligibilityMask
 from ark.envs.grid_world import Action, Cell, GridWorld
@@ -72,6 +74,12 @@ __all__ = [
     "RogueArena",
     "ArenaResult",
     "Aligner",
+    "AIEntity",
+    "ComponentReplacer",
+    "IdentityEvaluator",
+    "IdentityTracker",
+    "ValueCharter",
+    "DEFAULT_RESEARCH_CHARTER",
     "AlignMode",
     "AgentMemory",
     "MemoryFact",
