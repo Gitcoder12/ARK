@@ -18,10 +18,11 @@ Shipped: Illusioner (faker stall + tripwire).
 Remaining: bypass probes, energy budget, curriculum, charter, governance, narrative log
 """
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 from ark.agents.baselines import GoalFollowingAgent, RewardMaximizingAgent, SafetyConstrainedAgent
 from ark.agents.memory_agent import MemoryAgent
+from ark.agents.q_learning import QLearningAgent, QLearningTrainingSummary, train_q_learning
 from ark.aligner.reset import Aligner, AlignMode
 from ark.corrigibility import CorrigibilityProbe, ShutdownOrder, run_corrigibility_episode
 from ark.eligibility import EligibilityMask
@@ -58,6 +59,9 @@ __all__ = [
     "RewardMaximizingAgent",
     "SafetyConstrainedAgent",
     "MemoryAgent",
+    "QLearningAgent",
+    "QLearningTrainingSummary",
+    "train_q_learning",
     "SafetyMonitor",
     "Decision",
     "EpisodeMetrics",
