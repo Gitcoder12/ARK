@@ -17,3 +17,12 @@ Alignment and reliability research framework. Current open PRs add strict CI, id
 | YYYY-MM-DD | contributor id | link | paths | exact command | pass / fail / not run | evidence |
 
 Record failures, regressions, reverted work and checks not run. Never overwrite historical entries or attribute changes to an agent that did not perform them. A green CI run is not proof of production readiness.
+
+## Portfolio documentation rollout — 2026-11-13
+
+- Documentation PR: https://github.com/Gitcoder12/ARK/pull/20
+- Added project-specific feature plan, company-fit mapping, two-level README guide and quality checklist.
+- Existing agent/contributor instructions were preserved or extended without replacing the repository's established policies.
+- README now includes a beginner explanation and a technical/research view tied to current scope and limitations.
+- Validation: documentation/source review only; no application runtime test or deployment is claimed by this docs PR.
+- Status: draft PR, not merged.
