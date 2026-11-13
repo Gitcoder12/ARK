@@ -23,7 +23,9 @@ class IdentityEvaluator:
     def charter_integrity(self, baseline_charter: list[str] | None = None) -> float:
         baseline = {
             item.strip()
-            for item in (baseline_charter if baseline_charter is not None else self.baseline_charter)
+            for item in (
+                baseline_charter if baseline_charter is not None else self.baseline_charter
+            )
             if isinstance(item, str) and item.strip()
         }
         if not baseline:
