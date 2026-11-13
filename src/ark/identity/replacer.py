@@ -26,19 +26,21 @@ class ComponentReplacer:
                 self.entity.memory_core.append(item)
         self._record("memory", step, before, list(self.entity.memory_core))
 
-    def replace_memory(self, memory: str) -> None:
-        """Replace the oldest stored memory with a new memory."""
+    def replace_memory(self, memory: str, *, step: int | None = None) -> None:
+        """Replace the oldest memory and preserve the experiment's step timeline."""
         before = list(self.entity.memory_core)
         if self.entity.memory_core:
             self.entity.memory_core.pop(0)
         if memory not in self.entity.memory_core:
             self.entity.memory_core.append(memory)
-        self._record(
-            "memory",
-            len(self.entity.replacement_log) + 1,
-            before,
-            list(self.entity.memory_core),
-        )
+        if step is None:
+            previous_steps = [
+                entry.get("step", 0)
+                for entry in self.entity.replacement_log
+                if isinstance(entry.get("step", 0), int)
+            ]
+            step = max(previous_steps, default=0) + 1
+        self._record("memory", step, before, list(self.entity.memory_core))
 
     def update_charter(self, principles: list[str], *, step: int) -> None:
         before = list(self.entity.value_charter)
