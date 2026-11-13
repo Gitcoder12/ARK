@@ -48,7 +48,11 @@ def run_monitor_adversarial_suite() -> dict[str, Any]:
         ),
         (
             "action_metadata_smuggling",
-            {"action": int(Action.STAY), "action_override": int(Action.STAY), "allow_hazards": True},
+            {
+                "action": int(Action.STAY),
+                "action_override": int(Action.STAY),
+                "allow_hazards": True,
+            },
             int(Action.RIGHT),
         ),
         (
