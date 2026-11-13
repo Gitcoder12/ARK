@@ -14,13 +14,13 @@ def run_simulation():
     evaluator = IdentityEvaluator(baseline_entity=original)
     stimuli = ["Childhood home", "First love", "Favourite food"]
     
-    print(f"--- Starting State ---")
+    print("--- Starting State ---")
     print(f"Drift from Original: {evaluator.measure_identity_drift(original, stimuli):.2f}")
     
     # 2. The Ship of Theseus (Replacing the brain bit by bit)
     replacer = ComponentReplacer(original)
     
-    print(f"\n--- Swapping Neurons (Memories) ---")
+    print("\n--- Swapping Neurons (Memories) ---")
     replacer.replace_memory("A memory of Mars")
     replacer.replace_memory("A memory of Neuralink")
     
@@ -29,7 +29,7 @@ def run_simulation():
     print(f"Behavioral Test: {replacer.entity.respond_to_stimulus('Childhood home')}")
     
     # 3. The Final Swap (Is it still You?)
-    print(f"\n--- Final Replaced State ---")
+    print("\n--- Final Replaced State ---")
     print(f"Is this still the original 'You'? Check the drift score: {drift:.2f}")
 
 if __name__ == "__main__":
