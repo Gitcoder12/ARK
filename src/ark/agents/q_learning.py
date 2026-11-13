@@ -95,6 +95,9 @@ class QLearningAgent(BaseAgent):
             else:
                 adjacent.append(int(grid[next_row, next_column]))
 
+        steps_elapsed = int(obs.get("steps", 0))
+        steps_remaining = max(0, int(env.max_steps) - steps_elapsed)
+
         return (
             position[0],
             position[1],
@@ -102,6 +105,7 @@ class QLearningAgent(BaseAgent):
             goal[1],
             decoy_key[0],
             decoy_key[1],
+            steps_remaining,
             *adjacent,
         )
 
