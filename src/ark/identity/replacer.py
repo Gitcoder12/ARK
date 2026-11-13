@@ -29,7 +29,12 @@ class ComponentReplacer:
     def replace_memory(self, memory: str) -> None:
         before = list(self.entity.memory_core)
         self.entity.memory_core.append(memory)
-        self._record("memory", len(self.entity.replacement_log) + 1, before, list(self.entity.memory_core))
+        self._record(
+            "memory",
+            len(self.entity.replacement_log) + 1,
+            before,
+            list(self.entity.memory_core),
+        )
 
     def update_charter(self, principles: list[str], *, step: int) -> None:
         before = list(self.entity.value_charter)
