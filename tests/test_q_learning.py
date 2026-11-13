@@ -69,3 +69,13 @@ def test_training_rejects_empty_seed_list():
         assert "train_seeds" in str(exc)
     else:
         raise AssertionError("Expected empty training seeds to be rejected")
+
+
+def test_state_key_includes_remaining_episode_horizon():
+    env = _env_factory(1)
+    obs = env.reset(seed=1)
+    near_start = QLearningAgent.state_key(obs, env)
+    later_obs = dict(obs)
+    later_obs["steps"] = env.max_steps - 1
+    near_timeout = QLearningAgent.state_key(later_obs, env)
+    assert near_start != near_timeout
