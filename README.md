@@ -210,25 +210,15 @@ Details: `docs/prompting-ideas.md`
 
 Apache License 2.0.
 
+
 ---
 
-## Project handbook
+## AI-maintained project notes (secondary — 2026-11-13)
 
-- [Activity log](ACTIVITY_LOG.md)
-- [Feature upgrade plan](FEATURE_UPGRADE_PLAN.md)
-- [Company and team fit](COMPANY_FIT.md)
-- [Beginner and technical README draft](README_ADDENDUM_DRAFT.md)
-- [README quality checklist](README_QUALITY_CHECKLIST.md)
-- [Contribution workflow](CONTRIBUTING.md)
+This section supplements the maintainer-authored README above; it does not replace or certify the original claims.
 
-## Understanding the project
-
-### In plain language
-
-A research framework for testing whether autonomous AI agents keep following their intended goals when rewards, instructions, memory or environments change.
-
-### Technical and research view
-
-Explain the actual package layout, core modules, inputs, outputs, algorithms, external dependencies and execution path here. Link architecture or experiment notes and describe failure handling.
-
-For future work, see [FEATURE_UPGRADE_PLAN.md](FEATURE_UPGRADE_PLAN.md), [ACTIVITY_LOG.md](ACTIVITY_LOG.md), [COMPANY_FIT.md](COMPANY_FIT.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
+- ARK is an experimental agent-alignment and reliability research project. Simulator checks do not establish real-world alignment or safety.
+- Report benchmark inputs, models, seeds, baselines, threat assumptions, false positives, false negatives and unrun experiments explicitly.
+- Never present heuristic monitor scores as calibrated probabilities or a finite test suite as a complete security guarantee.
+- Preserve real and maintainer-provided data; keep synthetic simulator episodes clearly labelled. Never invent results or silently substitute datasets.
+- See the proposed [MODEL_AUDIT_ROUTER.md](https://github.com/Gitcoder12/ARK/blob/audit/model-router-2026-11-13/MODEL_AUDIT_ROUTER.md) for independent model review instructions.
