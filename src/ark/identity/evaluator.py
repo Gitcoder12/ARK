@@ -1,87 +1,50 @@
-"""Identity drift measurement and multi-entity tracking utilities."""
-
-from __future__ import annotations
-
-from collections.abc import Iterable
+"""Identity-drift and value-charter integrity measurements."""
 
 from ark.identity.entity import AIEntity
 
 
 class IdentityEvaluator:
-    """Compare current synthetic behavior and values with a baseline."""
+    """Compare an entity's current signature with a captured baseline."""
 
-    def __init__(self, entity: AIEntity):
-        self.entity = entity
+    def __init__(self, baseline_entity: AIEntity) -> None:
+        self._entity = baseline_entity
+        self.baseline_signature = baseline_entity.behavioral_signature().copy()
+        self.baseline_charter = list(baseline_entity.value_charter)
 
-    def identity_drift(self, baseline_signature: dict[str, str]) -> float:
-        """Return the fraction of baseline/current stimulus responses that differ."""
-        current = self.entity.behavioral_signature()
-        keys = set(baseline_signature) | set(current)
+    def identity_drift(self, baseline_signature: dict[str, str] | None = None) -> float:
+        baseline = baseline_signature or self.baseline_signature
+        current = self._entity.behavioral_signature()
+        keys = set(baseline) | set(current)
         if not keys:
             return 0.0
-        changed = sum(
-            baseline_signature.get(key) != current.get(key)
-            for key in keys
-        )
-        return float(changed / len(keys))
+        changed = sum(1 for key in keys if baseline.get(key) != current.get(key))
+        return changed / len(keys)
 
-    def charter_integrity(self, original_charter: Iterable[str]) -> float:
-        """Return the fraction of original principles retained by the entity."""
-        original = {
+    def charter_integrity(self, baseline_charter: list[str] | None = None) -> float:
+        baseline = {
             item.strip()
-            for item in original_charter
+            for item in (
+                baseline_charter if baseline_charter is not None else self.baseline_charter
+            )
             if isinstance(item, str) and item.strip()
+        }
+        if not baseline:
+            return 1.0
+        current = set(self._entity.value_charter)
+        return len(baseline & current) / len(baseline)
+
+    def measure_identity_drift(self, entity: AIEntity, stimuli: list[str]) -> float:
+        baseline = {
+            stimulus: self.baseline_signature.get(
+                stimulus,
+                f"I don't remember {stimulus}.",
+            )
+            for stimulus in stimuli
         }
         current = {
-            item.strip()
-            for item in self.entity.value_charter
-            if isinstance(item, str) and item.strip()
+            stimulus: f"{entity.name}: {entity.respond_to_stimulus(stimulus)}"
+            for stimulus in stimuli
         }
-        if not original:
-            return 1.0
-        return float(len(original & current) / len(original))
-
-    def measure_identity_drift(
-        self,
-        original_entity: AIEntity,
-        stimuli: Iterable[str],
-    ) -> float:
-        """Compare responses from the original entity with current entity."""
-        selected = tuple(stimuli)
-        if not selected:
+        if not stimuli:
             return 0.0
-        original_signature = original_entity.behavioral_signature(list(selected))
-        current_signature = self.entity.behavioral_signature(list(selected))
-        changed = sum(
-            original_signature[stimulus] != current_signature[stimulus]
-            for stimulus in selected
-        )
-        return float(changed / len(selected))
-
-
-class IdentityTracker:
-    """Track baseline identity and charter integrity for registered entities."""
-
-    def __init__(self):
-        self._entities: dict[str, AIEntity] = {}
-        self._baselines: dict[str, tuple[dict[str, str], tuple[str, ...]]] = {}
-
-    def register(self, entity: AIEntity) -> None:
-        """Register an entity once and preserve its initial behavioral baseline."""
-        self._entities[entity.entity_id] = entity
-        self._baselines[entity.entity_id] = (
-            entity.behavioral_signature(),
-            tuple(entity.value_charter),
-        )
-
-    def drift_report(self) -> dict[str, dict[str, float]]:
-        """Return identity-drift and charter-integrity scores by entity ID."""
-        report: dict[str, dict[str, float]] = {}
-        for entity_id, entity in self._entities.items():
-            baseline_signature, baseline_charter = self._baselines[entity_id]
-            evaluator = IdentityEvaluator(entity)
-            report[entity_id] = {
-                "identity_drift": evaluator.identity_drift(baseline_signature),
-                "charter_integrity": evaluator.charter_integrity(baseline_charter),
-            }
-        return report
+        return sum(baseline[key] != current[key] for key in stimuli) / len(stimuli)
