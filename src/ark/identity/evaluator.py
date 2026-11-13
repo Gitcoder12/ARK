@@ -34,10 +34,6 @@ class IdentityEvaluator:
         return len(baseline & current) / len(baseline)
 
     def measure_identity_drift(self, entity: AIEntity, stimuli: list[str]) -> float:
-        current = {
-            stimulus: entity.respond_to_stimulus(stimulus)
-            for stimulus in stimuli
-        }
         baseline = {
             stimulus: self.baseline_signature.get(
                 stimulus,
