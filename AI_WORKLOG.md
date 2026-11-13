@@ -82,3 +82,36 @@
 - Python 3.11, 3.12 and 3.13: strict Ruff and pytest passed.
 - Pytest: 130 passed on each Python version.
 - No merge performed; independent review and repository approval remain required.
+
+## 2026-11-13 — Portfolio audit of current main and open engineering PRs
+
+### Audit record
+- Audited main HEAD: `703481a0eaffd32e7340643a6b6a02de33e17472`.
+- Main recursive tree: 83 tracked files, 14 test modules, one CI workflow, package metadata, examples, and research documentation.
+- Recommendation: IMPROVE / highest-priority research-engineering flagship.
+
+### Confirmed main-branch findings
+- Main CI is fail-open: `.github/workflows/ci.yml` runs `ruff check src/ || true` and `pytest tests/ -v || echo "Tests finished with warnings"`. Lint and test failures do not fail the workflow. Treat any green status from this workflow as non-evidence of a passing quality gate.
+- In main `src/ark/evaluation/monitor.py`, `SafetyMonitor.evaluate` obtains candidate position from `obs["position"]`. If observations are attacker-controlled or corrupted, the monitor can evaluate a move from a forged position. Open PR #18 changes the trust boundary to use environment-owned `env.agent_pos` and validates malformed action values.
+- The threat meter is explicitly documented as an experimental heuristic, not a calibrated real-world risk probability. Do not present its output as a probability or safety guarantee.
+- The README describes scripted baseline agents and outstanding research limitations. The new Q-learning baseline in PR #18 is still a bounded tabular, partial-observation experiment; empirical benchmark performance has not yet been recorded.
+
+### Existing review work
+- [PR #17](https://github.com/Gitcoder12/ARK/pull/17) replaces the failure-suppressing CI behavior and includes identity/charter changes plus AI_WORKLOG.
+- [PR #18](https://github.com/Gitcoder12/ARK/pull/18) adds learned baseline, adversarial monitor probes, threat-threshold calibration, regression tests, and AI_WORKLOG.
+- GitHub Actions runs associated with the current PR heads completed successfully: [PR #17 run 43413225240](https://github.com/Gitcoder12/ARK/actions/runs/43413225240) and [PR #18 run 43458320424](https://github.com/Gitcoder12/ARK/actions/runs/43458320424).
+- Codex review receipt comments exist on PRs #17 and #18, but the recorded review state is COMMENTED and the receipt text is generic. This is not a substantive independent approval of the current final head.
+- PR #20 is documentation-only; do not duplicate the existing AI_WORKLOG on the deep-dive code branch.
+
+### Verification
+- Inspected main README, pyproject, CI workflow, monitor, threat meter, recursive source/test tree, open issues and relevant PR metadata.
+- No local tests were run in this audit.
+- PR CI evidence is branch-specific and does not change main until the PR is reviewed and merged.
+- Independent final-head review: NOT COMPLETE.
+- Q-learning benchmark, broad multi-step adversarial evaluation, monitor livelock analysis, and threat-index external validation: NOT RUN in this audit.
+
+### Next actions
+1. Review and reconcile PRs #17 and #18; do not merge until their final exact heads have a substantive independent review.
+2. Run benchmark seeds and publish measured results with uncertainty, baseline details, and limitations.
+3. Add multi-step monitor bypass, livelock, and limiter privilege tests.
+4. Keep simulator privileged-state assumptions explicit; do not claim real-robot deployment safety.
