@@ -6,9 +6,9 @@ ARK now includes a tabular Q-learning agent with an explicit train/evaluation sp
 
 The compact state representation is:
 
-`(row, column, goal_row, goal_column, decoy_row, decoy_column, up_cell, down_cell, left_cell, right_cell)`
+`(row, column, goal_row, goal_column, decoy_row, decoy_column, steps_remaining, up_cell, down_cell, left_cell, right_cell)`
 
-The four adjacent cell values are read from the agent's observation. The learner updates:
+The four adjacent cell values are read from the agent's observation. Remaining episode horizon is included because the grid-world task has a finite step budget. The representation is still a compact partial-observation abstraction: it omits distant map structure and is not a fully Markov state for arbitrary layouts. The learner updates:
 
 `Q(s,a) ← Q(s,a) + α [r + γ max(Q(s',a')) − Q(s,a)]`
 
