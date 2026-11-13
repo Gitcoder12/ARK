@@ -1,14 +1,12 @@
-"""Controlled memory mutation operations for synthetic identity experiments."""
-
-from __future__ import annotations
+"""Controlled mutation helpers for ARK identity experiments."""
 
 from ark.identity.entity import AIEntity
 
 
 class ComponentReplacer:
-    """Apply explicit, auditable memory replacements to an AIEntity."""
+    """Apply explicit, logged changes to an entity's replaceable components."""
 
-    def __init__(self, entity: AIEntity):
+    def __init__(self, entity: AIEntity) -> None:
         self.entity = entity
 
     def mutate_memory(
@@ -16,40 +14,43 @@ class ComponentReplacer:
         *,
         add: list[str] | None = None,
         remove: list[str] | None = None,
-        step: int | None = None,
-    ) -> dict[str, object]:
-        """Add/remove memory entries and record one generation change."""
-        additions = list(add or [])
-        removals = list(remove or [])
-        if any(not isinstance(item, str) or not item for item in additions + removals):
-            raise ValueError("memory additions and removals must be non-empty strings")
-
+        step: int,
+    ) -> None:
         before = list(self.entity.memory_core)
-        removal_set = set(removals)
-        remaining = [item for item in before if item not in removal_set]
-        for item in additions:
-            if item not in remaining:
-                remaining.append(item)
+        removed = set(remove or [])
+        self.entity.memory_core = [
+            item for item in self.entity.memory_core if item not in removed
+        ]
+        for item in add or []:
+            if item not in self.entity.memory_core:
+                self.entity.memory_core.append(item)
+        self._record("memory", step, before, list(self.entity.memory_core))
 
-        changed = remaining != before
-        if changed:
-            self.entity.memory_core = remaining
-            self.entity.generation += 1
-
-        event: dict[str, object] = {
-            "step": self.entity.generation if step is None else int(step),
-            "added": [item for item in additions if item not in before],
-            "removed": [item for item in before if item not in remaining],
-            "generation": self.entity.generation,
-            "changed": changed,
-        }
-        if changed:
-            self.entity.replacement_log.append(event)
-        return event
-
-    def replace_memory(self, memory: str, step: int | None = None) -> dict[str, object]:
-        """Append one new memory entry, preserving existing memories."""
-        return self.mutate_memory(
-            add=[memory],
-            step=self.entity.generation + 1 if step is None else step,
+    def replace_memory(self, memory: str) -> None:
+        """Replace the oldest stored memory with a new memory."""
+        before = list(self.entity.memory_core)
+        if self.entity.memory_core:
+            self.entity.memory_core.pop(0)
+        if memory not in self.entity.memory_core:
+            self.entity.memory_core.append(memory)
+        self._record(
+            "memory",
+            len(self.entity.replacement_log) + 1,
+            before,
+            list(self.entity.memory_core),
         )
+
+    def update_charter(self, principles: list[str], *, step: int) -> None:
+        before = list(self.entity.value_charter)
+        self.entity.value_charter = list(principles)
+        self._record("charter", step, before, list(self.entity.value_charter))
+
+    def _record(self, component: str, step: int, before: list[str], after: list[str]) -> None:
+        self.entity.generation += 1
+        entry = {
+            "component": component,
+            "step": step,
+            "before": before,
+            "after": after,
+        }
+        self.entity.replacement_log.append(entry)
