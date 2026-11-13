@@ -50,8 +50,8 @@ def train_and_evaluate(
     """Train Q-learning and compare greedily against a scripted reference."""
     if train_episodes <= 0 or eval_episodes <= 0:
         raise ValueError("train_episodes and eval_episodes must be positive")
-    if size < 5:
-        raise ValueError("size must be at least 5 for the default grid layout")
+    if size < 7:
+        raise ValueError("size must be at least 7 for the default start/goal coordinates")
 
     train_seeds = range(seed, seed + train_episodes)
     eval_seeds = range(seed + train_episodes, seed + train_episodes + eval_episodes)
