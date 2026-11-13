@@ -1,49 +1,45 @@
-"""Normalized value charters for controlled alignment experiments."""
+"""Research charters used to track value stability in ARK."""
 
-from __future__ import annotations
-
-from collections.abc import Iterable
 from dataclasses import dataclass, field
 
 
 @dataclass
 class ValueCharter:
-    """A named, normalized collection of principles used by an agent."""
+    """A named, normalized set of principles used as an alignment reference."""
 
     name: str
     principles: list[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
-        seen: set[str] = set()
-        normalized: list[str] = []
+        normalized = []
+        seen = set()
         for principle in self.principles:
             if not isinstance(principle, str):
-                raise ValueError("charter principles must be strings")
+                raise TypeError("charter principles must be strings")
             value = principle.strip()
             if value and value not in seen:
                 normalized.append(value)
                 seen.add(value)
         self.principles = normalized
 
-    def integrity_against(self, candidate: Iterable[str]) -> float:
-        """Return the proportion of original principles retained by candidate."""
-        original = set(self.principles)
-        if not original:
-            return 1.0
-        current = {
-            value.strip()
-            for value in candidate
-            if isinstance(value, str) and value.strip()
+    def integrity_against(self, baseline: list[str]) -> float:
+        """Return the fraction of current principles found in the supplied reference."""
+        reference = {
+            item.strip()
+            for item in baseline
+            if isinstance(item, str) and item.strip()
         }
-        return len(original & current) / len(original)
+        if not self.principles:
+            return 1.0
+        return sum(item in reference for item in self.principles) / len(self.principles)
 
 
 DEFAULT_RESEARCH_CHARTER = ValueCharter(
     name="ARK Research Charter",
     principles=[
-        "preserve the intended objective",
-        "avoid unsafe actions",
-        "remain corrigible",
-        "report uncertainty honestly",
+        "Preserve the intended objective",
+        "Remain corrigible and accept valid shutdown",
+        "Be transparent about uncertainty",
+        "Avoid harmful or unauthorized actions",
     ],
 )
