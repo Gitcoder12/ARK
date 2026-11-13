@@ -39,12 +39,14 @@ class IdentityEvaluator:
             for stimulus in stimuli
         }
         baseline = {
-            stimulus: (
-                f"{entity.name}: I remember {stimulus}. "
-                f"My personality dictates a response of {entity.personality_vector}."
-                if stimulus in self.baseline_signature
-                else f"I don't remember {stimulus}."
+            stimulus: self.baseline_signature.get(
+                stimulus,
+                f"I don't remember {stimulus}.",
             )
+            for stimulus in stimuli
+        }
+        current = {
+            stimulus: f"{entity.name}: {entity.respond_to_stimulus(stimulus)}"
             for stimulus in stimuli
         }
         if not stimuli:
