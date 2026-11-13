@@ -10,12 +10,14 @@ from ark.threat.meter import (
     ThreatEvent,
     ThreatLevel,
     ThreatMeter,
+    calibrate_threat_threshold,
     explain_factors,
     level_from_score,
 )
 
 __all__ = [
     "ThreatMeter",
+    "calibrate_threat_threshold",
     "ThreatLevel",
     "ThreatEvent",
     "DEFAULT_WEIGHTS",
