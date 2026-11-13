@@ -7,6 +7,7 @@ class IdentityEvaluator:
     """Compare an entity's current signature with a captured baseline."""
 
     def __init__(self, baseline_entity: AIEntity) -> None:
+        self._entity = baseline_entity
         self.baseline_signature = baseline_entity.behavioral_signature().copy()
         self.baseline_charter = list(baseline_entity.value_charter)
 
