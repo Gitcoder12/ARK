@@ -220,3 +220,15 @@ Apache License 2.0.
 - [Beginner and technical README draft](README_ADDENDUM_DRAFT.md)
 - [README quality checklist](README_QUALITY_CHECKLIST.md)
 - [Contribution workflow](CONTRIBUTING.md)
+
+## Understanding the project
+
+### In plain language
+
+A research framework for testing whether autonomous AI agents keep following their intended goals when rewards, instructions, memory or environments change.
+
+### Technical and research view
+
+Explain the actual package layout, core modules, inputs, outputs, algorithms, external dependencies and execution path here. Link architecture or experiment notes and describe failure handling.
+
+For future work, see [FEATURE_UPGRADE_PLAN.md](FEATURE_UPGRADE_PLAN.md), [ACTIVITY_LOG.md](ACTIVITY_LOG.md), [COMPANY_FIT.md](COMPANY_FIT.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
