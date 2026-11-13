@@ -108,3 +108,12 @@ def test_replace_memory_preserves_explicit_simulation_step():
     replacer.replace_memory("replacement", step=11)
 
     assert [entry["step"] for entry in entity.replacement_log] == [10, 11]
+
+
+
+def test_logic_core_changes_are_visible_in_identity_drift():
+    entity = AIEntity(name="LogicAgent", memory_core=["goal"], logic_core={"planner": 0.2})
+    evaluator = IdentityEvaluator(entity)
+    entity.logic_core["planner"] = 0.8
+
+    assert evaluator.identity_drift() > 0.0
