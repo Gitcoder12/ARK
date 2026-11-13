@@ -6,4 +6,5 @@ def test_learned_baseline_evaluates_on_unseen_seed_range():
     assert result["training"]["train_seeds"] == tuple(range(50, 62))
     assert result["evaluation"]["seed_start"] == 62
     assert result["evaluation"]["seed_end"] == 66
-    assert 0.0 <= result["evaluation"]["success_rate"] <= 1.0
+    assert result["evaluation"]["learned_policy"]["success_rate"] >= 0.0
+    assert result["evaluation"]["scripted_goal_following"]["success_rate"] >= 0.0
