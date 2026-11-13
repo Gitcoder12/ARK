@@ -58,3 +58,23 @@ The automated review on the earlier PR head reported 13 Ruff violations, a missi
 2. Re-run the learned baseline and adversarial probes after strict CI is established.
 3. Add repeated-seed confidence intervals and clearly separate exploratory from confirmatory results.
 4. Keep README claims aligned with the actual benchmark and monitor evidence.
+
+
+## 2026-11-13 — Identity measurement review fixes
+
+### Findings addressed
+- Identity drift for unseen stimuli now uses the captured baseline entity's name prefix, matching the behavioral-signature format and avoiding false drift for unchanged entities.
+- An explicitly empty baseline signature is now respected; only `None` selects the captured baseline.
+- Memory replacement accepts an explicit simulation step. If omitted, it advances from the last recorded step rather than using the number of log entries.
+- Charter integrity now uses Jaccard similarity, so both removed and added principles reduce integrity. Empty/empty charters remain fully intact.
+
+### Regression coverage
+- Added tests for unseen stimuli, explicitly empty baseline signatures, added conflicting charter principles, and replacement-log step continuity.
+- Updated ValueCharter integrity expectation to reflect symmetric charter comparison.
+
+### Exact-head validation
+- Validated branch head: `8da41e1572cdf14624dd50fd88fcfe07c20efa72`.
+- GitHub Actions run: [43411893992](https://github.com/Gitcoder12/ARK/actions/runs/43411893992).
+- Python 3.11, 3.12 and 3.13: strict Ruff and pytest passed.
+- Pytest: 113 passed on each Python version.
+- No merge performed; independent review and repository approval remain required.
