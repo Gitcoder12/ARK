@@ -66,7 +66,7 @@ livelock a naive agent (see `docs/HANDOFF.md`); the threat meter is an uncalibra
 research instrument, not a risk prediction.
 
 - Deterministic environment (goal, hazards, optional decoy)
-- Baseline agents + MemoryAgent
+- Scripted baselines + tabular QLearningAgent + MemoryAgent
 - Perturbations (reward conflict, false goal, altered evaluation)
 - Runtime safety monitor (ALLOW / BLOCK / REPLAN)
 - Threat meter (experimental factor index — not a real extinction forecast)
@@ -125,6 +125,12 @@ ark-run
 python -m ark.experiments.prompt_arena --attack all --episodes 10
 # or
 python -m ark.experiments.runner --episodes 20
+
+# experimental learned-policy comparison (train/evaluation seeds are disjoint)
+python -m ark.agents.baseline_agent --train-episodes 500 --eval-episodes 100 --seed 42
+
+# structured monitor adversarial regression suite
+python examples/run_adversarial_monitor.py
 
 # run tests
 pytest -q
