@@ -10,13 +10,15 @@ from ark.threat.meter import (
     ThreatEvent,
     ThreatLevel,
     ThreatMeter,
-    calibrate_threat_threshold,
     explain_factors,
     level_from_score,
 )
 
+from ark.threat.calibration import ThreatCalibration, calibrate_threat_threshold
+
 __all__ = [
     "ThreatMeter",
+    "ThreatCalibration",
     "calibrate_threat_threshold",
     "ThreatLevel",
     "ThreatEvent",
