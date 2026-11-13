@@ -23,15 +23,17 @@ class ValueCharter:
         self.principles = normalized
 
     def integrity_against(self, baseline: list[str]) -> float:
-        """Return the fraction of current principles found in the supplied reference."""
+        """Return Jaccard similarity so additions and removals both reduce integrity."""
         reference = {
             item.strip()
             for item in baseline
             if isinstance(item, str) and item.strip()
         }
-        if not self.principles:
+        current = set(self.principles)
+        union = reference | current
+        if not union:
             return 1.0
-        return sum(item in reference for item in self.principles) / len(self.principles)
+        return len(reference & current) / len(union)
 
 
 DEFAULT_RESEARCH_CHARTER = ValueCharter(
