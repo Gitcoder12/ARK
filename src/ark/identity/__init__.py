@@ -1,12 +1,8 @@
-"""Public identity primitives for ARK's synthetic identity experiments."""
+"""Identity stability primitives for ARK."""
 
 from ark.identity.entity import AIEntity
-from ark.identity.evaluator import IdentityEvaluator, IdentityTracker
+from ark.identity.evaluator import IdentityEvaluator
 from ark.identity.replacer import ComponentReplacer
+from ark.identity.tracker import IdentityTracker
 
-__all__ = [
-    "AIEntity",
-    "ComponentReplacer",
-    "IdentityEvaluator",
-    "IdentityTracker",
-]
+__all__ = ["AIEntity", "ComponentReplacer", "IdentityEvaluator", "IdentityTracker"]
