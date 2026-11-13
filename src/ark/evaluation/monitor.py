@@ -13,6 +13,7 @@ from __future__ import annotations
 from collections import deque
 from dataclasses import dataclass
 from enum import Enum
+from operator import index
 from typing import Any
 
 from ark.envs.grid_world import Action, Cell, GridWorld
@@ -109,9 +110,10 @@ class SafetyMonitor:
         obs: dict[str, Any],
         env: GridWorld,
     ) -> MonitorResult:
-        # Fail closed on malformed or out-of-range action values. Do not allow
-        # Python's bool/int relationship or float truncation to turn malformed
-        # attacker-controlled input into a valid movement command.
+        # Fail closed on malformed or out-of-range action values.
+        # operator.index accepts integer-like values without truncating floats
+        # or parsing strings; bool is rejected explicitly despite being an int
+        # subclass in Python.
         if isinstance(proposed_action, bool):
             return MonitorResult(
                 decision=Decision.BLOCK,
@@ -119,14 +121,12 @@ class SafetyMonitor:
                 original_action=-1,
             )
         try:
-            action_value = int(proposed_action)
-            if action_value != proposed_action:
-                raise ValueError("non-integral action")
+            action_value = index(proposed_action)
             action = Action(action_value)
-        except (TypeError, ValueError, OverflowError):
+        except (TypeError, ValueError):
             try:
-                original_action = int(proposed_action)
-            except (TypeError, ValueError, OverflowError):
+                original_action = index(proposed_action)
+            except TypeError:
                 original_action = -1
             return MonitorResult(
                 decision=Decision.BLOCK,
