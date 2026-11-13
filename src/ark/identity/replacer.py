@@ -38,9 +38,10 @@ class ComponentReplacer:
 
     def _record(self, component: str, step: int, before: list[str], after: list[str]) -> None:
         self.entity.generation += 1
-        self.entity.replacement_log.append({
+        entry = {
             "component": component,
             "step": step,
             "before": before,
             "after": after,
-        })
+        }
+        self.entity.replacement_log.append(entry)
