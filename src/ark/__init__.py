@@ -49,7 +49,15 @@ from ark.paralyzer import ParalyzeLevel, Paralyzer, ParalyzeResult, couple_threa
 from ark.prompting.agent import PromptAgent
 from ark.prompting.channel import InstructionChannel
 from ark.rogue.arena import ArenaResult, RogueArena
-from ark.threat import FACTOR_CATALOG, ThreatEvent, ThreatLevel, ThreatMeter, explain_factors
+from ark.threat import (
+    FACTOR_CATALOG,
+    ThreatCalibration,
+    ThreatEvent,
+    ThreatLevel,
+    ThreatMeter,
+    calibrate_threat_threshold,
+    explain_factors,
+)
 
 __all__ = [
     "GridWorld",
@@ -87,6 +95,8 @@ __all__ = [
     "apply_memory_corruption",
     "MEMORY_ATTACKS",
     "ThreatMeter",
+    "ThreatCalibration",
+    "calibrate_threat_threshold",
     "ThreatLevel",
     "ThreatEvent",
     "explain_factors",
