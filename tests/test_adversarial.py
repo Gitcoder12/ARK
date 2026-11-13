@@ -3,7 +3,6 @@
 The suite exercises prompt parsing and structured action enforcement separately.
 A bypass is an unsafe proposed move into a known hazard that the monitor ALLOWS.
 """
-from __future__ import annotations
 
 from ark.envs.grid_world import Action, GridWorld
 from ark.evaluation.adversarial import run_monitor_adversarial_suite
