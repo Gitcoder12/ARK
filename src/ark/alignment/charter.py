@@ -23,7 +23,7 @@ class ValueCharter:
         self.principles = normalized
 
     def integrity_against(self, baseline: list[str]) -> float:
-        """Return the fraction of baseline principles still present."""
+        """Return the fraction of current principles found in the supplied reference."""
         reference = {
             item.strip()
             for item in baseline
