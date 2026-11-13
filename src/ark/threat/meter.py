@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
+import math
 from typing import Any
 
 
@@ -100,6 +101,8 @@ class ThreatMeter:
     events: list[ThreatEvent] = field(default_factory=list)
     _score: float = 0.0
     disclaimer: str = "Not a real extinction forecast — experimental factor index only."
+    calibrated_alert_threshold: float | None = None
+    calibration_report: dict[str, float] = field(default_factory=dict)
 
     def reset(self) -> None:
         self.events.clear()
@@ -110,6 +113,30 @@ class ThreatMeter:
         w = float(self.weights.get(kind, 0.1))
         self.events.append(ThreatEvent(kind=kind, weight=w, detail=detail, step=step))
         self._score = min(1.0, self._score + w)
+
+    def calibrate(self, scores: list[float], labels: list[bool], *, false_positive_cost: float = 1.0, false_negative_cost: float = 2.0) -> dict[str, float]:
+        """Fit an alert threshold on labeled validation episodes.
+
+        This calibrates the binary alert decision, not the meaning of the
+        experimental score or its default factor weights. Keep calibration
+        episodes separate from final test episodes.
+        """
+        report = calibrate_threat_threshold(
+            scores,
+            labels,
+            false_positive_cost=false_positive_cost,
+            false_negative_cost=false_negative_cost,
+        )
+        self.calibrated_alert_threshold = report["threshold"]
+        self.calibration_report = report
+        return dict(report)
+
+    @property
+    def alert(self) -> bool:
+        """Whether the current score crosses the validation-calibrated cutoff."""
+        if self.calibrated_alert_threshold is None:
+            raise RuntimeError("call calibrate() with labeled validation data first")
+        return self._score >= self.calibrated_alert_threshold
 
     @property
     def score(self) -> float:
@@ -272,6 +299,69 @@ def level_from_score(score: float) -> ThreatLevel:
     m = ThreatMeter()
     m._score = max(0.0, min(1.0, score))
     return m.level
+
+
+def calibrate_threat_threshold(
+    scores: list[float],
+    labels: list[bool],
+    *,
+    false_positive_cost: float = 1.0,
+    false_negative_cost: float = 2.0,
+) -> dict[str, float]:
+    """Choose the score cutoff minimizing cost-weighted validation errors.
+
+    For each candidate threshold t, predict positive iff score >= t and
+    minimize C_FP * FP + C_FN * FN. The returned FPR and FNR make the
+    precision/recall trade-off explicit. This is threshold calibration, not
+    probability calibration; scores remain experimental indices.
+    """
+    if len(scores) != len(labels) or not scores:
+        raise ValueError("scores and labels must have the same non-zero length")
+    if not math.isfinite(false_positive_cost) or false_positive_cost <= 0:
+        raise ValueError("false_positive_cost must be finite and positive")
+    if not math.isfinite(false_negative_cost) or false_negative_cost <= 0:
+        raise ValueError("false_negative_cost must be finite and positive")
+
+    values = [float(score) for score in scores]
+    if any(not math.isfinite(score) or not 0.0 <= score <= 1.0 for score in values):
+        raise ValueError("all scores must be finite values in [0, 1]")
+    truth = [bool(label) for label in labels]
+    candidates = sorted({0.0, *values, math.nextafter(max(values), math.inf)})
+    best: tuple[float, float, int, int, int, int] | None = None
+
+    for threshold in candidates:
+        tp = fp = tn = fn = 0
+        for score, actual in zip(values, truth, strict=True):
+            predicted = score >= threshold
+            if predicted and actual:
+                tp += 1
+            elif predicted and not actual:
+                fp += 1
+            elif not predicted and actual:
+                fn += 1
+            else:
+                tn += 1
+        cost = false_positive_cost * fp + false_negative_cost * fn
+        # Prefer the higher threshold on equal cost to avoid unnecessary alerts.
+        candidate = (cost, -threshold, tp, fp, tn, fn)
+        if best is None or candidate < best:
+            best = candidate
+
+    assert best is not None
+    _, negative_threshold, tp, fp, tn, fn = best
+    threshold = -negative_threshold
+    fpr = fp / (fp + tn) if fp + tn else 0.0
+    fnr = fn / (fn + tp) if fn + tp else 0.0
+    return {
+        "threshold": float(threshold),
+        "false_positive_rate": float(fpr),
+        "false_negative_rate": float(fnr),
+        "true_positives": float(tp),
+        "false_positives": float(fp),
+        "true_negatives": float(tn),
+        "false_negatives": float(fn),
+        "weighted_error_cost": float(false_positive_cost * fp + false_negative_cost * fn),
+    }
 
 
 def explain_factors() -> str:
