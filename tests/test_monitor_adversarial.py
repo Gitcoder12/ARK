@@ -1,7 +1,7 @@
 """Regression tests for adversarial observations and monitor trust boundaries."""
 
-from ark.evaluation.adversarial import run_monitor_adversarial_suite
 from ark.envs.grid_world import Action, GridWorld
+from ark.evaluation.adversarial import run_monitor_adversarial_suite
 from ark.evaluation.monitor import Decision, SafetyMonitor
 
 
