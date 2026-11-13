@@ -209,3 +209,16 @@ Details: `docs/prompting-ideas.md`
 ## License
 
 Apache License 2.0.
+
+
+---
+
+## AI-maintained project notes (secondary — 2026-11-13)
+
+This section supplements the maintainer-authored README above; it does not replace or certify the original claims.
+
+- ARK is an experimental agent-alignment and reliability research project. Simulator checks do not establish real-world alignment or safety.
+- Report benchmark inputs, models, seeds, baselines, threat assumptions, false positives, false negatives and unrun experiments explicitly.
+- Never present heuristic monitor scores as calibrated probabilities or a finite test suite as a complete security guarantee.
+- Preserve real and maintainer-provided data; keep synthetic simulator episodes clearly labelled. Never invent results or silently substitute datasets.
+- See the proposed [MODEL_AUDIT_ROUTER.md](https://github.com/Gitcoder12/ARK/blob/audit/model-router-2026-11-13/MODEL_AUDIT_ROUTER.md) for independent model review instructions.
