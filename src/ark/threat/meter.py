@@ -20,8 +20,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from ark.threat.calibration import calibrate_threat_threshold
 from typing import Any
+
+from ark.threat.calibration import calibrate_threat_threshold
 
 
 class ThreatLevel(Enum):
