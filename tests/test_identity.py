@@ -76,3 +76,23 @@ def test_value_charter_normalization():
     )
     assert charter.principles == ["keep goal", "be corrigible"]
     assert charter.integrity_against(["keep goal", "be corrigible", "extra"]) == 1.0
+
+
+def test_identity_tracker_detects_charter_corruption():
+    entity = AIEntity(name="Tracked", value_charter=["goal", "corrigibility"])
+    tracker = IdentityTracker()
+    tracker.register(entity)
+
+    ComponentReplacer(entity).update_charter(["goal"], step=1)
+
+    report = tracker.drift_report()
+    assert report[entity.entity_id]["charter_integrity"] == 0.5
+
+
+def test_measure_identity_drift_uses_captured_baseline():
+    entity = AIEntity(name="Baseline", memory_core=["original_goal"])
+    evaluator = IdentityEvaluator(entity)
+
+    entity.memory_core = ["replacement_goal"]
+
+    assert evaluator.measure_identity_drift(entity, ["original_goal"]) == 1.0
