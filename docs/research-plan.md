@@ -4,7 +4,7 @@
 
 Can an autonomous AI system preserve its intended objective when goals, rewards, memory, instructions, environment, or evaluation criteria are perturbed?
 
-## Phase 1 — Controlled grid world ✅ (MVP)
+## Phase 1 — Controlled grid world  (MVP)
 
 Establish a deterministic environment with:
 
@@ -38,7 +38,7 @@ Establish a deterministic environment with:
 
 **Implementation status:** complete in `src/ark/` — run with `ark-run` or `python -m ark.experiments.runner`.
 
-## Phase 2 — Memory integrity ✅
+## Phase 2 — Memory integrity 
 
 Test intact, missing, corrupted, and conflicting memory while keeping the underlying task controlled.
 
