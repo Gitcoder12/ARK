@@ -32,6 +32,13 @@ This worklog records the strict-CI repair and the identity/value-stability modul
 | Documentation | Needs ongoing updates | Document benchmark assumptions, threat score limits and reproducibility |
 | CI/release | Strict matrix | No success claims until both checks pass on the exact latest PR head |
 
+## Validation evidence
+
+- Exact PR #17 head `e3de80400e033805fa3f05d410b81eb864c6a8f6` completed both strict GitHub Actions jobs successfully.
+- Python 3.11: passed.
+- Python 3.12: passed.
+- Ruff and pytest are blocking steps in both matrix jobs.
+
 ## Validation discipline
 
 - Only GitHub Actions results attached to the exact PR head count as passing evidence.
