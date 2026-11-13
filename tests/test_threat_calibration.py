@@ -5,9 +5,9 @@ from ark.threat import ThreatMeter, calibrate_threat_threshold
 
 def test_calibration_reports_false_positive_and_negative_rates():
     report = calibrate_threat_threshold([0.05, 0.15, 0.55, 0.85], [False, False, True, True])
-    assert report["false_positive_rate"] == 0.0
-    assert report["false_negative_rate"] == 0.0
-    assert 0.15 < report["threshold"] <= 0.55
+    assert report.false_positive_rate == 0.0
+    assert report.false_negative_rate == 0.0
+    assert 0.15 < report.threshold <= 0.55
 
 
 def test_meter_uses_validation_calibrated_alert_threshold():
