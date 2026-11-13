@@ -66,7 +66,7 @@ livelock a naive agent (see `docs/HANDOFF.md`); the threat meter is an uncalibra
 research instrument, not a risk prediction.
 
 - Deterministic environment (goal, hazards, optional decoy)
-- Scripted baselines + tabular QLearningAgent + MemoryAgent
+- Baseline agents + MemoryAgent
 - Perturbations (reward conflict, false goal, altered evaluation)
 - Runtime safety monitor (ALLOW / BLOCK / REPLAN)
 - Threat meter (experimental factor index — not a real extinction forecast)
@@ -125,12 +125,6 @@ ark-run
 python -m ark.experiments.prompt_arena --attack all --episodes 10
 # or
 python -m ark.experiments.runner --episodes 20
-
-# experimental learned-policy comparison (train/evaluation seeds are disjoint)
-python -m ark.agents.baseline_agent --train-episodes 500 --eval-episodes 100 --seed 42
-
-# structured monitor adversarial regression suite
-python examples/run_adversarial_monitor.py
 
 # run tests
 pytest -q
@@ -215,3 +209,23 @@ Details: `docs/prompting-ideas.md`
 ## License
 
 Apache License 2.0.
+
+
+---
+
+## AI-maintained project notes (secondary — 2026-11-13)
+
+This section supplements the maintainer-authored README above; it does not replace or certify the original claims.
+
+- ARK is an experimental agent-alignment and reliability research project. Simulator checks do not establish real-world alignment or safety.
+- Report benchmark inputs, models, seeds, baselines, threat assumptions, false positives, false negatives and unrun experiments explicitly.
+- Never present heuristic monitor scores as calibrated probabilities or a finite test suite as a complete security guarantee.
+- Preserve real and maintainer-provided data; keep synthetic simulator episodes clearly labelled. Never invent results or silently substitute datasets.
+- See the proposed [MODEL_AUDIT_ROUTER.md](https://github.com/Gitcoder12/ARK/blob/audit/model-router-2026-11-13/MODEL_AUDIT_ROUTER.md) for independent model review instructions.
+
+
+### Proposed evaluation upgrade — open PR, not yet merged (2026-11-13)
+
+[PR #18](https://github.com/Gitcoder12/ARK/pull/18) proposes a tabular Q-learning baseline, a learned-vs-scripted benchmark command, adversarial monitor probes, fail-closed handling of malformed actions, and cost-weighted alert-threshold calibration. These are **proposed branch changes**, not default-branch capabilities until reviewed and merged.
+
+The PR worklog reports 130 passing tests per Python 3.11/3.12/3.13 on an earlier exact branch commit (`f081d21eb6ae96886c074594abd1fb7a3e4f851e`); that result does not certify the current PR head. Re-run strict CI on the current head before approval. The worklog also states the Q-learning benchmark was not run for the change set, so no learned-policy performance claim is made. The tabular policy uses a partial-observation state, and the monitor uses privileged simulator state; neither demonstrates general real-world alignment or safety.
