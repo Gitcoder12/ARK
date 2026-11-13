@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import pytest
-
+from ark.alignment import DEFAULT_RESEARCH_CHARTER, ValueCharter
 from ark.identity import AIEntity, ComponentReplacer, IdentityEvaluator, IdentityTracker
-from ark.alignment import ValueCharter, DEFAULT_RESEARCH_CHARTER
 
 
 def test_entity_creation_and_signature():
