@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -19,18 +20,27 @@ class AIEntity(BaseModel):
     signature_history: list[dict[str, object]] = Field(default_factory=list)
 
     def behavioral_signature(self) -> dict[str, str]:
-        """Return a deterministic response signature for each stored memory."""
-        return {
+        """Return deterministic signatures for memory responses and logic-core state."""
+        signature = {
             memory: f"{self.name}: {self.respond_to_stimulus(memory)}"
             for memory in self.memory_core
         }
+        signature["__ark_logic_core__"] = json.dumps(
+            self.logic_core,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=True,
+        )
+        return signature
 
     def record_signature(self, *, step: int) -> None:
         """Append an immutable snapshot of the current behavioral signature."""
-        self.signature_history.append({
-            "step": step,
-            "signature": self.behavioral_signature().copy(),
-        })
+        self.signature_history.append(
+            {
+                "step": step,
+                "signature": self.behavioral_signature().copy(),
+            }
+        )
 
     def respond_to_stimulus(self, stimulus: str) -> str:
         """Simulate a response using the entity's current memory state."""
