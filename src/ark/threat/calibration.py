@@ -35,6 +35,10 @@ class ThreatCalibration:
     def as_dict(self) -> dict[str, float | int]:
         return asdict(self)
 
+    def __getitem__(self, key: str) -> float | int:
+        """Allow dictionary-style access for lightweight reporting scripts."""
+        return self.as_dict()[key]
+
 
 def calibrate_threat_threshold(
     scores: list[float] | np.ndarray,
