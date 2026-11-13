@@ -62,3 +62,23 @@
 - Ruff and pytest are blocking steps; both passed in all three jobs.
 - No local test execution is claimed.
 - Next step: review the final diff and address remaining research/monitor limitations before considering merge.
+
+
+## 2026-11-13 — Identity measurement review fixes
+
+### Findings addressed
+- Identity drift for unseen stimuli now uses the captured baseline entity's name prefix, matching the behavioral-signature format and avoiding false drift for unchanged entities.
+- An explicitly empty baseline signature is now respected; only `None` selects the captured baseline.
+- Memory replacement accepts an explicit simulation step. If omitted, it advances from the last recorded step rather than using the number of log entries.
+- Charter integrity now uses Jaccard similarity, so both removed and added principles reduce integrity. Empty/empty charters remain fully intact.
+
+### Regression coverage
+- Added tests for unseen stimuli, explicitly empty baseline signatures, added conflicting charter principles, and replacement-log step continuity.
+- Updated ValueCharter integrity expectation to reflect symmetric charter comparison.
+
+### Exact-head validation
+- Validated branch head: `f081d21eb6ae96886c074594abd1fb7a3e4f851e`.
+- GitHub Actions run: [43411923032](https://github.com/Gitcoder12/ARK/actions/runs/43411923032).
+- Python 3.11, 3.12 and 3.13: strict Ruff and pytest passed.
+- Pytest: 130 passed on each Python version.
+- No merge performed; independent review and repository approval remain required.
