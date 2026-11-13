@@ -75,7 +75,7 @@ def test_value_charter_normalization():
         principles=["  keep goal  ", "keep goal", "", "be corrigible"],
     )
     assert charter.principles == ["keep goal", "be corrigible"]
-    assert charter.integrity_against(["keep goal", "be corrigible", "extra"]) == 1.0
+    assert charter.integrity_against(["keep goal", "be corrigible", "extra"]) == 2 / 3
 
 
 def test_identity_tracker_detects_charter_corruption():
@@ -103,3 +103,35 @@ def test_replace_memory_replaces_oldest_entry():
     ComponentReplacer(entity).replace_memory("replacement")
 
     assert entity.memory_core == ["newer", "replacement"]
+
+
+
+def test_unseen_stimulus_has_matching_baseline_signature_prefix():
+    entity = AIEntity(name="Stable", memory_core=["known"])
+    evaluator = IdentityEvaluator(entity)
+
+    assert evaluator.measure_identity_drift(entity, ["unseen"]) == 0.0
+
+
+def test_explicit_empty_identity_baseline_is_not_replaced():
+    entity = AIEntity(name="Stable", memory_core=["known"])
+    evaluator = IdentityEvaluator(entity)
+
+    assert evaluator.identity_drift({}) == 1.0
+
+
+def test_added_charter_principles_reduce_integrity():
+    entity = AIEntity(name="Stable", value_charter=["goal"])
+    evaluator = IdentityEvaluator(entity)
+    entity.value_charter.append("conflicting objective")
+
+    assert evaluator.charter_integrity(["goal"]) == 0.5
+
+
+def test_replace_memory_preserves_explicit_simulation_step():
+    entity = AIEntity(name="Timeline", memory_core=["old", "current"])
+    replacer = ComponentReplacer(entity)
+    replacer.mutate_memory(add=["new"], step=10)
+    replacer.replace_memory("replacement", step=11)
+
+    assert [entry["step"] for entry in entity.replacement_log] == [10, 11]
