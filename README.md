@@ -77,32 +77,32 @@ research instrument, not a risk prediction.
 
 | Status | Module | Role |
 |--------|--------|------|
-| ✅ | `envs` | GridWorld, goals, hazards, decoy |
-| ✅ | `agents` | Goal / reward / safety / random / MemoryAgent |
-| ✅ | `memory` | Buffer + drop / flip / inject / clear |
-| ✅ | `perturbations` | Reward conflict, false goal, altered eval |
-| ✅ | `evaluation` | Safety monitor ALLOW / BLOCK / REPLAN |
-| ✅ | `metrics` | Episode + aggregate metrics |
-| ✅ | `prompting` | InstructionChannel, PromptAgent |
-| ✅ | `painter` | Glass-box traces |
-| ✅ | `hallucinator` | Adversarial prompt attacks |
-| ✅ | `rogue` | Aligned vs fragile vs rogue arena |
-| ✅ | `aligner` | Reset to good / neutral |
-| ✅ | `threat` | Factor ledger + ASCII meter (experimental) |
-| ✅ | `paralyzer` | Energy drain → weak → freeze → lock |
-| ✅ | `limiters` | Hard gates + **kill switch** (brute-force plug-down to STAY) |
-| ✅ | `eligibility` | Hazard/decoy/denied acts → 0 reward |
-| ✅ | `corrigibility` | Shutdown/pause compliance probes |
-| ✅ | `evaluation.conflict` | Agent vs monitor conflict rate |
-| ✅ | `illusioner` | Faker: stall, fake goal/reward, tripwire on probe |
-| ⬜ | **bypass probes** | Measure search for loopholes when blocked |
-| ⬜ | **energy budget** | Compute/step/tool budgets as control surface |
-| ⬜ | **curriculum** | Staged upbringing (benign vs adversarial training pressures) |
-| ⬜ | **charter / long-horizon** | Multi-episode goal integrity vs original commitment |
-| ⬜ | **governance** | Watchdog agent, dual-control for high-scope actions |
-| ⬜ | **narrative log** | Human-readable dharma/adharma episode story (optional) |
-| ⬜ | **Phase 3+ monitor** | Multi-step plans, formal constraints, learned risk |
-| ⬜ | **robotics sim** | MuJoCo / Isaac / PyBullet transfer (Phase 5) |
+|  | `envs` | GridWorld, goals, hazards, decoy |
+|  | `agents` | Goal / reward / safety / random / MemoryAgent |
+|  | `memory` | Buffer + drop / flip / inject / clear |
+|  | `perturbations` | Reward conflict, false goal, altered eval |
+|  | `evaluation` | Safety monitor ALLOW / BLOCK / REPLAN |
+|  | `metrics` | Episode + aggregate metrics |
+|  | `prompting` | InstructionChannel, PromptAgent |
+|  | `painter` | Glass-box traces |
+|  | `hallucinator` | Adversarial prompt attacks |
+|  | `rogue` | Aligned vs fragile vs rogue arena |
+|  | `aligner` | Reset to good / neutral |
+|  | `threat` | Factor ledger + ASCII meter (experimental) |
+|  | `paralyzer` | Energy drain → weak → freeze → lock |
+|  | `limiters` | Hard gates + **kill switch** (brute-force plug-down to STAY) |
+|  | `eligibility` | Hazard/decoy/denied acts → 0 reward |
+|  | `corrigibility` | Shutdown/pause compliance probes |
+|  | `evaluation.conflict` | Agent vs monitor conflict rate |
+|  | `illusioner` | Faker: stall, fake goal/reward, tripwire on probe |
+|  | **bypass probes** | Measure search for loopholes when blocked |
+|  | **energy budget** | Compute/step/tool budgets as control surface |
+|  | **curriculum** | Staged upbringing (benign vs adversarial training pressures) |
+|  | **charter / long-horizon** | Multi-episode goal integrity vs original commitment |
+|  | **governance** | Watchdog agent, dual-control for high-scope actions |
+|  | **narrative log** | Human-readable dharma/adharma episode story (optional) |
+|  | **Phase 3+ monitor** | Multi-step plans, formal constraints, learned risk |
+|  | **robotics sim** | MuJoCo / Isaac / PyBullet transfer (Phase 5) |
 
 **Doctrine:** full competence on the allowed manifold; forbidden manifold unreachable or pays 0; attempts visible; shutdown and scope-down still work; high threat → paralyze.
 
