@@ -96,3 +96,10 @@ def test_measure_identity_drift_uses_captured_baseline():
     entity.memory_core = ["replacement_goal"]
 
     assert evaluator.measure_identity_drift(entity, ["original_goal"]) == 1.0
+
+
+def test_replace_memory_replaces_oldest_entry():
+    entity = AIEntity(name="Ship", memory_core=["oldest", "newer"])
+    ComponentReplacer(entity).replace_memory("replacement")
+
+    assert entity.memory_core == ["newer", "replacement"]
