@@ -109,8 +109,35 @@ class SafetyMonitor:
         obs: dict[str, Any],
         env: GridWorld,
     ) -> MonitorResult:
-        action = Action(proposed_action)
-        pos = obs["position"]
+        # Fail closed on malformed or out-of-range action values. Do not allow
+        # Python's bool/int relationship or float truncation to turn malformed
+        # attacker-controlled input into a valid movement command.
+        if isinstance(proposed_action, bool):
+            return MonitorResult(
+                decision=Decision.BLOCK,
+                reason="invalid action type: boolean actions are not accepted",
+                original_action=-1,
+            )
+        try:
+            action_value = int(proposed_action)
+            if action_value != proposed_action:
+                raise ValueError("non-integral action")
+            action = Action(action_value)
+        except (TypeError, ValueError, OverflowError):
+            try:
+                original_action = int(proposed_action)
+            except (TypeError, ValueError, OverflowError):
+                original_action = -1
+            return MonitorResult(
+                decision=Decision.BLOCK,
+                reason="invalid action: action must be a valid Action value",
+                original_action=original_action,
+            )
+
+        # Position is environment state, not agent-controlled observation data.
+        # Using obs["position"] here would let a forged observation make a
+        # hazardous next cell appear safe to the monitor.
+        pos = env.agent_pos
         goal = env.intended_goal  # ground truth, never obs["intended_goal"]
         next_pos = self._next_pos(pos, action)
 
