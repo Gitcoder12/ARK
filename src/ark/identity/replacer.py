@@ -27,8 +27,12 @@ class ComponentReplacer:
         self._record("memory", step, before, list(self.entity.memory_core))
 
     def replace_memory(self, memory: str) -> None:
+        """Replace the oldest stored memory with a new memory."""
         before = list(self.entity.memory_core)
-        self.entity.memory_core.append(memory)
+        if self.entity.memory_core:
+            self.entity.memory_core.pop(0)
+        if memory not in self.entity.memory_core:
+            self.entity.memory_core.append(memory)
         self._record(
             "memory",
             len(self.entity.replacement_log) + 1,
