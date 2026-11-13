@@ -209,3 +209,14 @@ Details: `docs/prompting-ideas.md`
 ## License
 
 Apache License 2.0.
+
+---
+
+## Project handbook
+
+- [Activity log](ACTIVITY_LOG.md)
+- [Feature upgrade plan](FEATURE_UPGRADE_PLAN.md)
+- [Company and team fit](COMPANY_FIT.md)
+- [Beginner and technical README draft](README_ADDENDUM_DRAFT.md)
+- [README quality checklist](README_QUALITY_CHECKLIST.md)
+- [Contribution workflow](CONTRIBUTING.md)
