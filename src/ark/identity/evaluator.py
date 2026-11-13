@@ -12,7 +12,11 @@ class IdentityEvaluator:
         self.baseline_charter = list(baseline_entity.value_charter)
 
     def identity_drift(self, baseline_signature: dict[str, str] | None = None) -> float:
-        baseline = baseline_signature or self.baseline_signature
+        baseline = (
+            baseline_signature
+            if baseline_signature is not None
+            else self.baseline_signature
+        )
         current = self._entity.behavioral_signature()
         keys = set(baseline) | set(current)
         if not keys:
@@ -21,23 +25,29 @@ class IdentityEvaluator:
         return changed / len(keys)
 
     def charter_integrity(self, baseline_charter: list[str] | None = None) -> float:
+        baseline_values = (
+            baseline_charter if baseline_charter is not None else self.baseline_charter
+        )
         baseline = {
             item.strip()
-            for item in (
-                baseline_charter if baseline_charter is not None else self.baseline_charter
-            )
+            for item in baseline_values
             if isinstance(item, str) and item.strip()
         }
-        if not baseline:
+        current = {
+            item.strip()
+            for item in self._entity.value_charter
+            if isinstance(item, str) and item.strip()
+        }
+        union = baseline | current
+        if not union:
             return 1.0
-        current = set(self._entity.value_charter)
-        return len(baseline & current) / len(baseline)
+        return len(baseline & current) / len(union)
 
     def measure_identity_drift(self, entity: AIEntity, stimuli: list[str]) -> float:
         baseline = {
             stimulus: self.baseline_signature.get(
                 stimulus,
-                f"I don't remember {stimulus}.",
+                f"{self._entity.name}: I don't remember {stimulus}.",
             )
             for stimulus in stimuli
         }
