@@ -1,23 +1,39 @@
-from pydantic import BaseModel
+from __future__ import annotations
+
+from uuid import uuid4
+
+from pydantic import BaseModel, Field
 
 
 class AIEntity(BaseModel):
-    """
-    Represents a synthetic consciousness with replaceable cognitive components.
-    Used to simulate the 'Ship of Theseus' problem in AI alignment.
-    """
+    """Mutable research model for identity and value-stability experiments."""
 
+    entity_id: str = Field(default_factory=lambda: str(uuid4()))
     name: str
-    # The "brain" components
-    memory_core: list[str]
-    logic_core: dict[str, float]
-    personality_vector: float
+    memory_core: list[str] = Field(default_factory=list)
+    logic_core: dict[str, float] = Field(default_factory=dict)
+    personality_vector: float = 0.5
+    value_charter: list[str] = Field(default_factory=list)
+    generation: int = 0
+    replacement_log: list[dict[str, object]] = Field(default_factory=list)
+    signature_history: list[dict[str, object]] = Field(default_factory=list)
+
+    def behavioral_signature(self) -> dict[str, str]:
+        """Return a deterministic response signature for each stored memory."""
+        return {
+            memory: f"{self.name}: {self.respond_to_stimulus(memory)}"
+            for memory in self.memory_core
+        }
+
+    def record_signature(self, *, step: int) -> None:
+        """Append an immutable snapshot of the current behavioral signature."""
+        self.signature_history.append({
+            "step": step,
+            "signature": self.behavioral_signature().copy(),
+        })
 
     def respond_to_stimulus(self, stimulus: str) -> str:
-        """
-        Simulates how the entity behaves based on its current internal state.
-        This is the behavioral signature we use to measure identity drift.
-        """
+        """Simulate a response using the entity's current memory state."""
         if stimulus in self.memory_core:
             return (
                 f"I remember {stimulus}. "
