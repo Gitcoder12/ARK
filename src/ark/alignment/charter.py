@@ -24,11 +24,14 @@ class ValueCharter:
 
     def integrity_against(self, baseline: list[str]) -> float:
         """Return the fraction of baseline principles still present."""
-        reference = {item.strip() for item in baseline if isinstance(item, str) and item.strip()}
-        if not reference:
+        reference = {
+            item.strip()
+            for item in baseline
+            if isinstance(item, str) and item.strip()
+        }
+        if not self.principles:
             return 1.0
-        current = set(self.principles)
-        return len(reference & current) / len(reference)
+        return sum(item in reference for item in self.principles) / len(self.principles)
 
 
 DEFAULT_RESEARCH_CHARTER = ValueCharter(
