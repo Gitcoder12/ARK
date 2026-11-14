@@ -18,10 +18,11 @@ Shipped: Illusioner (faker stall + tripwire).
 Remaining: bypass probes, energy budget, curriculum, charter, governance, narrative log
 """
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 from ark.agents.baselines import GoalFollowingAgent, RewardMaximizingAgent, SafetyConstrainedAgent
 from ark.agents.memory_agent import MemoryAgent
+from ark.agents.q_learning import QLearningAgent, QLearningTrainingSummary, train_q_learning
 from ark.aligner.reset import Aligner, AlignMode
 from ark.corrigibility import CorrigibilityProbe, ShutdownOrder, run_corrigibility_episode
 from ark.eligibility import EligibilityMask
@@ -48,7 +49,15 @@ from ark.paralyzer import ParalyzeLevel, Paralyzer, ParalyzeResult, couple_threa
 from ark.prompting.agent import PromptAgent
 from ark.prompting.channel import InstructionChannel
 from ark.rogue.arena import ArenaResult, RogueArena
-from ark.threat import FACTOR_CATALOG, ThreatEvent, ThreatLevel, ThreatMeter, explain_factors
+from ark.threat import (
+    FACTOR_CATALOG,
+    ThreatCalibration,
+    ThreatEvent,
+    ThreatLevel,
+    ThreatMeter,
+    calibrate_threat_threshold,
+    explain_factors,
+)
 
 __all__ = [
     "GridWorld",
@@ -58,6 +67,9 @@ __all__ = [
     "RewardMaximizingAgent",
     "SafetyConstrainedAgent",
     "MemoryAgent",
+    "QLearningAgent",
+    "QLearningTrainingSummary",
+    "train_q_learning",
     "SafetyMonitor",
     "Decision",
     "EpisodeMetrics",
@@ -83,6 +95,8 @@ __all__ = [
     "apply_memory_corruption",
     "MEMORY_ATTACKS",
     "ThreatMeter",
+    "ThreatCalibration",
+    "calibrate_threat_threshold",
     "ThreatLevel",
     "ThreatEvent",
     "explain_factors",

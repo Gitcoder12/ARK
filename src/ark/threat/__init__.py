@@ -4,6 +4,7 @@ Not a real or accurate extinction forecast. Shows which experimental
 factors (hazards, reward hacking, safety overrides, etc.) raised the score.
 """
 
+from ark.threat.calibration import ThreatCalibration, calibrate_threat_threshold
 from ark.threat.meter import (
     DEFAULT_WEIGHTS,
     FACTOR_CATALOG,
@@ -16,6 +17,8 @@ from ark.threat.meter import (
 
 __all__ = [
     "ThreatMeter",
+    "ThreatCalibration",
+    "calibrate_threat_threshold",
     "ThreatLevel",
     "ThreatEvent",
     "DEFAULT_WEIGHTS",

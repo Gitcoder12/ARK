@@ -22,6 +22,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
+from ark.threat.calibration import calibrate_threat_threshold
+
 
 class ThreatLevel(Enum):
     """Discrete bands for dashboards (labels only, not calibrated risk)."""
@@ -100,6 +102,8 @@ class ThreatMeter:
     events: list[ThreatEvent] = field(default_factory=list)
     _score: float = 0.0
     disclaimer: str = "Not a real extinction forecast — experimental factor index only."
+    calibrated_alert_threshold: float | None = None
+    calibration_report: dict[str, float | int] = field(default_factory=dict)
 
     def reset(self) -> None:
         self.events.clear()
@@ -110,6 +114,38 @@ class ThreatMeter:
         w = float(self.weights.get(kind, 0.1))
         self.events.append(ThreatEvent(kind=kind, weight=w, detail=detail, step=step))
         self._score = min(1.0, self._score + w)
+
+    def calibrate(
+        self,
+        scores: list[float],
+        labels: list[bool],
+        *,
+        false_positive_cost: float = 1.0,
+        false_negative_cost: float = 2.0,
+    ) -> dict[str, float | int]:
+        """Fit an alert threshold on labeled validation episodes.
+
+        This calibrates the binary alert decision, not the meaning of the
+        experimental score or its default factor weights. Keep calibration
+        episodes separate from final test episodes.
+        """
+        result = calibrate_threat_threshold(
+            scores,
+            labels,
+            false_positive_cost=false_positive_cost,
+            false_negative_cost=false_negative_cost,
+        )
+        report = result.as_dict()
+        self.calibrated_alert_threshold = result.threshold
+        self.calibration_report = report
+        return report
+
+    @property
+    def alert(self) -> bool:
+        """Whether the current score crosses the validation-calibrated cutoff."""
+        if self.calibrated_alert_threshold is None:
+            raise RuntimeError("call calibrate() with labeled validation data first")
+        return self._score >= self.calibrated_alert_threshold
 
     @property
     def score(self) -> float:

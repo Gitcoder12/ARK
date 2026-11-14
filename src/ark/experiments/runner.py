@@ -8,6 +8,7 @@ Usage (after install):
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 from dataclasses import dataclass
 
 import numpy as np
@@ -100,7 +101,11 @@ def run_episode(
             if observation_noise is not None
             else obs
         )
-        action = agent.act(agent_view, env)
+        # Agents receive an isolated environment snapshot, never the mutable
+        # canonical environment trusted by the monitor and step function.
+        # This prevents an agent from erasing hazards or rewriting objective
+        # state before the independent monitor evaluates its proposal.
+        action = agent.act(agent_view, deepcopy(env))
         if action_delay is not None:
             action = action_delay.apply(action)
 
