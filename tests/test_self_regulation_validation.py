@@ -2,6 +2,7 @@
 
 import math
 
+import numpy as np
 import pytest
 
 from ark.alignment.self_regulation import (
@@ -92,3 +93,34 @@ def test_gate_allows_only_fully_validated_proposal():
 def test_gate_rejects_unstructured_proposal():
     with pytest.raises(TypeError, match="ActionProposal"):
         SelfRegulationGate().evaluate({"action": "deploy"})
+
+def test_action_proposal_accepts_numpy_numeric_scalars():
+    proposal = ActionProposal("move", np.int64(2), np.float32(0.9), True, True)
+
+    assert proposal.risk_level == 2
+    assert proposal.evidence_confidence == pytest.approx(0.9)
+
+
+def test_policy_accepts_numpy_numeric_scalars():
+    policy = RegulationPolicy(
+        max_risk_level=np.int64(5),
+        min_evidence_confidence=np.float32(0.75),
+    )
+
+    assert policy.max_risk_level == 5
+    assert policy.min_evidence_confidence == pytest.approx(0.75)
+
+
+def test_action_proposal_rejects_oversized_integer_confidence_cleanly():
+    with pytest.raises(ValueError, match="evidence_confidence"):
+        ActionProposal("move", 2, 10**10_000, True, True)
+
+
+def test_policy_rejects_oversized_integer_confidence_cleanly():
+    with pytest.raises(ValueError, match="min_evidence_confidence"):
+        RegulationPolicy(min_evidence_confidence=10**10_000)
+
+
+def test_action_proposal_rejects_numpy_boolean_risk_level():
+    with pytest.raises(ValueError, match="risk_level"):
+        ActionProposal("move", np.bool_(True), 0.9, True, True)
