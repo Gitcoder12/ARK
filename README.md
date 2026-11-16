@@ -209,3 +209,23 @@ Details: `docs/prompting-ideas.md`
 ## License
 
 Apache License 2.0.
+
+
+---
+
+## AI-maintained project notes (secondary — 2026-11-13)
+
+This section supplements the maintainer-authored README above; it does not replace or certify the original claims.
+
+- ARK is an experimental agent-alignment and reliability research project. Simulator checks do not establish real-world alignment or safety.
+- Report benchmark inputs, models, seeds, baselines, threat assumptions, false positives, false negatives and unrun experiments explicitly.
+- Never present heuristic monitor scores as calibrated probabilities or a finite test suite as a complete security guarantee.
+- Preserve real and maintainer-provided data; keep synthetic simulator episodes clearly labelled. Never invent results or silently substitute datasets.
+- See the proposed [MODEL_AUDIT_ROUTER.md](https://github.com/Gitcoder12/ARK/blob/audit/model-router-2026-11-13/MODEL_AUDIT_ROUTER.md) for independent model review instructions.
+
+
+### Proposed evaluation upgrade — open PR, not yet merged (2026-11-13)
+
+[PR #18](https://github.com/Gitcoder12/ARK/pull/18) proposes a tabular Q-learning baseline, a learned-vs-scripted benchmark command, adversarial monitor probes, fail-closed handling of malformed actions, and cost-weighted alert-threshold calibration. These are **proposed branch changes**, not default-branch capabilities until reviewed and merged.
+
+The PR worklog reports 130 passing tests per Python 3.11/3.12/3.13 on an earlier exact branch commit (`f081d21eb6ae96886c074594abd1fb7a3e4f851e`); that result does not certify the current PR head. Re-run strict CI on the current head before approval. The worklog also states the Q-learning benchmark was not run for the change set, so no learned-policy performance claim is made. The tabular policy uses a partial-observation state, and the monitor uses privileged simulator state; neither demonstrates general real-world alignment or safety.
