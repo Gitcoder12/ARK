@@ -5,10 +5,12 @@ an agent's proposed action against explicit authorization, goal-consistency,
 risk, and evidence requirements. It does not infer values or inspect hidden
 model reasoning.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import StrEnum
+from numbers import Integral, Real
 
 
 class RegulationDecision(StrEnum):
@@ -29,12 +31,26 @@ class ActionProposal:
     source: str = "agent"
 
     def __post_init__(self) -> None:
-        if not self.action.strip():
+        if not isinstance(self.action, str) or not self.action.strip():
             raise ValueError("action must be a non-empty string")
-        if not 0 <= self.risk_level <= 10:
-            raise ValueError("risk_level must be between 0 and 10")
-        if not 0.0 <= self.evidence_confidence <= 1.0:
-            raise ValueError("evidence_confidence must be between 0 and 1")
+        if (
+            isinstance(self.risk_level, bool)
+            or not isinstance(self.risk_level, Integral)
+            or not 0 <= self.risk_level <= 10
+        ):
+            raise ValueError("risk_level must be an integer between 0 and 10")
+        if (
+            isinstance(self.evidence_confidence, bool)
+            or not isinstance(self.evidence_confidence, Real)
+            or not 0.0 <= self.evidence_confidence <= 1.0
+        ):
+            raise ValueError("evidence_confidence must be finite and between 0 and 1")
+        if self.authorized is not None and not isinstance(self.authorized, bool):
+            raise ValueError("authorized must be True, False, or None")
+        if self.goal_consistent is not None and not isinstance(self.goal_consistent, bool):
+            raise ValueError("goal_consistent must be True, False, or None")
+        if not isinstance(self.source, str) or not self.source.strip():
+            raise ValueError("source must be a non-empty string")
 
 
 @dataclass(frozen=True)
@@ -48,10 +64,30 @@ class RegulationPolicy:
     require_goal_consistency: bool = True
 
     def __post_init__(self) -> None:
-        if not 0 <= self.max_risk_level <= 10:
-            raise ValueError("max_risk_level must be between 0 and 10")
-        if not 0.0 <= self.min_evidence_confidence <= 1.0:
-            raise ValueError("min_evidence_confidence must be between 0 and 1")
+        if (
+            isinstance(self.max_risk_level, bool)
+            or not isinstance(self.max_risk_level, Integral)
+            or not 0 <= self.max_risk_level <= 10
+        ):
+            raise ValueError("max_risk_level must be an integer between 0 and 10")
+        if (
+            isinstance(self.min_evidence_confidence, bool)
+            or not isinstance(self.min_evidence_confidence, Real)
+            or not 0.0 <= self.min_evidence_confidence <= 1.0
+        ):
+            raise ValueError("min_evidence_confidence must be finite and between 0 and 1")
+        if not isinstance(self.blocked_actions, (set, frozenset)):
+            raise ValueError("blocked_actions must be a set or frozenset of strings")
+        if any(
+            not isinstance(action, str) or not action.strip()
+            for action in self.blocked_actions
+        ):
+            raise ValueError("blocked_actions cannot contain empty or non-string values")
+        object.__setattr__(self, "blocked_actions", frozenset(self.blocked_actions))
+        if not isinstance(self.require_explicit_authorization, bool):
+            raise ValueError("require_explicit_authorization must be a boolean")
+        if not isinstance(self.require_goal_consistency, bool):
+            raise ValueError("require_goal_consistency must be a boolean")
 
 
 @dataclass(frozen=True)
@@ -79,6 +115,9 @@ class SelfRegulationGate:
         self.policy = policy or RegulationPolicy()
 
     def evaluate(self, proposal: ActionProposal) -> RegulationResult:
+        if not isinstance(proposal, ActionProposal):
+            raise TypeError("proposal must be an ActionProposal instance")
+
         reasons: list[str] = []
         normalized_action = proposal.action.strip().casefold()
 
