@@ -12,7 +12,7 @@ The repository has **12 open pull requests**. The largest research branches over
 - `deep-dive-sprint`: 74 commits ahead of main; 33 changed files in its comparison.
 - `fix/strict-ci-validation`: 36 commits ahead; overlaps the deep-dive work on CI, charter, identity, and experiment code.
 - `depth-mode/ark-identity-charter`: 4 commits ahead; overlaps the same identity/charter area.
-- `gita-alignment-foundation`: 5 commits ahead; new self-regulation research foundation.
+- `gita-alignment-foundation`: 7 commits ahead; new self-regulation research foundation.
 
 Do not merge all 25 branches directly into `main`. First consolidate into one integration line, resolve overlaps, run the full suite, then open one reviewed PR to protected `main`.
 
@@ -43,7 +43,7 @@ Do not merge all 25 branches directly into `main`. First consolidate into one in
 | `fix/final-app-deployment` | +1; large `app.py` rewrite | Competes with cooperative-swarm UI and Streamlit import branches; compare behavior and deployment evidence before choosing. Open PR #3. |
 | `fix/streamlit-imports` | +1; small `app.py` import fix | Compare with patch-2 and final deployment branch; keep one correct import strategy. Open PR #2. |
 | `fix/strict-ci-validation` | +36; strict CI, charter and identity modules/tests | Strong candidate source for CI and identity work, but overlaps deep-dive and depth-mode. Open PR status to be checked against exact head. |
-| `gita-alignment-foundation` | +6; self-regulation gate, tests, example, research docs and Start Here | Current active integration/research branch. Keep as the single working branch while consolidation proceeds. |
+| `gita-alignment-foundation` | +7; self-regulation gate, tests, example, research docs and Start Here | Current active integration/research branch. Keep as the single working branch while consolidation proceeds. |
 | `pre-v0.5.0-backup` | 12 commits behind main; no unique commits ahead | Preserve as historical backup; never merge into current work. |
 
 ## Open pull requests found
