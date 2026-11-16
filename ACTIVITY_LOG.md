@@ -1,28 +1,33 @@
 # ARK — Activity Log
 
-**Snapshot:** 2026-11-13
+**Snapshot:** 2026-11-16  
+**Purpose:** Record project changes, validation evidence and limitations without overstating maturity.
 
-## Verified portfolio work
+## Verified integration status
 
-PR #17 reports strict CI and 113 tests per Python version; PR #18 reports the learned baseline, adversarial probes, threshold calibration and 130 tests per Python version. Both remain open and unmerged. PR #19 is a draft text cleanup. Current PR-head checks were successful: https://github.com/Gitcoder12/ARK/pulls
+- PR #18 merged into `main` on 2026-11-16. It integrates the tabular Q-learning baseline, adversarial monitor probes, fail-closed malformed-action handling and cost-sensitive alert-threshold calibration.
+- The exact PR #18 merge head passed strict Ruff and pytest on Python 3.11, 3.12 and 3.13 (GitHub Actions run #43910105125).
+- PR #23 added the Gita-inspired ALLOW / BLOCK / REVIEW self-regulation research gate to `deep-dive-sprint`; that branch was then merged into `main` through PR #18.
+- PR #21 (model-audit/data-integrity policy) and PR #22 (project status snapshot) were integrated into `deep-dive-sprint` before PR #18 merged it into `main`.
 
 ## Current implementation and limitations
 
-Alignment and reliability research framework. Current open PRs add strict CI, identity/value-charter measurement, a tabular Q-learning baseline, adversarial probes, fail-closed monitor behavior and alert calibration. The benchmark remains experimental; results do not establish general alignment or safety.
+ARK is an experimental alignment and reliability research framework. The merged code includes a tabular Q-learning baseline, adversarial monitor probes, monitor hardening, threshold calibration and a self-regulation research gate.
+
+The benchmark has not yet been run for empirical learned-policy performance reporting. The Q-learning state is partial-observation and tabular; the simulator monitor uses privileged environment state; the threat index is heuristic rather than a calibrated real-world probability. The self-regulation gate is a research primitive, not a complete runtime safety boundary. Finite regression tests do not establish general alignment or safety.
 
 ## Append-only record
 
-| Date | Human / agent | Issue or PR | Scope and files | Validation command / environment | Result | Evidence and caveats |
-|---|---|---|---|---|---|---|
-| YYYY-MM-DD | contributor id | link | paths | exact command | pass / fail / not run | evidence |
+| Date | Change | Evidence | Caveats |
+|---|---|---|---|
+| 2026-11-16 | PR #18 merged to main | GitHub Actions run #43910105125; strict Ruff and pytest on Python 3.11, 3.12 and 3.13 | CI success is not a production-readiness or alignment guarantee |
+| 2026-11-16 | PR #23 self-regulation gate integrated through PR #18 | PR #23 merged into development branch; development branch merged by PR #18 | Inputs require independent validation; not a complete runtime safety boundary |
+| 2026-11-16 | PR #21 audit policy and PR #22 status snapshot integrated through PR #18 | Both PRs merged into development branch before PR #18 | Documentation does not replace an independent code or security audit |
 
 Record failures, regressions, reverted work and checks not run. Never overwrite historical entries or attribute changes to an agent that did not perform them. A green CI run is not proof of production readiness.
 
-## Portfolio documentation rollout — 2026-11-13
+## Documentation rollout — PR #20
 
-- Documentation PR: https://github.com/Gitcoder12/ARK/pull/20
-- Added project-specific feature plan, company-fit mapping, two-level README guide and quality checklist.
-- Existing agent/contributor instructions were preserved or extended without replacing the repository's established policies.
-- README now includes a beginner explanation and a technical/research view tied to current scope and limitations.
-- Validation: documentation/source review only; no application runtime test or deployment is claimed by this docs PR.
-- Status: draft PR, not merged.
+This pull request adds the project-specific feature plan, company-fit mapping, README quality checklist and activity log. It retains the existing contribution setup, code-style guidance, experiment instructions and scientific bar while adding a clearer review workflow.
+
+Validation for this documentation-only change: source and diff review. No application runtime test or deployment is claimed by this documentation change.
