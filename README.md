@@ -221,11 +221,20 @@ This section supplements the maintainer-authored README above; it does not repla
 - Report benchmark inputs, models, seeds, baselines, threat assumptions, false positives, false negatives and unrun experiments explicitly.
 - Never present heuristic monitor scores as calibrated probabilities or a finite test suite as a complete security guarantee.
 - Preserve real and maintainer-provided data; keep synthetic simulator episodes clearly labelled. Never invent results or silently substitute datasets.
-- See the proposed [MODEL_AUDIT_ROUTER.md](https://github.com/Gitcoder12/ARK/blob/audit/model-router-2026-11-13/MODEL_AUDIT_ROUTER.md) for independent model review instructions.
+- See the proposed [MODEL_AUDIT_ROUTER.md](https://github.com/Gitcoder12/ARK/blob/main/MODEL_AUDIT_ROUTER.md) for independent model review instructions.
 
 
-### Proposed evaluation upgrade — open PR, not yet merged (2026-11-13)
+### Evaluation upgrade — merged into main (2026-11-16)
 
-[PR #18](https://github.com/Gitcoder12/ARK/pull/18) proposes a tabular Q-learning baseline, a learned-vs-scripted benchmark command, adversarial monitor probes, fail-closed handling of malformed actions, and cost-weighted alert-threshold calibration. These are **proposed branch changes**, not default-branch capabilities until reviewed and merged.
+PR #18 merged the tabular Q-learning baseline, adversarial monitor probes, fail-closed handling of malformed actions, and cost-sensitive alert-threshold calibration into `main`. The exact merge-head CI passed strict Ruff and pytest on Python 3.11, 3.12 and 3.13 (GitHub Actions run #43910105125).
 
-The PR worklog reports 130 passing tests per Python 3.11/3.12/3.13 on an earlier exact branch commit (`f081d21eb6ae96886c074594abd1fb7a3e4f851e`); that result does not certify the current PR head. Re-run strict CI on the current head before approval. The worklog also states the Q-learning benchmark was not run for the change set, so no learned-policy performance claim is made. The tabular policy uses a partial-observation state, and the monitor uses privileged simulator state; neither demonstrates general real-world alignment or safety.
+Research limits remain: the Q-learning benchmark has not been run for empirical learned-policy performance reporting; the policy uses a partial-observation state; the monitor uses privileged simulator state; and the threat index is heuristic. These components do not establish general real-world alignment or safety.
+
+## Project documentation
+
+- [Activity log](ACTIVITY_LOG.md) — dated project work and validation evidence.
+- [Feature upgrade plan](FEATURE_UPGRADE_PLAN.md) — research priorities and acceptance criteria.
+- [Company and team fit](COMPANY_FIT.md) — prospective role relevance, not endorsements or hiring claims.
+- [Contributor workflow](CONTRIBUTING.md) — development and review process.
+- [README quality checklist](README_QUALITY_CHECKLIST.md) — documentation review criteria.
+- [README explanation draft](README_ADDENDUM_DRAFT.md) — optional explanatory copy, not authoritative implementation documentation.
