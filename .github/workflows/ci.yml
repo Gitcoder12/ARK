@@ -2,33 +2,74 @@ name: CI
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "deep-dive-sprint"]
   pull_request:
-    branches: ["main"]
+    branches: ["main", "deep-dive-sprint"]
 
 jobs:
-  quality:
+  lint:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.13"
           cache: pip
-
       - name: Install package and development dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
-
       - name: Lint source and tests
         run: ruff check src tests
 
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install package and development dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Run test suite
+        run: pytest tests -v --strict-markers
+
+  test-311:
+    name: test (3.11)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install package and development dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Run test suite
+        run: pytest tests -v --strict-markers
+
+  test-312:
+    name: test (3.12)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install package and development dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
       - name: Run test suite
         run: pytest tests -v --strict-markers
