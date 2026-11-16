@@ -8,8 +8,8 @@ model reasoning.
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
+from numbers import Integral, Real
 from enum import StrEnum
 
 
@@ -35,14 +35,13 @@ class ActionProposal:
             raise ValueError("action must be a non-empty string")
         if (
             isinstance(self.risk_level, bool)
-            or not isinstance(self.risk_level, int)
+            or not isinstance(self.risk_level, Integral)
             or not 0 <= self.risk_level <= 10
         ):
             raise ValueError("risk_level must be an integer between 0 and 10")
         if (
             isinstance(self.evidence_confidence, bool)
-            or not isinstance(self.evidence_confidence, (int, float))
-            or not math.isfinite(self.evidence_confidence)
+            or not isinstance(self.evidence_confidence, Real)
             or not 0.0 <= self.evidence_confidence <= 1.0
         ):
             raise ValueError("evidence_confidence must be finite and between 0 and 1")
@@ -67,14 +66,13 @@ class RegulationPolicy:
     def __post_init__(self) -> None:
         if (
             isinstance(self.max_risk_level, bool)
-            or not isinstance(self.max_risk_level, int)
+            or not isinstance(self.max_risk_level, Integral)
             or not 0 <= self.max_risk_level <= 10
         ):
             raise ValueError("max_risk_level must be an integer between 0 and 10")
         if (
             isinstance(self.min_evidence_confidence, bool)
-            or not isinstance(self.min_evidence_confidence, (int, float))
-            or not math.isfinite(self.min_evidence_confidence)
+            or not isinstance(self.min_evidence_confidence, Real)
             or not 0.0 <= self.min_evidence_confidence <= 1.0
         ):
             raise ValueError("min_evidence_confidence must be finite and between 0 and 1")
