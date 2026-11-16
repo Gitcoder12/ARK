@@ -1,6 +1,6 @@
 # ARK — Company and Team Fit
 
-**Snapshot:** 2026-11-13
+**Snapshot:** 2026-11-16
 
 ## Project thesis
 
@@ -14,7 +14,7 @@ Company matches below are prospective skill and problem-area fit, not known cust
 
 **Potential role families:** Research Engineer, Software Engineer, ML Engineer, Evaluation Engineer, Robotics Engineer or Systems Engineer, depending on current openings.
 
-**Evidence this project should demonstrate:** Alignment and reliability research framework. Current open PRs add strict CI, identity/value-charter measurement, a tabular Q-learning baseline, adversarial probes, fail-closed monitor behavior and alert calibration. The benchmark remains experimental; results do not establish general alignment or safety.
+**Evidence this project should demonstrate:** The main branch now includes a tabular Q-learning baseline, adversarial monitor probes, fail-closed malformed-action handling, threshold calibration and a self-regulation research gate. The benchmark remains experimental; no empirical learned-policy performance claim is made. The project does not establish general alignment or safety.
 
 ## Anthropic
 
@@ -22,7 +22,7 @@ Company matches below are prospective skill and problem-area fit, not known cust
 
 **Potential role families:** Research Engineer, Software Engineer, ML Engineer, Evaluation Engineer, Robotics Engineer or Systems Engineer, depending on current openings.
 
-**Evidence this project should demonstrate:** Alignment and reliability research framework. Current open PRs add strict CI, identity/value-charter measurement, a tabular Q-learning baseline, adversarial probes, fail-closed monitor behavior and alert calibration. The benchmark remains experimental; results do not establish general alignment or safety.
+**Evidence this project should demonstrate:** Reproducible evaluation design, adversarial testing, explicit action-gating outcomes, careful treatment of uncertainty and honest documentation of limitations. Current simulator work is not evidence of real-world alignment.
 
 ## Google DeepMind
 
@@ -30,7 +30,7 @@ Company matches below are prospective skill and problem-area fit, not known cust
 
 **Potential role families:** Research Engineer, Software Engineer, ML Engineer, Evaluation Engineer, Robotics Engineer or Systems Engineer, depending on current openings.
 
-**Evidence this project should demonstrate:** Alignment and reliability research framework. Current open PRs add strict CI, identity/value-charter measurement, a tabular Q-learning baseline, adversarial probes, fail-closed monitor behavior and alert calibration. The benchmark remains experimental; results do not establish general alignment or safety.
+**Evidence this project should demonstrate:** Controlled environments, documented assumptions, baseline comparisons, multi-seed evaluation, transparent metrics and a traceable engineering workflow. Empirical benchmark runs and broader independent review remain important follow-up work.
 
 ## NVIDIA
 
@@ -38,7 +38,7 @@ Company matches below are prospective skill and problem-area fit, not known cust
 
 **Potential role families:** Research Engineer, Software Engineer, ML Engineer, Evaluation Engineer, Robotics Engineer or Systems Engineer, depending on current openings.
 
-**Evidence this project should demonstrate:** Alignment and reliability research framework. Current open PRs add strict CI, identity/value-charter measurement, a tabular Q-learning baseline, adversarial probes, fail-closed monitor behavior and alert calibration. The benchmark remains experimental; results do not establish general alignment or safety.
+**Evidence this project should demonstrate:** Practical Python engineering, reproducible experiments, simulator integration, CI discipline and a clear distinction between simulator-only results and real-world deployment evidence.
 
 ## Application evidence checklist
 
@@ -47,4 +47,4 @@ Company matches below are prospective skill and problem-area fit, not known cust
 - Architecture, assumptions and limitations.
 - Exact mapping from a current official job description to code and results.
 
-Use official company research, engineering, newsroom and careers pages. Keep people references to public professional leaders and project contributors explicitly credited in public material.
+Use official company research, engineering, newsroom and careers pages. Keep people references to public professional leaders and project contributors explicitly credited in public material. Re-check current job descriptions before making any application-specific fit claim.
