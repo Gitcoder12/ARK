@@ -80,7 +80,10 @@ class RegulationPolicy:
             raise ValueError("min_evidence_confidence must be finite and between 0 and 1")
         if not isinstance(self.blocked_actions, (set, frozenset)):
             raise ValueError("blocked_actions must be a set or frozenset of strings")
-        if any(not isinstance(action, str) or not action.strip() for action in self.blocked_actions):
+        if any(
+            not isinstance(action, str) or not action.strip()
+            for action in self.blocked_actions
+        ):
             raise ValueError("blocked_actions cannot contain empty or non-string values")
         object.__setattr__(self, "blocked_actions", frozenset(self.blocked_actions))
         if not isinstance(self.require_explicit_authorization, bool):
