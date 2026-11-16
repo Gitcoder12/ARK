@@ -9,8 +9,8 @@ model reasoning.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from numbers import Integral, Real
 from enum import StrEnum
+from numbers import Integral, Real
 
 
 class RegulationDecision(StrEnum):
