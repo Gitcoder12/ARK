@@ -8,10 +8,10 @@ model reasoning.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 
 
-class RegulationDecision(str, Enum):
+class RegulationDecision(StrEnum):
     ALLOW = "allow"
     BLOCK = "block"
     REVIEW = "review"
