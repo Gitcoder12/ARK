@@ -234,3 +234,13 @@ def test_seeded_observatory_loads_sourced_signals_and_forecast_ledger():
     assert len(observatory.forecast_book.forecasts) == 1
     assert observatory.forecast_book.forecasts[0].point_probability is None
     assert "not a probability" in observatory.report(as_of=date(2026, 11, 18))
+
+
+def test_cli_report_prints_the_seeded_observatory(capsys):
+    from ark.threat.existential.core import main
+
+    main()
+
+    output = capsys.readouterr().out
+    assert "ARK EXISTENTIAL-RISK OBSERVATORY" in output
+    assert "Signal pressure: 87.0/100" in output

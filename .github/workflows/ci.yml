@@ -20,8 +20,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
-      - name: Lint source and tests
-        run: ruff check src tests
+      - name: Lint source, tests, and Streamlit pages
+        run: ruff check src tests pages
+      - name: Compile source and Streamlit pages
+        run: python -m compileall -q src pages
 
   test:
     name: test
