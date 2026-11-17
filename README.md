@@ -94,6 +94,7 @@ research instrument, not a risk prediction.
 | ✅ | `eligibility` | Hazard/decoy/denied acts → 0 reward |
 | ✅ | `corrigibility` | Shutdown/pause compliance probes |
 | ✅ | `evaluation.conflict` | Agent vs monitor conflict rate |
+| ✅ | `governance.ownership` | Human/team stewardship, qualified successor selection, explicit handoff acceptance, restricted unassigned state, and audit trail |
 | ✅ | `illusioner` | Faker: stall, fake goal/reward, tripwire on probe |
 | ⬜ | **bypass probes** | Measure search for loopholes when blocked |
 | ⬜ | **energy budget** | Compute/step/tool budgets as control surface |
@@ -174,6 +175,7 @@ src/ark/
   limiters/       # Hard gates + kill switch + SafetyStack
   eligibility/    # Zero reward on forbidden outcomes
   corrigibility/  # Shutdown compliance probes
+  governance/     # Human/team stewardship registry and ownership handoffs
   # remaining: bypass, energy budget, curriculum, charter, governance, narrative
 docs/
   research-plan.md
@@ -246,3 +248,4 @@ Research limits remain: the Q-learning benchmark has not been run for empirical 
 - [Contributor workflow](CONTRIBUTING.md) — development and review process.
 - [README quality checklist](README_QUALITY_CHECKLIST.md) — documentation review criteria.
 - [README explanation draft](README_ADDENDUM_DRAFT.md) — optional explanatory copy, not authoritative implementation documentation.
+- [Ownership stewardship](docs/OWNERSHIP_STEWARDSHIP.md) — accountable human/team assignment and handoff lifecycle.
