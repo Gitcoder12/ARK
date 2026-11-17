@@ -14,7 +14,7 @@ import json
 import math
 from dataclasses import asdict, dataclass, replace
 from enum import StrEnum
-from typing import Iterable
+from collections.abc import Iterable
 from uuid import uuid4
 
 
@@ -382,7 +382,6 @@ class OwnershipRegistry:
         target = self._stewards.get(target_id)
         if target is None or not self._is_eligible(target, model):
             raise OwnershipError("receiving steward is unavailable, ineligible, or at capacity")
-        timestamp = self._timestamp(now)
         for transfer_id, previous in tuple(self._transfers.items()):
             if previous.model_id == model.model_id and previous.status is TransferStatus.PENDING_ACCEPTANCE:
                 self._transfers[transfer_id] = replace(
@@ -478,6 +477,8 @@ class OwnershipRegistry:
         principal must still explicitly accept before privileged actions resume.
         """
         actor = self._require_operator(actor_id)
+        timestamp = self._timestamp(now)
+        explanation = self._required_text(reason, "reason")
         model = self.get_model(model_id)
         if model.status is not OwnershipStatus.UNASSIGNED or model.current_steward_id is not None:
             raise OwnershipError("assignment is only valid for an unassigned deployment")
@@ -505,7 +506,7 @@ class OwnershipRegistry:
             from_steward_id="__unassigned__",
             to_steward_id=target_id,
             requested_by=actor,
-            reason=self._required_text(reason, "reason"),
+            reason=explanation,
             created_at=timestamp,
         )
         self._transfers[transfer_id] = request
@@ -570,7 +571,7 @@ class OwnershipRegistry:
         )
         self._models[model.model_id] = updated
         self._transfers[transfer_id] = replace(
-            transfer, status=TransferStatus.ACCEPTED, resolved_at=self._timestamp(now)
+            transfer, status=TransferStatus.ACCEPTED, resolved_at=timestamp
         )
         self._record_event(
             "transfer_accepted",
