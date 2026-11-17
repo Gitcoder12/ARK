@@ -182,7 +182,7 @@ def test_declined_receiver_is_not_selected_again(registry):
     assert second.to_steward_id == "team-c"
 
 
-def test_receiver_capacity_is_checked_at_acceptance():
+def test_receiver_capacity_is_rechecked_at_acceptance():
     store = OwnershipRegistry(governance_operators={"admin"})
     store.register_steward(
         Steward("owner", StewardKind.PERSON, frozenset({"review"})),
@@ -197,26 +197,30 @@ def test_receiver_capacity_is_checked_at_acceptance():
         now=0,
     )
     store.register_model(
-        "already-owned",
-        current_steward_id="receiver",
-        required_capabilities={"review"},
-        now=1,
-    )
-    store.register_model(
         "to-transfer",
         current_steward_id="owner",
         required_capabilities={"review"},
         now=1,
     )
+    request = store.request_transfer(
+        "to-transfer",
+        "receiver",
+        requested_by="owner",
+        reason="handoff",
+        now=2,
+    )
+    store.register_model(
+        "other-model",
+        current_steward_id="receiver",
+        required_capabilities={"review"},
+        now=3,
+    )
 
     with pytest.raises(OwnershipError, match="capacity"):
-        store.request_transfer(
-            "to-transfer",
-            "receiver",
-            requested_by="owner",
-            reason="handoff",
-            now=2,
-        )
+        store.accept_transfer(request.transfer_id, actor_id="receiver", now=4)
+
+    assert store.get_transfer(request.transfer_id).status is TransferStatus.PENDING_ACCEPTANCE
+    assert store.privileged_actions_allowed("to-transfer") is False
 
 
 def test_non_operator_cannot_flag_unavailability(registry):
