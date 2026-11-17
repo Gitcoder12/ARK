@@ -505,7 +505,10 @@ class OwnershipRegistry:
         if target is None or not self._is_eligible(target, model):
             raise OwnershipError("receiving steward is unavailable, ineligible, or at capacity")
         for transfer_id, previous in tuple(self._transfers.items()):
-            if previous.model_id == model.model_id and previous.status is TransferStatus.PENDING_ACCEPTANCE:
+            if (
+                previous.model_id == model.model_id
+                and previous.status is TransferStatus.PENDING_ACCEPTANCE
+            ):
                 self._transfers[transfer_id] = replace(
                     previous, status=TransferStatus.SUPERSEDED, resolved_at=timestamp
                 )
