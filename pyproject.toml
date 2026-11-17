@@ -43,6 +43,7 @@ viz = [
 [project.scripts]
 ark-run = "ark.experiments.runner:main"
 ark-arena = "ark.experiments.prompt_arena:main"
+ark-army = "ark.armies:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
