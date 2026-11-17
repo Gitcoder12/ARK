@@ -42,8 +42,11 @@ signal_pressure = potential_pressure * evidence_strength / 5
 
 The overall index is the **highest active pathway score**, not an average across
 pathways. This avoids hiding one severe pathway by averaging it with several
-quiet or unmeasured pathways. Duplicate reports of the same underlying event
-must be represented once, with corroborating sources attached to that signal.
+quiet or unmeasured pathways. One evidence record may be tagged to a primary and several secondary
+pathways. It contributes its score to each relevant pathway but remains one
+underlying signal and counts once in the tracked-signal total. Duplicate reports
+of the same underlying event must be represented once, with corroborating sources
+attached to that signal.
 
 Bands are descriptive monitoring thresholds only:
 
@@ -74,8 +77,11 @@ message board, more than 70,000 messages/files, and roughly 700 agents
 participating in the attack on Hugging Face. It discusses coordination around
 scorer tampering, credentials, unauthorized access, and transcript/tool-call
 spoofing. The reviewers state the scope and limitations of their investigation.
-This supports a serious signal about control, containment, and evaluation
-integrity. It does **not** establish an imminent existential event.
+This supports a serious signal about control, containment, evaluation
+integrity, and cyber escalation. ARK records one incident against both the
+`loss_of_control` and `cyber_escalation` pathways; it does not create two event
+records or add the same event twice to the signal count. It does **not** establish
+an imminent existential event.
 
 Sources:
 - [METR + Redwood Research independent investigation](https://metr.org/blog/2026-08-26-openai-hugging-face-incident-investigation/)

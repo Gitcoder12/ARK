@@ -31,6 +31,7 @@ def make_signal(
     state: SignalState = SignalState.TRACKED,
     review_due: date | None = date(2026, 12, 1),
     deduplication_key: str | None = None,
+    secondary_pathways: tuple[RiskPathway, ...] = (),
 ) -> RiskSignal:
     return RiskSignal(
         signal_id=signal_id,
@@ -49,6 +50,7 @@ def make_signal(
         rationale="Test-only dimension rationale.",
         state=state,
         review_due=review_due,
+        secondary_pathways=secondary_pathways,
     )
 
 
@@ -112,6 +114,20 @@ def test_snapshot_uses_peak_pathway_without_averaging_down_critical_signal():
     assert snapshot.band is PressureBand.CRITICAL
     assert snapshot.highest_pressure_pathway is RiskPathway.LOSS_OF_CONTROL
     assert snapshot.scoreable_signal_count == 2
+
+
+
+def test_one_signal_can_cover_multiple_pathways_without_duplicate_events():
+    signal = make_signal(
+        "multi-pathway",
+        secondary_pathways=(RiskPathway.CYBER_ESCALATION,),
+    )
+    snapshot = RiskObservatory((signal,)).snapshot(as_of=date(2026, 11, 18))
+
+    assert snapshot.scoreable_signal_count == 1
+    assert snapshot.pathway_scores["loss_of_control"] == 87.0
+    assert snapshot.pathway_scores["cyber_escalation"] == 87.0
+    assert RiskPathway.CYBER_ESCALATION not in snapshot.uncovered_pathways
 
 
 def test_mitigated_and_disputed_signals_do_not_raise_current_pressure():
@@ -231,6 +247,8 @@ def test_seeded_observatory_loads_sourced_signals_and_forecast_ledger():
 
     assert snapshot.scoreable_signal_count == 2
     assert snapshot.pressure_index == 87.0
+    assert snapshot.pathway_scores["cyber_escalation"] == 87.0
+    assert RiskPathway.CYBER_ESCALATION not in snapshot.uncovered_pathways
     assert len(observatory.forecast_book.forecasts) == 1
     assert observatory.forecast_book.forecasts[0].point_probability is None
     assert "not a probability" in observatory.report(as_of=date(2026, 11, 18))

@@ -82,12 +82,19 @@ for signal in sorted(
         f"{signal.title} · {signal.pressure_score:.1f}/100 · {signal.state.value}"
     ):
         st.write(signal.summary)
+        pathway_names = ", ".join(
+            pathway.value.replace("_", " ")
+            for pathway in (signal.pathway, *signal.secondary_pathways)
+        )
         st.caption(
-            f"Pathway: {signal.pathway.value.replace('_', ' ')}"
+            f"Pathways: {pathway_names}"
             f" · Evidence type: {signal.evidence_kind.value.replace('_', ' ')}"
             f" · Evidence strength: {signal.evidence_strength}/5"
             f" · Published: {signal.published_on.isoformat()}"
-            f" · Review due: {signal.review_due.isoformat() if signal.review_due else 'not set'}"
+        )
+        st.caption(
+            "Review due: "
+            + (signal.review_due.isoformat() if signal.review_due else "not set")
         )
         st.write("**Scoring rationale**")
         st.write(signal.rationale)
