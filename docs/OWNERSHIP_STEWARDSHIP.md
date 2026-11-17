@@ -59,6 +59,12 @@ registry.register_model(
     required_capabilities={"evaluate", "monitor"},
     now=1,
 )
+registry.register_model(
+    "deployment-2",
+    current_steward_id="alice",
+    required_capabilities={"evaluate", "monitor"},
+    now=1,
+)
 
 request = registry.request_transfer(
     "deployment-1",
@@ -84,6 +90,9 @@ handoffs = registry.reassign_all_owned_models(
     reason="steward unavailable",
     now=4,
 )
+assert len(handoffs) == 1
+assert handoffs[0][0] == "deployment-2"
+assert handoffs[0][1] is not None
 ```
 
 ## Security and research boundaries
