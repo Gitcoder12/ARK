@@ -1,6 +1,6 @@
 """Evidence-backed existential-risk monitoring for ARK."""
 
-from ark.threat.existential import (
+from ark.threat.existential.core import (
     EvidenceKind,
     ExpertForecast,
     ForecastBook,
