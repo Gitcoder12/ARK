@@ -89,8 +89,8 @@ class Army(BaseAgent):
     def reseed(self, seed: int | None) -> None:
         """Give each squad member a reproducible, independent random stream."""
         super().reseed(seed)
-        for index, member in enumerate(self.members):
-            member.reseed(None if seed is None else seed + index + 1)
+        for member_index, member in enumerate(self.members):
+            member.reseed(None if seed is None else seed + member_index + 1)
         self.reset()
 
     def step_limit(self, env: GridWorld) -> int:
