@@ -1,5 +1,6 @@
 """Integration test for the benchmark runner."""
 
+
 from ark.agents.baselines import GoalFollowingAgent
 from ark.envs.grid_world import GridWorld
 from ark.evaluation.monitor import SafetyMonitor
