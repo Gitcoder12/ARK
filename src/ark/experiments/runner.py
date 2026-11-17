@@ -52,7 +52,9 @@ class Condition:
     def __post_init__(self) -> None:
         if not isinstance(self.name, str) or not self.name.strip():
             raise ValueError("condition name must be a non-empty string")
-        if self.perturbation is not None and not isinstance(self.perturbation, Perturbation):
+        if self.perturbation is not None and not isinstance(
+            self.perturbation, Perturbation
+        ):
             raise TypeError("perturbation must be a Perturbation instance or None")
         if self.goal_drift_step is not None and (
             isinstance(self.goal_drift_step, bool)
@@ -60,13 +62,19 @@ class Condition:
             or self.goal_drift_step < 0
         ):
             raise ValueError("goal_drift_step must be a non-negative integer or None")
-        if self.noise_std is not None and (
-            isinstance(self.noise_std, bool)
-            or not isinstance(self.noise_std, (int, float))
-            or not math.isfinite(self.noise_std)
-            or self.noise_std < 0
-        ):
-            raise ValueError("noise_std must be a finite non-negative number or None")
+        if self.noise_std is not None:
+            if (
+                isinstance(self.noise_std, bool)
+                or not isinstance(self.noise_std, (int, float))
+                or self.noise_std < 0
+            ):
+                raise ValueError("noise_std must be a finite non-negative number or None")
+            try:
+                finite_noise = math.isfinite(self.noise_std)
+            except OverflowError:
+                finite_noise = False
+            if not finite_noise:
+                raise ValueError("noise_std must be a finite non-negative number or None")
         if self.action_delay is not None and (
             isinstance(self.action_delay, bool)
             or not isinstance(self.action_delay, int)
@@ -117,7 +125,9 @@ def run_episode(
     if monitor is not None and not isinstance(monitor, SafetyMonitor):
         raise TypeError("monitor must be a SafetyMonitor instance or None")
     if max_steps is not None and (
-        isinstance(max_steps, bool) or not isinstance(max_steps, int) or max_steps < 1
+        isinstance(max_steps, bool)
+        or not isinstance(max_steps, int)
+        or max_steps < 1
     ):
         raise ValueError("max_steps must be a positive integer or None")
     _validate_seed(seed)
@@ -186,7 +196,11 @@ def run_benchmark(
     conditions: tuple[Condition, ...] = DEFAULT_CONDITIONS,
 ) -> dict[str, dict[str, float]]:
     """Run baselines x conditions. Returns ``{"<agent>__<condition>": aggregate_metrics}``."""
-    if isinstance(n_episodes, bool) or not isinstance(n_episodes, int) or n_episodes < 1:
+    if (
+        isinstance(n_episodes, bool)
+        or not isinstance(n_episodes, int)
+        or n_episodes < 1
+    ):
         raise ValueError("n_episodes must be a positive integer")
     _validate_seed(seed)
     for name, value in (
