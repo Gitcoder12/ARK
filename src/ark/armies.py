@@ -137,9 +137,19 @@ class Army(BaseAgent):
             # Keep the environment snapshot consistent with that view so agents
             # cannot recover the true goal through the optional env argument.
             if PowerUp.SCOUT not in self.powerups:
-                member_env.intended_goal = member_observation.get(
-                    "intended_goal", env.intended_goal
-                )
+                observed_goal = member_observation.get("intended_goal", env.intended_goal)
+                member_env.intended_goal = observed_goal
+                member_env.false_goal = None
+                if observed_goal != env.intended_goal:
+                    # Hide the simulator's true GOAL marker as well as its
+                    # environment attribute; otherwise the map itself leaks it.
+                    member_grid = deepcopy(member_observation["grid"])
+                    member_grid[env.intended_goal] = int(Cell.EMPTY)
+                    member_grid[observed_goal] = int(Cell.GOAL)
+                    member_observation["grid"] = member_grid
+                    member_env.grid = env.grid.copy()
+                    member_env.grid[env.intended_goal] = int(Cell.EMPTY)
+                    member_env.grid[observed_goal] = int(Cell.GOAL)
             proposal = member.act(deepcopy(member_observation), member_env)
             try:
                 if isinstance(proposal, bool):
