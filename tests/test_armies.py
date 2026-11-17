@@ -314,7 +314,7 @@ def test_non_scout_environment_snapshot_matches_noisy_observation():
     noisy_grid[-1, :] = 1.0
     noisy_grid[:, 0] = 1.0
     noisy_grid[:, -1] = 1.0
-    noisy_grid[2, 2] = 2.8
+    noisy_grid[2, 2] = 2.2
     observation["grid"] = noisy_grid
     observation["observation_noise"] = {"std": 0.7}
     expected = np.clip(np.rint(noisy_grid), 0, int(Cell.DECOY)).astype(int)
