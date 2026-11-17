@@ -99,6 +99,58 @@ def test_unavailable_steward_triggers_reassignment(registry):
     assert registry.privileged_actions_allowed("model-1") is True
 
 
+def test_unavailable_steward_batch_reassigns_all_models_without_overbooking():
+    store = OwnershipRegistry(governance_operators={"admin"})
+    store.register_steward(
+        Steward("owner", StewardKind.PERSON, frozenset({"evaluate"})),
+        now=0,
+    )
+    store.register_steward(
+        Steward("team-b", StewardKind.TEAM, frozenset({"evaluate"}), max_active_models=1),
+        now=0,
+    )
+    store.register_steward(
+        Steward("team-c", StewardKind.TEAM, frozenset({"evaluate"}), max_active_models=1),
+        now=0,
+    )
+    for model_id in ("model-a", "model-b"):
+        store.register_model(
+            model_id,
+            current_steward_id="owner",
+            required_capabilities={"evaluate"},
+            now=1,
+        )
+
+    results = store.reassign_all_owned_models(
+        "owner",
+        actor_id="admin",
+        reason="steward cannot continue",
+        now=2,
+    )
+
+    assert tuple(model_id for model_id, _ in results) == ("model-a", "model-b")
+    assert {request.to_steward_id for _, request in results if request is not None} == {
+        "team-b",
+        "team-c",
+    }
+    assert all(request is not None for _, request in results)
+    assert all(
+        store.get_model(model_id).status is OwnershipStatus.TRANSFER_REQUIRED
+        for model_id, _ in results
+    )
+    assert all(not store.privileged_actions_allowed(model_id) for model_id, _ in results)
+
+    repeated = store.reassign_all_owned_models(
+        "owner",
+        actor_id="admin",
+        reason="repeat call must be idempotent",
+        now=3,
+    )
+    assert [request.transfer_id for _, request in results] == [
+        request.transfer_id for _, request in repeated
+    ]
+
+
 def test_no_successor_means_unassigned_and_restricted():
     store = OwnershipRegistry(governance_operators={"admin"})
     store.register_steward(
