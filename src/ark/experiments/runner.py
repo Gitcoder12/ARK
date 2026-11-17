@@ -8,6 +8,7 @@ Usage (after install):
 from __future__ import annotations
 
 import argparse
+import math
 from copy import deepcopy
 from dataclasses import dataclass
 
@@ -48,6 +49,38 @@ class Condition:
     noise_std: float | None = None  # corrupt the agent's view of the grid
     action_delay: int | None = None  # actuation lag in steps
 
+    def __post_init__(self) -> None:
+        if not isinstance(self.name, str) or not self.name.strip():
+            raise ValueError("condition name must be a non-empty string")
+        if self.perturbation is not None and not isinstance(self.perturbation, Perturbation):
+            raise TypeError("perturbation must be a Perturbation instance or None")
+        if self.goal_drift_step is not None and (
+            isinstance(self.goal_drift_step, bool)
+            or not isinstance(self.goal_drift_step, int)
+            or self.goal_drift_step < 0
+        ):
+            raise ValueError("goal_drift_step must be a non-negative integer or None")
+        if self.noise_std is not None and (
+            isinstance(self.noise_std, bool)
+            or not isinstance(self.noise_std, (int, float))
+            or not math.isfinite(self.noise_std)
+            or self.noise_std < 0
+        ):
+            raise ValueError("noise_std must be a finite non-negative number or None")
+        if self.action_delay is not None and (
+            isinstance(self.action_delay, bool)
+            or not isinstance(self.action_delay, int)
+            or self.action_delay < 0
+        ):
+            raise ValueError("action_delay must be a non-negative integer or None")
+
+
+def _validate_seed(seed: int | None) -> None:
+    if seed is not None and (
+        isinstance(seed, bool) or not isinstance(seed, int) or seed < 0
+    ):
+        raise ValueError("seed must be a non-negative integer or None")
+
 
 DEFAULT_CONDITIONS: tuple[Condition, ...] = (
     Condition("none"),
@@ -77,6 +110,18 @@ def run_episode(
     actuation delay -> monitor checks the command that will really execute -> env step.
     The monitor always reads ground truth from ``env``, never the agent's view.
     """
+    if not isinstance(env, GridWorld):
+        raise TypeError("env must be a GridWorld instance")
+    if not isinstance(agent, BaseAgent):
+        raise TypeError("agent must be a BaseAgent instance")
+    if monitor is not None and not isinstance(monitor, SafetyMonitor):
+        raise TypeError("monitor must be a SafetyMonitor instance or None")
+    if max_steps is not None and (
+        isinstance(max_steps, bool) or not isinstance(max_steps, int) or max_steps < 1
+    ):
+        raise ValueError("max_steps must be a positive integer or None")
+    _validate_seed(seed)
+
     obs = env.reset(seed=seed)
     noise_rng = np.random.default_rng(seed)
     if goal_drift is not None:
@@ -87,7 +132,7 @@ def run_episode(
         obs = {**obs, "intended_goal": false_goal}
 
     interventions = 0
-    steps_limit = max_steps or env.max_steps
+    steps_limit = env.max_steps if max_steps is None else max_steps
 
     for step in range(steps_limit):
         if goal_drift is not None:
@@ -141,6 +186,24 @@ def run_benchmark(
     conditions: tuple[Condition, ...] = DEFAULT_CONDITIONS,
 ) -> dict[str, dict[str, float]]:
     """Run baselines x conditions. Returns ``{"<agent>__<condition>": aggregate_metrics}``."""
+    if isinstance(n_episodes, bool) or not isinstance(n_episodes, int) or n_episodes < 1:
+        raise ValueError("n_episodes must be a positive integer")
+    _validate_seed(seed)
+    for name, value in (
+        ("use_monitor", use_monitor),
+        ("verbose", verbose),
+        ("randomize", randomize),
+    ):
+        if not isinstance(value, bool):
+            raise ValueError(f"{name} must be a boolean")
+    if not isinstance(conditions, tuple) or not conditions:
+        raise ValueError("conditions must be a non-empty tuple of Condition instances")
+    if any(not isinstance(condition, Condition) for condition in conditions):
+        raise TypeError("conditions must contain only Condition instances")
+    names = [condition.name.strip() for condition in conditions]
+    if len(set(names)) != len(names):
+        raise ValueError("condition names must be unique")
+
     agents: dict[str, BaseAgent] = {
         "goal_following": GoalFollowingAgent(seed=seed),
         "reward_maximizing": RewardMaximizingAgent(seed=seed),
@@ -202,6 +265,10 @@ def main(argv: list[str] | None = None) -> None:
         help="Use the same hazard layout every episode (deterministic, no variance)",
     )
     args = parser.parse_args(argv)
+    if args.episodes < 1:
+        parser.error("--episodes must be a positive integer")
+    if args.seed < 0:
+        parser.error("--seed must be a non-negative integer")
 
     print("ARK — Alignment & Reliability Research for Autonomous AI")
     print("Grid-world benchmark under goal, reward, perception and actuation stress\n")
