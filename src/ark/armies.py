@@ -181,6 +181,11 @@ def run_army_benchmark(
         raise ValueError("use_monitor must be a boolean")
     if not isinstance(conditions, tuple) or not conditions:
         raise ValueError("conditions must be a non-empty tuple")
+    if any(not isinstance(condition, Condition) for condition in conditions):
+        raise TypeError("conditions must contain Condition instances")
+    condition_names = [condition.name for condition in conditions]
+    if len(set(condition_names)) != len(condition_names):
+        raise ValueError("condition names must be unique")
 
     output: list[ArmyResult] = []
     for army in army_list:
@@ -194,11 +199,15 @@ def run_army_benchmark(
                     condition.perturbation,
                 )
                 army.reseed(episode_seed)
+                episode_limit = army.step_limit(env)
+                # GridWorld enforces its own max_steps internally, so Boost
+                # must update both the runner budget and environment budget.
+                env.max_steps = episode_limit
                 metrics = run_episode(
                     env,
                     army,
                     monitor=SafetyMonitor() if use_monitor else None,
-                    max_steps=army.step_limit(env),
+                    max_steps=episode_limit,
                     seed=episode_seed,
                     false_goal=env.false_goal,
                     goal_drift=(
