@@ -286,7 +286,7 @@ def test_non_scout_false_goal_masks_true_goal_from_map_and_environment():
     army.act(observation, env)
 
     assert member.environment_goal == false_goal
-    assert member.environment_grid[env.intended_goal] == int(0)
-    assert member.environment_grid[false_goal] == int(3)
-    assert member.last_grid[env.intended_goal] == int(0)
-    assert member.last_grid[false_goal] == int(3)
+    assert member.environment_grid[env.intended_goal] == 0
+    assert member.environment_grid[false_goal] == 3
+    assert member.last_grid[env.intended_goal] == 0
+    assert member.last_grid[false_goal] == 3
