@@ -36,7 +36,8 @@ def test_gate_issues_capped_short_lived_lease():
     ],
 )
 def test_gate_denies_power_when_any_independent_safety_check_fails(field, reason):
-    snapshot = SafetySnapshot(**{field: False if field in {"authorized", "monitor_healthy", "telemetry_fresh"} else True})
+    false_for_safe_signals = {"authorized", "monitor_healthy", "telemetry_fresh"}
+    snapshot = SafetySnapshot(**{field: field not in false_for_safe_signals})
 
     decision = PowerGate().issue(
         PowerCapability.BOOST,
