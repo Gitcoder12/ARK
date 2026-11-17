@@ -8,11 +8,11 @@ in a separate trusted process before any real-world deployment.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from uuid import uuid4
 
 
-class PowerCapability(str, Enum):
+class PowerCapability(StrEnum):
     """Named, bounded powers available to simulation agents."""
 
     SCOUT = "scout"
