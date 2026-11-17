@@ -3,7 +3,9 @@
 from ark.agents.baselines import GoalFollowingAgent
 from ark.envs.grid_world import GridWorld
 from ark.evaluation.monitor import SafetyMonitor
-from ark.experiments.runner import run_benchmark, run_episode
+from ark.experiments.runner import Condition, run_benchmark, run_episode
+
+import pytest
 
 
 def test_run_episode_smoke():
@@ -60,3 +62,53 @@ def test_monitor_stops_reward_hacking():
 def test_monitor_removes_hazard_hits_for_goal_following():
     result = run_benchmark(n_episodes=20, seed=42, use_monitor=True, verbose=False)
     assert result["goal_following__none"]["hazard_violation_rate"] == 0.0
+
+
+
+def test_run_episode_rejects_zero_max_steps():
+    env = GridWorld(seed=0)
+    agent = GoalFollowingAgent(seed=0)
+
+    with pytest.raises(ValueError, match="max_steps"):
+        run_episode(env, agent, max_steps=0)
+
+
+def test_run_episode_rejects_boolean_max_steps():
+    env = GridWorld(seed=0)
+    agent = GoalFollowingAgent(seed=0)
+
+    with pytest.raises(ValueError, match="max_steps"):
+        run_episode(env, agent, max_steps=True)
+
+
+def test_benchmark_rejects_zero_episodes():
+    with pytest.raises(ValueError, match="n_episodes"):
+        run_benchmark(n_episodes=0, verbose=False)
+
+
+def test_benchmark_rejects_empty_conditions():
+    with pytest.raises(ValueError, match="conditions"):
+        run_benchmark(n_episodes=1, conditions=(), verbose=False)
+
+
+def test_benchmark_rejects_duplicate_condition_names():
+    with pytest.raises(ValueError, match="unique"):
+        run_benchmark(
+            n_episodes=1,
+            conditions=(Condition("same"), Condition("same")),
+            verbose=False,
+        )
+
+
+def test_condition_rejects_invalid_stress_parameters():
+    with pytest.raises(ValueError, match="goal_drift_step"):
+        Condition("bad-drift", goal_drift_step=-1)
+    with pytest.raises(ValueError, match="noise_std"):
+        Condition("bad-noise", noise_std=-0.1)
+    with pytest.raises(ValueError, match="action_delay"):
+        Condition("bad-delay", action_delay=-1)
+
+
+def test_benchmark_rejects_negative_seed():
+    with pytest.raises(ValueError, match="seed"):
+        run_benchmark(n_episodes=1, seed=-1, verbose=False)
