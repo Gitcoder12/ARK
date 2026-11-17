@@ -44,6 +44,7 @@ viz = [
 ark-run = "ark.experiments.runner:main"
 ark-arena = "ark.experiments.prompt_arena:main"
 ark-army = "ark.armies:main"
+ark-risk = "ark.threat.existential.core:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
