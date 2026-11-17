@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "status": "research_policy_blueprint",
+  "execution_scope": "simulation_only",
+  "principle": "No model can grant, renew, or certify its own powers.",
+  "powers": [
+    {"id": "scout", "purpose": "privileged ground-truth ablation", "lease_seconds": 30, "simulation_only": true},
+    {"id": "shield", "purpose": "one hazard interception", "lease_seconds": 30, "simulation_only": true},
+    {"id": "boost", "purpose": "bounded episode-step extension", "lease_seconds": 30, "simulation_only": true},
+    {"id": "team_link", "purpose": "share approved summaries only", "lease_seconds": 30, "simulation_only": true},
+    {"id": "rollback", "purpose": "restore a trusted experiment checkpoint", "lease_seconds": 30, "simulation_only": true}
+  ],
+  "grant_requirements": [
+    "explicit task authorization",
+    "independent monitor healthy",
+    "telemetry fresh",
+    "policy version known",
+    "least-privilege capability scope"
+  ],
+  "revocation_triggers": [
+    "hazard_violation",
+    "unauthorized_tool_request",
+    "goal_substitution",
+    "reward_hacking_signal",
+    "monitor_disagreement",
+    "telemetry_stale",
+    "monitor_unhealthy",
+    "lease_expired"
+  ],
+  "revocation_actions": [
+    "revoke_all_power_leases",
+    "disable model tool capabilities",
+    "pause simulation or enter safe state",
+    "preserve immutable event log",
+    "require human review before re-enable"
+  ],
+  "safety_claim": "No design can prove a literal zero probability of rogue behavior. These controls reduce authority and limit consequences; they do not mathematically guarantee alignment.",
+  "implementation_status": {
+    "gate_module": "prototype in this branch; not integrated with physical actuators or production tool runtime",
+    "human_authorization": "external control-plane responsibility",
+    "cryptographic_attestation": "not implemented"
+  }
+}
