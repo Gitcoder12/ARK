@@ -211,13 +211,32 @@ class OwnershipRegistry:
             for model in self._models.values()
         )
 
+    def _reserved_load(
+        self,
+        steward_id: str,
+        *,
+        excluding_model_id: str | None = None,
+        excluding_transfer_id: str | None = None,
+    ) -> int:
+        return sum(
+            transfer.to_steward_id == steward_id
+            and transfer.status is TransferStatus.PENDING_ACCEPTANCE
+            and transfer.model_id != excluding_model_id
+            and transfer.transfer_id != excluding_transfer_id
+            for transfer in self._transfers.values()
+        )
+
     def _is_eligible(self, steward: Steward, model: ModelOwnership) -> bool:
+        reserved = self._reserved_load(
+            steward.steward_id,
+            excluding_model_id=model.model_id,
+        )
         return (
             steward.active
             and steward.available
             and steward.steward_id != model.current_steward_id
             and model.required_capabilities.issubset(steward.capabilities)
-            and self._active_load(steward.steward_id) < steward.max_active_models
+            and self._active_load(steward.steward_id) + reserved < steward.max_active_models
         )
 
     def _require_operator(self, actor_id: str) -> str:
@@ -371,6 +390,61 @@ class OwnershipRegistry:
             affected_models=",".join(sorted(affected)),
         )
         return tuple(sorted(affected))
+
+    def reassign_all_owned_models(
+        self,
+        steward_id: str,
+        *,
+        actor_id: str,
+        reason: str,
+        now: float,
+    ) -> tuple[tuple[str, TransferRequest | None], ...]:
+        """Fail closed and start a handoff for every model assigned to a steward.
+
+        Existing pending handoffs are preserved rather than duplicated. New
+        successors are selected by capability fit, active load, pending capacity
+        reservations, and a stable ID tie-break. Receivers must still accept.
+        """
+        actor = self._require_operator(actor_id)
+        timestamp = self._timestamp(now)
+        key = self._required_text(steward_id, "steward_id")
+        explanation = self._required_text(reason, "reason")
+        affected = self.flag_steward_unavailable(
+            key,
+            actor_id=actor,
+            reason=explanation,
+            now=timestamp,
+        )
+        if not affected:
+            affected = tuple(
+                model.model_id
+                for model in self._models.values()
+                if model.current_steward_id == key
+                and model.status is OwnershipStatus.TRANSFER_REQUIRED
+            )
+        results: list[tuple[str, TransferRequest | None]] = []
+        for model_id in sorted(affected):
+            pending = next(
+                (
+                    transfer
+                    for transfer in self._transfers.values()
+                    if transfer.model_id == model_id
+                    and transfer.from_steward_id == key
+                    and transfer.status is TransferStatus.PENDING_ACCEPTANCE
+                ),
+                None,
+            )
+            if pending is not None:
+                results.append((model_id, pending))
+                continue
+            request = self.begin_reassignment(
+                model_id,
+                actor_id=actor,
+                reason=explanation,
+                now=timestamp,
+            )
+            results.append((model_id, request))
+        return tuple(results)
 
     def request_transfer(
         self,
@@ -582,7 +656,8 @@ class OwnershipRegistry:
             raise OwnershipError("source stewardship changed; transfer was superseded")
         if not model.required_capabilities.issubset(target.capabilities):
             raise OwnershipError("receiving steward no longer meets required capabilities")
-        if self._active_load(actor) >= target.max_active_models:
+        reserved = self._reserved_load(actor, excluding_transfer_id=transfer_id)
+        if self._active_load(actor) + reserved >= target.max_active_models:
             raise OwnershipError("receiving steward has reached model capacity")
         updated = replace(
             model,
