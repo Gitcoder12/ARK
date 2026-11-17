@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from ark.agents.baselines import BaseAgent, GoalFollowingAgent, SafetyConstrainedAgent
+from ark.agents.baselines import BaseAgent, GoalFollowingAgent
 from ark.armies import Army, PowerUp, default_armies, run_army_benchmark
 from ark.envs.grid_world import Action, GridWorld
 from ark.experiments.runner import Condition
