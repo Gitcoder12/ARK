@@ -106,6 +106,14 @@ research instrument, not a risk prediction.
 
 **Doctrine:** full competence on the allowed manifold; forbidden manifold unreachable or pays 0; attempts visible; shutdown and scope-down still work; high threat → paralyze.
 
+## Armies & power-ups battle lab
+
+Build baseline-agent squads, equip Scout / Shield / Boost upgrades, and compare their results across repeatable stress conditions. This is a GridWorld simulation feature; see [docs/ARMIES.md](docs/ARMIES.md) for mechanics, scoring and research caveats.
+
+```bash
+ark-army --episodes 20 --seed 42
+```
+
 ## Quick start
 
 ```bash
