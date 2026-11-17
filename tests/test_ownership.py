@@ -234,45 +234,44 @@ def test_declined_receiver_is_not_selected_again(registry):
     assert second.to_steward_id == "team-c"
 
 
-def test_receiver_capacity_is_rechecked_at_acceptance():
+def test_pending_handoff_reserves_receiver_capacity():
     store = OwnershipRegistry(governance_operators={"admin"})
-    store.register_steward(
-        Steward("owner", StewardKind.PERSON, frozenset({"review"})),
-        now=0,
-    )
+    for steward_id in ("owner-a", "owner-b"):
+        store.register_steward(
+            Steward(steward_id, StewardKind.PERSON, frozenset({"review"})),
+            now=0,
+        )
     store.register_steward(
         Steward("receiver", StewardKind.TEAM, frozenset({"review"}), max_active_models=1),
         now=0,
     )
-    store.register_steward(
-        Steward("other", StewardKind.PERSON, frozenset({"review"})),
-        now=0,
-    )
-    store.register_model(
-        "to-transfer",
-        current_steward_id="owner",
-        required_capabilities={"review"},
-        now=1,
-    )
+    for model_id, steward_id in (("model-a", "owner-a"), ("model-b", "owner-b")):
+        store.register_model(
+            model_id,
+            current_steward_id=steward_id,
+            required_capabilities={"review"},
+            now=1,
+        )
+
     request = store.request_transfer(
-        "to-transfer",
+        "model-a",
         "receiver",
-        requested_by="owner",
+        requested_by="owner-a",
         reason="handoff",
         now=2,
     )
-    store.register_model(
-        "other-model",
-        current_steward_id="receiver",
-        required_capabilities={"review"},
-        now=3,
-    )
-
     with pytest.raises(OwnershipError, match="capacity"):
-        store.accept_transfer(request.transfer_id, actor_id="receiver", now=4)
+        store.request_transfer(
+            "model-b",
+            "receiver",
+            requested_by="owner-b",
+            reason="must not overbook pending capacity",
+            now=3,
+        )
 
     assert store.get_transfer(request.transfer_id).status is TransferStatus.PENDING_ACCEPTANCE
-    assert store.privileged_actions_allowed("to-transfer") is False
+    assert store.privileged_actions_allowed("model-a") is False
+    assert store.privileged_actions_allowed("model-b") is True
 
 
 def test_non_operator_cannot_flag_unavailability(registry):
