@@ -30,7 +30,10 @@ stateDiagram-v2
    transfers responsibility.
 5. If nobody qualifies, the deployment becomes **UNASSIGNED** and stays restricted.
    A later assignment also requires explicit acceptance.
-6. Every state transition is recorded in a hash-chained audit history.
+6. For an unavailable steward who has several deployments, call
+   `reassign_all_owned_models()`. It proposes handoffs for all affected models,
+   reserves successor capacity across pending requests, and never auto-accepts.
+7. Every state transition is recorded in a hash-chained audit history.
 
 ## Quick example
 
@@ -73,6 +76,14 @@ registry.accept_transfer(
     now=3,
 )
 assert registry.privileged_actions_allowed("deployment-1")
+
+# Batch reassign every model belonging to an unavailable steward.
+handoffs = registry.reassign_all_owned_models(
+    "alice",
+    actor_id="ops-admin",
+    reason="steward unavailable",
+    now=4,
+)
 ```
 
 ## Security and research boundaries
