@@ -292,8 +292,16 @@ class OwnershipRegistry:
     def eligible_successors(self, model_id: str) -> tuple[Steward, ...]:
         """Return eligible successors sorted by current load, then stable ID."""
         model = self.get_model(model_id)
+        declined = {
+            transfer.to_steward_id
+            for transfer in self._transfers.values()
+            if transfer.model_id == model.model_id
+            and transfer.status is TransferStatus.DECLINED
+        }
         candidates = [
-            steward for steward in self._stewards.values() if self._is_eligible(steward, model)
+            steward
+            for steward in self._stewards.values()
+            if self._is_eligible(steward, model) and steward.steward_id not in declined
         ]
         return tuple(sorted(candidates, key=lambda item: (self._active_load(item.steward_id), item.steward_id)))
 
@@ -446,6 +454,63 @@ class OwnershipRegistry:
             now=now,
         )
 
+    def request_assignment(
+        self,
+        model_id: str,
+        to_steward_id: str,
+        *,
+        actor_id: str,
+        reason: str,
+        now: float,
+    ) -> TransferRequest:
+        """Propose a first steward for an unassigned deployment.
+
+        Only governance operators may initiate assignment. The receiving
+        principal must still explicitly accept before privileged actions resume.
+        """
+        actor = self._require_operator(actor_id)
+        model = self.get_model(model_id)
+        if model.status is not OwnershipStatus.UNASSIGNED or model.current_steward_id is not None:
+            raise OwnershipError("assignment is only valid for an unassigned deployment")
+        target_id = self._required_text(to_steward_id, "to_steward_id")
+        target = self._stewards.get(target_id)
+        if target is None or not self._is_eligible(target, model):
+            raise OwnershipError("receiving steward is unavailable, ineligible, or at capacity")
+        timestamp = self._timestamp(now)
+        for transfer_id, previous in tuple(self._transfers.items()):
+            if previous.model_id == model.model_id and previous.status is TransferStatus.PENDING_ACCEPTANCE:
+                self._transfers[transfer_id] = replace(
+                    previous, status=TransferStatus.SUPERSEDED, resolved_at=timestamp
+                )
+                self._record_event(
+                    "assignment_superseded",
+                    actor,
+                    timestamp,
+                    transfer_id,
+                    replacement_steward=target_id,
+                )
+        transfer_id = str(uuid4())
+        request = TransferRequest(
+            transfer_id=transfer_id,
+            model_id=model.model_id,
+            from_steward_id="__unassigned__",
+            to_steward_id=target_id,
+            requested_by=actor,
+            reason=self._required_text(reason, "reason"),
+            created_at=timestamp,
+        )
+        self._transfers[transfer_id] = request
+        self._record_event(
+            "assignment_requested",
+            actor,
+            timestamp,
+            transfer_id,
+            model_id=model.model_id,
+            to_steward=target_id,
+            reason=request.reason,
+        )
+        return request
+
     def accept_transfer(
         self,
         transfer_id: str,
@@ -464,9 +529,24 @@ class OwnershipRegistry:
         if target is None or not target.active or not target.available:
             raise OwnershipError("receiving steward is no longer active and available")
         model = self.get_model(transfer.model_id)
-        if model.current_steward_id != transfer.from_steward_id:
+        expected_source = (
+            None if transfer.from_steward_id == "__unassigned__" else transfer.from_steward_id
+        )
+        source_matches = model.current_steward_id == expected_source
+        assignment_matches = (
+            transfer.from_steward_id != "__unassigned__"
+            or model.status is OwnershipStatus.UNASSIGNED
+        )
+        if not source_matches or not assignment_matches:
             self._transfers[transfer_id] = replace(
                 transfer, status=TransferStatus.SUPERSEDED, resolved_at=self._timestamp(now)
+            )
+            self._record_event(
+                "transfer_superseded",
+                actor,
+                now,
+                transfer_id,
+                reason="source_ownership_changed",
             )
             raise OwnershipError("source stewardship changed; transfer was superseded")
         if not model.required_capabilities.issubset(target.capabilities):
