@@ -44,9 +44,13 @@ middle.metric("Tracked evidence signals", snapshot.scoreable_signal_count)
 right.metric("Evidence reviews overdue", len(snapshot.stale_signal_ids))
 
 st.progress(snapshot.pressure_index / 100.0)
+peak_pathway = (
+    snapshot.highest_pressure_pathway.value
+    if snapshot.highest_pressure_pathway
+    else "none"
+)
 st.caption(
-    f"Peak pathway: {snapshot.highest_pressure_pathway.value if snapshot.highest_pressure_pathway else 'none'} "
-    f"· Snapshot date: {snapshot.as_of.isoformat()}"
+    f"Peak pathway: {peak_pathway} · Snapshot date: {snapshot.as_of.isoformat()}"
 )
 
 st.subheader("Pathway pressure")
