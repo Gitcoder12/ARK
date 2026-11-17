@@ -144,7 +144,10 @@ class Army(BaseAgent):
         if (
             not isinstance(observed_goal, (tuple, list))
             or len(observed_goal) != 2
-            or any(isinstance(value, bool) or not isinstance(value, (int, np.integer)) for value in observed_goal)
+            or any(
+                isinstance(value, bool) or not isinstance(value, (int, np.integer))
+                for value in observed_goal
+            )
             or not all(0 <= int(value) < env.size for value in observed_goal)
         ):
             # Missing or malformed objective information must not fall back to
