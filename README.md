@@ -89,6 +89,7 @@ research instrument, not a risk prediction.
 | ✅ | `rogue` | Aligned vs fragile vs rogue arena |
 | ✅ | `aligner` | Reset to good / neutral |
 | ✅ | `threat` | Factor ledger + ASCII meter (experimental) |
+| ✅ | `threat.existential` | Evidence-backed risk signal observatory, separate expert-forecast ledger, and Streamlit dashboard |
 | ✅ | `paralyzer` | Energy drain → weak → freeze → lock |
 | ✅ | `limiters` | Hard gates + **kill switch** (brute-force plug-down to STAY) |
 | ✅ | `eligibility` | Hazard/decoy/denied acts → 0 reward |
@@ -248,4 +249,9 @@ Research limits remain: the Q-learning benchmark has not been run for empirical 
 - [Contributor workflow](CONTRIBUTING.md) — development and review process.
 - [README quality checklist](README_QUALITY_CHECKLIST.md) — documentation review criteria.
 - [README explanation draft](README_ADDENDUM_DRAFT.md) — optional explanatory copy, not authoritative implementation documentation.
+- [Existential-risk observatory](docs/EXISTENTIAL_RISK_OBSERVATORY.md) — scoring, source register, forecast separation, limitations, and run instructions.
 - [Ownership stewardship](docs/OWNERSHIP_STEWARDSHIP.md) — accountable human/team assignment and handoff lifecycle.
+
+## Evidence-backed existential-risk observatory
+
+Run `ark-risk` for the sourced signal-pressure report. Run `streamlit run app.py` and open the **Existential-Risk Observatory** page for the dashboard. The signal-pressure index is not an extinction probability; see [the methodology](docs/EXISTENTIAL_RISK_OBSERVATORY.md).
