@@ -9,12 +9,12 @@ trusted identity provider, transactional store, and independent control plane.
 
 from __future__ import annotations
 
-from collections.abc import Iterable
-from dataclasses import asdict, dataclass, replace
-from enum import StrEnum
 import hashlib
 import json
 import math
+from collections.abc import Iterable
+from dataclasses import asdict, dataclass, replace
+from enum import StrEnum
 from uuid import uuid4
 
 
@@ -108,7 +108,10 @@ class OwnershipRegistry:
     """
 
     def __init__(self, *, governance_operators: Iterable[str] = ()) -> None:
-        operators = frozenset(self._required_text(value, "governance operator") for value in governance_operators)
+        operators = frozenset(
+            self._required_text(value, "governance operator")
+            for value in governance_operators
+        )
         self._governance_operators = operators
         self._stewards: dict[str, Steward] = {}
         self._models: dict[str, ModelOwnership] = {}
@@ -150,9 +153,13 @@ class OwnershipRegistry:
             "details": dict(normalized),
             "previous_hash": previous_hash,
         }
-        digest = hashlib.sha256(
-            json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
-        ).hexdigest()
+        encoded = json.dumps(
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        ).encode("utf-8")
+        digest = hashlib.sha256(encoded).hexdigest()
         event = AuditEvent(
             sequence=payload["sequence"],
             event_type=event_type,
@@ -309,7 +316,12 @@ class OwnershipRegistry:
             for steward in self._stewards.values()
             if self._is_eligible(steward, model) and steward.steward_id not in declined
         ]
-        return tuple(sorted(candidates, key=lambda item: (self._active_load(item.steward_id), item.steward_id)))
+        return tuple(
+            sorted(
+                candidates,
+                key=lambda item: (self._active_load(item.steward_id), item.steward_id),
+            )
+        )
 
     def flag_steward_unavailable(
         self,
@@ -378,13 +390,18 @@ class OwnershipRegistry:
         if source_id is None or model.status is OwnershipStatus.UNASSIGNED:
             raise OwnershipError("unassigned deployments require a new assignment workflow")
         if actor != source_id and actor not in self._governance_operators:
-            raise OwnershipError("only the current steward or a governance operator may request transfer")
+            raise OwnershipError(
+                "only the current steward or a governance operator may request transfer"
+            )
         target = self._stewards.get(target_id)
         if target is None or not self._is_eligible(target, model):
             raise OwnershipError("receiving steward is unavailable, ineligible, or at capacity")
         timestamp = self._timestamp(now)
         for transfer_id, previous in tuple(self._transfers.items()):
-            if previous.model_id == model.model_id and previous.status is TransferStatus.PENDING_ACCEPTANCE:
+            if (
+                previous.model_id == model.model_id
+                and previous.status is TransferStatus.PENDING_ACCEPTANCE
+            ):
                 self._transfers[transfer_id] = replace(
                     previous, status=TransferStatus.SUPERSEDED, resolved_at=timestamp
                 )
@@ -636,7 +653,10 @@ class OwnershipRegistry:
         )
         self._models[model.model_id] = updated
         for transfer_id, transfer in tuple(self._transfers.items()):
-            if transfer.model_id == model.model_id and transfer.status is TransferStatus.PENDING_ACCEPTANCE:
+            if (
+                transfer.model_id == model.model_id
+                and transfer.status is TransferStatus.PENDING_ACCEPTANCE
+            ):
                 self._transfers[transfer_id] = replace(
                     transfer, status=TransferStatus.CANCELLED, resolved_at=timestamp
                 )
@@ -680,9 +700,13 @@ class OwnershipRegistry:
                 "details": dict(event.details),
                 "previous_hash": event.previous_hash,
             }
-            digest = hashlib.sha256(
-                json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
-            ).hexdigest()
+            encoded = json.dumps(
+                payload,
+                sort_keys=True,
+                separators=(",", ":"),
+                allow_nan=False,
+            ).encode("utf-8")
+            digest = hashlib.sha256(encoded).hexdigest()
             if digest != event.event_hash:
                 return False
             previous_hash = event.event_hash
