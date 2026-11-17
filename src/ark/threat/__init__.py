@@ -1,7 +1,9 @@
-"""Threat / extinction meter — rising risk *index* for rogue behavior signals.
+"""ARK threat monitoring.
 
-Not a real or accurate extinction forecast. Shows which experimental
-factors (hazards, reward hacking, safety overrides, etc.) raised the score.
+ThreatMeter remains a GridWorld/prompt-arena experimental behavior index.
+RiskObservatory separately tracks sourced real-world existential-risk signals
+and attributed expert forecasts without claiming a calibrated extinction
+probability.
 """
 
 from ark.threat.calibration import ThreatCalibration, calibrate_threat_threshold
