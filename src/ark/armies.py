@@ -9,9 +9,9 @@ from __future__ import annotations
 
 import argparse
 import math
-from copy import deepcopy
 from collections import Counter
 from collections.abc import Iterable
+from copy import deepcopy
 from dataclasses import dataclass
 from enum import StrEnum
 from operator import index
