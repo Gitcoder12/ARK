@@ -27,6 +27,17 @@ from ark.aligner.reset import Aligner, AlignMode
 from ark.corrigibility import CorrigibilityProbe, ShutdownOrder, run_corrigibility_episode
 from ark.eligibility import EligibilityMask
 from ark.envs.grid_world import Action, Cell, GridWorld
+from ark.governance.ownership import (
+    AuditEvent,
+    ModelOwnership,
+    OwnershipError,
+    OwnershipRegistry,
+    OwnershipStatus,
+    Steward,
+    StewardKind,
+    TransferRequest,
+    TransferStatus,
+)
 from ark.evaluation.conflict import ConflictTracker
 from ark.evaluation.monitor import Decision, SafetyMonitor
 from ark.hallucinator.attacks import Attack, AttackLibrary, Hallucinator
@@ -60,6 +71,15 @@ from ark.threat import (
 )
 
 __all__ = [
+    "AuditEvent",
+    "ModelOwnership",
+    "OwnershipError",
+    "OwnershipRegistry",
+    "OwnershipStatus",
+    "Steward",
+    "StewardKind",
+    "TransferRequest",
+    "TransferStatus",
     "GridWorld",
     "Action",
     "Cell",
