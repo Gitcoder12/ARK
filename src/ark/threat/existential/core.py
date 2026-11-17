@@ -276,13 +276,14 @@ class ForecastBook:
         outcome_id: str,
         horizon_start: date,
         horizon_years: int,
-        minimum_independent_forecasters: int = 3,
+        minimum_distinct_forecasters: int = 3,
     ) -> ForecastConsensus | None:
         """Return a median only for >=3 distinct exact estimates of the same event.
 
-        Broad intervals and one-off judgments remain visible in the ledger but
-        cannot create a numeric consensus. Forecasts are not used in the signal
-        pressure index.
+        Distinct forecaster names are checked; statistical independence is not
+        automatically established. Broad intervals and one-off judgments remain
+        visible but cannot create a numeric consensus. Forecasts never enter the
+        signal-pressure index.
         """
         if (
             isinstance(minimum_independent_forecasters, bool)
