@@ -306,7 +306,10 @@ class OwnershipRegistry:
                 raise OwnershipError("initial steward must be registered, active, and available")
             if not requirements.issubset(steward.capabilities):
                 raise OwnershipError("initial steward lacks required capabilities")
-            if self._active_load(steward_key) >= steward.max_active_models:
+            committed_and_reserved = self._active_load(steward_key) + self._reserved_load(
+                steward_key
+            )
+            if committed_and_reserved >= steward.max_active_models:
                 raise OwnershipError("initial steward has reached model capacity")
             record = ModelOwnership(key, steward_key, requirements, tier, OwnershipStatus.ACTIVE)
         self._models[key] = record
