@@ -157,3 +157,47 @@ def test_boost_changes_the_actual_gridworld_episode_budget():
     # The episode reaches the 25% extended budget rather than stopping at
     # GridWorld's original max_steps (50).
     assert result.metrics["mean_steps"] == 63.0
+
+
+
+def test_army_members_receive_isolated_observations():
+    class MutatingAgent(FixedAgent):
+        def act(self, obs, env=None):
+            obs["grid"][1, 1] = 99
+            return int(Action.STAY)
+
+    observer = FixedAgent(int(Action.STAY))
+    army = Army("Isolated", [MutatingAgent(int(Action.STAY)), observer])
+    env = GridWorld(seed=0)
+    observation = env.reset()
+    expected_grid = env.grid.copy()
+
+    army.act(observation, env)
+
+    assert np.array_equal(observer.last_grid, expected_grid)
+
+
+def test_army_reseeds_and_resets_stateful_members():
+    class StatefulAgent(FixedAgent):
+        def __init__(self):
+            super().__init__(int(Action.STAY))
+            self.reset_count = 0
+
+        def reset(self):
+            self.reset_count += 1
+
+    member = StatefulAgent()
+    army = Army("Resettable", [member])
+    initial_count = member.reset_count
+
+    army.reseed(12)
+
+    assert member.reset_count == initial_count + 1
+
+
+def test_army_rejects_boolean_action_proposals():
+    army = Army("InvalidProposal", [FixedAgent(True)])
+    env = GridWorld(seed=0)
+    observation = env.reset()
+
+    assert army.act(observation, env) == int(Action.STAY)
