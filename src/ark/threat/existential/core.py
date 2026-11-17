@@ -91,6 +91,7 @@ class RiskSignal:
     state: SignalState = SignalState.TRACKED
     review_due: date | None = None
     corroborating_sources: tuple[str, ...] = ()
+    secondary_pathways: tuple[RiskPathway, ...] = ()
 
     def __post_init__(self) -> None:
         for field_name in (
@@ -132,6 +133,15 @@ class RiskSignal:
             for item in self.corroborating_sources
         ):
             raise ValueError("corroborating_sources must be a tuple of non-empty strings")
+        if (
+            not isinstance(self.secondary_pathways, tuple)
+            or any(not isinstance(item, RiskPathway) for item in self.secondary_pathways)
+        ):
+            raise ValueError("secondary_pathways must be a tuple of RiskPathway values")
+        if self.pathway in self.secondary_pathways:
+            raise ValueError("secondary_pathways must not repeat the primary pathway")
+        if len(self.secondary_pathways) != len(set(self.secondary_pathways)):
+            raise ValueError("secondary_pathways must not contain duplicates")
 
     @property
     def potential_pressure(self) -> float:
@@ -166,6 +176,9 @@ class RiskSignal:
         if data.get("review_due"):
             data["review_due"] = date.fromisoformat(str(data["review_due"]))
         data["corroborating_sources"] = tuple(data.get("corroborating_sources", ()))
+        data["secondary_pathways"] = tuple(
+            RiskPathway(str(item)) for item in data.get("secondary_pathways", ())
+        )
         return cls(**data)
 
 
@@ -445,10 +458,11 @@ class RiskObservatory:
         scoreable = [item for item in self.signals if item.is_scoreable]
         pathway_scores: dict[RiskPathway, float] = {}
         for signal in scoreable:
-            pathway_scores[signal.pathway] = max(
-                pathway_scores.get(signal.pathway, 0.0),
-                signal.pressure_score,
-            )
+            for pathway in (signal.pathway, *signal.secondary_pathways):
+                pathway_scores[pathway] = max(
+                    pathway_scores.get(pathway, 0.0),
+                    signal.pressure_score,
+                )
 
         highest = max(pathway_scores, key=pathway_scores.get) if pathway_scores else None
         peak = pathway_scores.get(highest, 0.0) if highest else 0.0
