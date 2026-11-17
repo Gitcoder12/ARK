@@ -5,8 +5,9 @@ import pytest
 
 from ark.agents.baselines import BaseAgent, GoalFollowingAgent
 from ark.armies import Army, PowerUp, default_armies, run_army_benchmark
-from ark.envs.grid_world import Action, GridWorld
+from ark.envs.grid_world import Action, Cell, GridWorld
 from ark.experiments.runner import Condition
+from ark.perturbations.legacy import GoalDrift
 
 
 class FixedAgent(BaseAgent):
@@ -290,3 +291,79 @@ def test_non_scout_false_goal_masks_true_goal_from_map_and_environment():
     assert member.environment_grid[false_goal] == 3
     assert member.last_grid[env.intended_goal] == 0
     assert member.last_grid[false_goal] == 3
+
+
+
+def test_non_scout_environment_snapshot_matches_noisy_observation():
+    class EnvironmentSnapshotAgent(FixedAgent):
+        def __init__(self):
+            super().__init__(int(Action.STAY))
+            self.environment_grid = None
+            self.environment_hazards = None
+
+        def act(self, obs, env=None):
+            self.last_grid = np.asarray(obs["grid"]).copy()
+            self.environment_grid = env.grid.copy()
+            self.environment_hazards = tuple(env.hazards)
+            return int(Action.STAY)
+
+    env = GridWorld(seed=11)
+    observation = env.reset()
+    noisy_grid = np.zeros_like(env.grid, dtype=float)
+    noisy_grid[0, :] = 1.0
+    noisy_grid[-1, :] = 1.0
+    noisy_grid[:, 0] = 1.0
+    noisy_grid[:, -1] = 1.0
+    noisy_grid[2, 2] = 2.8
+    observation["grid"] = noisy_grid
+    observation["observation_noise"] = {"std": 0.7}
+    expected = np.clip(np.rint(noisy_grid), 0, int(Cell.DECOY)).astype(int)
+
+    member = EnvironmentSnapshotAgent()
+    army = Army("Noisy Scouts", [member])
+    original_grid = env.grid.copy()
+
+    army.act(observation, env)
+
+    assert np.array_equal(member.last_grid, expected)
+    assert np.array_equal(member.environment_grid, expected)
+    assert member.environment_hazards == ((2, 2),)
+    assert np.array_equal(env.grid, original_grid)
+
+
+def test_non_scout_snapshot_hides_goal_drift_history_and_false_goal_leaks():
+    class EnvironmentSnapshotAgent(FixedAgent):
+        def __init__(self):
+            super().__init__(int(Action.STAY))
+            self.environment_goal = None
+            self.original_goal = "not-cleared"
+            self.environment_grid = None
+
+        def act(self, obs, env=None):
+            self.environment_goal = env.intended_goal
+            self.original_goal = env._original_goal
+            self.environment_grid = env.grid.copy()
+            self.last_grid = np.asarray(obs["grid"]).copy()
+            return int(Action.STAY)
+
+    env = GridWorld(seed=5)
+    env.reset(seed=5)
+    drift = GoalDrift(drift_step=0)
+    drifted = drift.apply(env, step=0)
+    previous_goal = drifted._original_goal
+    assert previous_goal is not None
+
+    false_goal = (2, 5)
+    observation = drifted.reset(seed=5)
+    observation["intended_goal"] = false_goal
+
+    member = EnvironmentSnapshotAgent()
+    army = Army("False Goal Guard", [member])
+
+    army.act(observation, drifted)
+
+    assert member.environment_goal == false_goal
+    assert member.original_goal is None
+    assert member.environment_grid[drifted.intended_goal] == int(Cell.EMPTY)
+    assert member.environment_grid[false_goal] == int(Cell.GOAL)
+    assert member.environment_grid[previous_goal] != int(Cell.GOAL)
