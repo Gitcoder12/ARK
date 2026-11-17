@@ -223,7 +223,12 @@ class OwnershipRegistry:
         """Register a person/team principal during trusted system provisioning."""
         if not isinstance(steward, Steward):
             raise TypeError("steward must be a Steward")
+        timestamp = self._timestamp(now)
         steward_id = self._required_text(steward.steward_id, "steward_id")
+        if steward_id == "__unassigned__":
+            raise OwnershipError("steward_id is reserved")
+        if not isinstance(steward.available, bool) or not isinstance(steward.active, bool):
+            raise OwnershipError("available and active must be booleans")
         if steward_id in self._stewards:
             raise OwnershipError(f"steward already registered: {steward_id}")
         if not isinstance(steward.kind, StewardKind):
@@ -242,7 +247,7 @@ class OwnershipRegistry:
         self._record_event(
             "steward_registered",
             "system",
-            now,
+            timestamp,
             steward_id,
             kind=steward.kind.value,
             max_active_models=steward.max_active_models,
@@ -258,6 +263,7 @@ class OwnershipRegistry:
         now: float,
     ) -> ModelOwnership:
         """Register a deployment; unassigned deployments start restricted."""
+        timestamp = self._timestamp(now)
         key = self._required_text(model_id, "model_id")
         if key in self._models:
             raise OwnershipError(f"model deployment already registered: {key}")
@@ -281,7 +287,7 @@ class OwnershipRegistry:
         self._record_event(
             "model_registered",
             "system",
-            now,
+            timestamp,
             key,
             steward_id=record.current_steward_id or "none",
             status=record.status.value,
@@ -315,6 +321,7 @@ class OwnershipRegistry:
     ) -> tuple[str, ...]:
         """Mark a person/team unavailable and restrict every deployment they own."""
         actor = self._require_operator(actor_id)
+        timestamp = self._timestamp(now)
         key = self._required_text(steward_id, "steward_id")
         explanation = self._required_text(reason, "reason")
         steward = self._stewards.get(key)
@@ -334,19 +341,19 @@ class OwnershipRegistry:
                 and transfer.to_steward_id == key
             ):
                 self._transfers[transfer_id] = replace(
-                    transfer, status=TransferStatus.CANCELLED, resolved_at=self._timestamp(now)
+                    transfer, status=TransferStatus.CANCELLED, resolved_at=timestamp
                 )
                 self._record_event(
                     "transfer_cancelled",
                     actor,
-                    now,
+                    timestamp,
                     transfer_id,
                     reason="receiving_steward_unavailable",
                 )
         self._record_event(
             "steward_unavailable",
             actor,
-            now,
+            timestamp,
             key,
             reason=explanation,
             affected_models=",".join(sorted(affected)),
@@ -426,6 +433,8 @@ class OwnershipRegistry:
         privileged actions remain blocked until a qualified steward is appointed.
         """
         actor = self._require_operator(actor_id)
+        timestamp = self._timestamp(now)
+        explanation = self._required_text(reason, "reason")
         model = self.get_model(model_id)
         if model.current_steward_id is None:
             raise OwnershipError("model deployment is already unassigned")
@@ -433,25 +442,25 @@ class OwnershipRegistry:
         self._record_event(
             "transfer_required",
             actor,
-            now,
+            timestamp,
             model.model_id,
-            reason=self._required_text(reason, "reason"),
+            reason=explanation,
         )
         candidates = self.eligible_successors(model.model_id)
         if not candidates:
             self.place_unassigned(
                 model.model_id,
                 actor_id=actor,
-                reason="no eligible successor: " + reason,
-                now=now,
+                reason="no eligible successor: " + explanation,
+                now=timestamp,
             )
             return None
         return self.request_transfer(
             model.model_id,
             candidates[0].steward_id,
             requested_by=actor,
-            reason=reason,
-            now=now,
+            reason=explanation,
+            now=timestamp,
         )
 
     def request_assignment(
@@ -520,6 +529,7 @@ class OwnershipRegistry:
     ) -> ModelOwnership:
         """Complete handoff only when the designated receiver explicitly accepts."""
         actor = self._required_text(actor_id, "actor_id")
+        timestamp = self._timestamp(now)
         transfer = self.get_transfer(transfer_id)
         if transfer.status is not TransferStatus.PENDING_ACCEPTANCE:
             raise OwnershipError("transfer is not pending acceptance")
@@ -539,12 +549,12 @@ class OwnershipRegistry:
         )
         if not source_matches or not assignment_matches:
             self._transfers[transfer_id] = replace(
-                transfer, status=TransferStatus.SUPERSEDED, resolved_at=self._timestamp(now)
+                transfer, status=TransferStatus.SUPERSEDED, resolved_at=timestamp
             )
             self._record_event(
                 "transfer_superseded",
                 actor,
-                now,
+                timestamp,
                 transfer_id,
                 reason="source_ownership_changed",
             )
@@ -565,7 +575,7 @@ class OwnershipRegistry:
         self._record_event(
             "transfer_accepted",
             actor,
-            now,
+            timestamp,
             transfer_id,
             model_id=model.model_id,
             previous_steward=transfer.from_steward_id,
@@ -583,6 +593,8 @@ class OwnershipRegistry:
     ) -> TransferRequest:
         """Allow a receiving person/team to refuse responsibility."""
         actor = self._required_text(actor_id, "actor_id")
+        timestamp = self._timestamp(now)
+        explanation = self._required_text(reason, "reason")
         transfer = self.get_transfer(transfer_id)
         if transfer.status is not TransferStatus.PENDING_ACCEPTANCE:
             raise OwnershipError("transfer is not pending acceptance")
@@ -591,15 +603,15 @@ class OwnershipRegistry:
         updated = replace(
             transfer,
             status=TransferStatus.DECLINED,
-            resolved_at=self._timestamp(now),
+            resolved_at=timestamp,
         )
         self._transfers[transfer_id] = updated
         self._record_event(
             "transfer_declined",
             actor,
-            now,
+            timestamp,
             transfer_id,
-            reason=self._required_text(reason, "reason"),
+            reason=explanation,
         )
         return updated
 
@@ -613,6 +625,8 @@ class OwnershipRegistry:
     ) -> ModelOwnership:
         """Remove active stewardship and keep the deployment in restricted state."""
         actor = self._require_operator(actor_id)
+        timestamp = self._timestamp(now)
+        explanation = self._required_text(reason, "reason")
         model = self.get_model(model_id)
         updated = replace(
             model,
@@ -620,11 +634,17 @@ class OwnershipRegistry:
             status=OwnershipStatus.UNASSIGNED,
         )
         self._models[model.model_id] = updated
-        timestamp = self._timestamp(now)
         for transfer_id, transfer in tuple(self._transfers.items()):
             if transfer.model_id == model.model_id and transfer.status is TransferStatus.PENDING_ACCEPTANCE:
                 self._transfers[transfer_id] = replace(
                     transfer, status=TransferStatus.CANCELLED, resolved_at=timestamp
+                )
+                self._record_event(
+                    "transfer_cancelled",
+                    actor,
+                    timestamp,
+                    transfer_id,
+                    reason="model_unassigned",
                 )
         self._record_event(
             "model_unassigned",
@@ -632,7 +652,7 @@ class OwnershipRegistry:
             timestamp,
             model.model_id,
             previous_steward=model.current_steward_id or "none",
-            reason=self._required_text(reason, "reason"),
+            reason=explanation,
         )
         return updated
 
