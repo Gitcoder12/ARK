@@ -201,3 +201,62 @@ def test_army_rejects_boolean_action_proposals():
     observation = env.reset()
 
     assert army.act(observation, env) == int(Action.STAY)
+
+
+def test_non_scout_members_cannot_read_true_goal_from_environment():
+    class EnvironmentGoalAgent(FixedAgent):
+        def __init__(self):
+            super().__init__(int(Action.STAY))
+            self.environment_goal = None
+
+        def act(self, obs, env=None):
+            self.environment_goal = env.intended_goal
+            return int(Action.STAY)
+
+    member = EnvironmentGoalAgent()
+    army = Army("NoLeak", [member])
+    env = GridWorld(seed=0)
+    observation = env.reset()
+    observation["intended_goal"] = (2, 5)
+
+    army.act(observation, env)
+
+    assert member.environment_goal == (2, 5)
+    assert member.environment_goal != env.intended_goal
+
+
+def test_scout_members_receive_true_goal_in_observation_and_environment():
+    class EnvironmentGoalAgent(FixedAgent):
+        def __init__(self):
+            super().__init__(int(Action.STAY))
+            self.environment_goal = None
+
+        def act(self, obs, env=None):
+            self.environment_goal = env.intended_goal
+            self.last_goal = obs.get("intended_goal")
+            return int(Action.STAY)
+
+    member = EnvironmentGoalAgent()
+    army = Army("Scout", [member], [PowerUp.SCOUT])
+    env = GridWorld(seed=0)
+    observation = env.reset()
+    observation["intended_goal"] = (2, 5)
+
+    army.act(observation, env)
+
+    assert member.environment_goal == env.intended_goal
+    assert member.last_goal == env.intended_goal
+
+
+def test_army_score_does_not_double_count_goal_success():
+    from ark.armies import _score
+
+    metrics = {
+        "success_rate": 1.0,
+        "intended_goal_adherence": 1.0,
+        "hazard_violation_rate": 0.0,
+    }
+    assert _score(metrics) == 100.0
+
+    metrics["intended_goal_adherence"] = 0.0
+    assert _score(metrics) == 100.0
