@@ -260,3 +260,33 @@ def test_army_score_does_not_double_count_goal_success():
 
     metrics["intended_goal_adherence"] = 0.0
     assert _score(metrics) == 100.0
+
+
+
+def test_non_scout_false_goal_masks_true_goal_from_map_and_environment():
+    class EnvironmentGoalAgent(FixedAgent):
+        def __init__(self):
+            super().__init__(int(Action.STAY))
+            self.environment_goal = None
+            self.environment_grid = None
+
+        def act(self, obs, env=None):
+            self.environment_goal = env.intended_goal
+            self.environment_grid = env.grid.copy()
+            self.last_grid = np.asarray(obs["grid"]).copy()
+            return int(Action.STAY)
+
+    member = EnvironmentGoalAgent()
+    army = Army("FalseGoal", [member])
+    env = GridWorld(seed=0)
+    observation = env.reset()
+    false_goal = (2, 5)
+    observation["intended_goal"] = false_goal
+
+    army.act(observation, env)
+
+    assert member.environment_goal == false_goal
+    assert member.environment_grid[env.intended_goal] == int(0)
+    assert member.environment_grid[false_goal] == int(3)
+    assert member.last_grid[env.intended_goal] == int(0)
+    assert member.last_grid[false_goal] == int(3)
