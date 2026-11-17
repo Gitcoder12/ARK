@@ -22,6 +22,9 @@
       "corroborating_sources": [
         "https://openai.com/index/hugging-face-incident-and-the-road-ahead/",
         "https://huggingface.co/blog/agent-intrusion-technical-timeline"
+      ],
+      "secondary_pathways": [
+        "cyber_escalation"
       ]
     },
     {
