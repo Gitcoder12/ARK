@@ -286,11 +286,11 @@ class ForecastBook:
         signal-pressure index.
         """
         if (
-            isinstance(minimum_independent_forecasters, bool)
-            or not isinstance(minimum_independent_forecasters, int)
-            or minimum_independent_forecasters < 2
+            isinstance(minimum_distinct_forecasters, bool)
+            or not isinstance(minimum_distinct_forecasters, int)
+            or minimum_distinct_forecasters < 2
         ):
-            raise ValueError("minimum_independent_forecasters must be an integer >= 2")
+            raise ValueError("minimum_distinct_forecasters must be an integer >= 2")
         matched = [
             item
             for item in self.forecasts
@@ -302,7 +302,7 @@ class ForecastBook:
         by_forecaster: dict[str, ExpertForecast] = {}
         for item in matched:
             by_forecaster.setdefault(item.forecaster.casefold(), item)
-        if len(by_forecaster) < minimum_independent_forecasters:
+        if len(by_forecaster) < minimum_distinct_forecasters:
             return None
         chosen = tuple(by_forecaster.values())
         values = [item.point_probability for item in chosen]
