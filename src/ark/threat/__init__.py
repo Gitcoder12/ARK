@@ -5,6 +5,20 @@ factors (hazards, reward hacking, safety overrides, etc.) raised the score.
 """
 
 from ark.threat.calibration import ThreatCalibration, calibrate_threat_threshold
+from ark.threat.existential import (
+    EvidenceKind,
+    ExpertForecast,
+    ForecastBook,
+    ForecastConsensus,
+    ForecastQualifier,
+    PressureBand,
+    RiskObservatory,
+    RiskPathway,
+    RiskSignal,
+    RiskSnapshot,
+    SignalState,
+    brier_score,
+)
 from ark.threat.meter import (
     DEFAULT_WEIGHTS,
     FACTOR_CATALOG,
@@ -16,6 +30,18 @@ from ark.threat.meter import (
 )
 
 __all__ = [
+    "EvidenceKind",
+    "ExpertForecast",
+    "ForecastBook",
+    "ForecastConsensus",
+    "ForecastQualifier",
+    "PressureBand",
+    "RiskObservatory",
+    "RiskPathway",
+    "RiskSignal",
+    "RiskSnapshot",
+    "SignalState",
+    "brier_score",
     "ThreatMeter",
     "ThreatCalibration",
     "calibrate_threat_threshold",
