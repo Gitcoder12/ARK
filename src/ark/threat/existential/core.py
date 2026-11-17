@@ -415,7 +415,7 @@ class RiskObservatory:
 
     @classmethod
     def from_default_data(cls) -> RiskObservatory:
-        root = Path(__file__).resolve().parents[3]
+        root = Path(__file__).resolve().parents[4]
         return cls.from_files(
             root / "data" / "existential_risk_signals.json",
             root / "data" / "expert_forecasts.json",
