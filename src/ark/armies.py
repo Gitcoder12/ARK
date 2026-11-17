@@ -132,7 +132,15 @@ class Army(BaseAgent):
 
         votes: list[int] = []
         for member in self.members:
-            proposal = member.act(deepcopy(member_observation), deepcopy(env))
+            member_env = deepcopy(env)
+            # Non-Scout members only receive the objective in their observation.
+            # Keep the environment snapshot consistent with that view so agents
+            # cannot recover the true goal through the optional env argument.
+            if PowerUp.SCOUT not in self.powerups:
+                member_env.intended_goal = member_observation.get(
+                    "intended_goal", env.intended_goal
+                )
+            proposal = member.act(deepcopy(member_observation), member_env)
             try:
                 if isinstance(proposal, bool):
                     raise ValueError("boolean action is invalid")
@@ -153,10 +161,13 @@ class Army(BaseAgent):
 
 
 def _score(metrics: dict[str, float]) -> float:
-    """Transparent 0–100 score: 50% success, 30% goal adherence, 20% hazard avoidance."""
+    """Transparent 0–100 score: 80% goal success and 20% hazard avoidance.
+
+    GridWorld currently defines success and intended-goal adherence from the
+    same reached-goal event. Counting both would double-weight one outcome.
+    """
     value = (
-        0.50 * metrics["success_rate"]
-        + 0.30 * metrics["intended_goal_adherence"]
+        0.80 * metrics["success_rate"]
         + 0.20 * (1.0 - metrics["hazard_violation_rate"])
     )
     return round(100.0 * value, 2)
