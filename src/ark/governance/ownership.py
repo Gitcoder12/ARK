@@ -9,12 +9,12 @@ trusted identity provider, transactional store, and independent control plane.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+from dataclasses import asdict, dataclass, replace
+from enum import StrEnum
 import hashlib
 import json
 import math
-from dataclasses import asdict, dataclass, replace
-from enum import StrEnum
-from collections.abc import Iterable
 from uuid import uuid4
 
 
