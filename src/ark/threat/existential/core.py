@@ -7,10 +7,10 @@ separately and are never mixed into the signal-pressure calculation.
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from datetime import date
 from enum import StrEnum
-import json
 from pathlib import Path
 from statistics import median
 from urllib.parse import urlparse
@@ -462,7 +462,11 @@ class RiskObservatory:
         uncovered = tuple(path for path in RiskPathway if path not in covered)
         top = tuple(
             (item.signal_id, item.pressure_score)
-            for item in sorted(scoreable, key=lambda item: item.pressure_score, reverse=True)[:top_n]
+            for item in sorted(
+                scoreable,
+                key=lambda item: item.pressure_score,
+                reverse=True,
+            )[:top_n]
         )
         return RiskSnapshot(
             as_of=review_date,
@@ -494,7 +498,12 @@ class RiskObservatory:
                 f"Signal pressure: {snapshot.pressure_index:.1f}/100 "
                 f"[{snapshot.band.value.upper()}]"
             ),
-            f"Peak pathway: {snapshot.highest_pressure_pathway.value if snapshot.highest_pressure_pathway else 'none'}",
+            "Peak pathway: "
+            + (
+                snapshot.highest_pressure_pathway.value
+                if snapshot.highest_pressure_pathway
+                else "none"
+            ),
             f"Tracked signals: {snapshot.scoreable_signal_count}",
             f"Stale reviews: {len(snapshot.stale_signal_ids)}",
             "",
