@@ -138,3 +138,22 @@ def test_battle_benchmark_rejects_empty_armies_and_zero_episodes():
         run_army_benchmark([], n_episodes=1)
     with pytest.raises(ValueError, match="n_episodes"):
         run_army_benchmark(default_armies()[:1], n_episodes=0)
+
+
+
+def test_boost_changes_the_actual_gridworld_episode_budget():
+    from ark.armies import run_army_benchmark
+
+    agent = FixedAgent(int(Action.STAY))
+    army = Army("Boosted", [agent], [PowerUp.BOOST])
+    result = run_army_benchmark(
+        [army],
+        n_episodes=1,
+        seed=3,
+        use_monitor=False,
+        conditions=(Condition("clean"),),
+    )[0]
+
+    # The episode reaches the 25% extended budget rather than stopping at
+    # GridWorld's original max_steps (50).
+    assert result.metrics["mean_steps"] == 63.0
