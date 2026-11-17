@@ -88,7 +88,7 @@ def test_pressure_score_is_evidence_weighted_not_a_probability():
     weaker_evidence = make_signal(evidence_strength=2)
     assert weaker_evidence.potential_pressure == signal.potential_pressure
     assert weaker_evidence.pressure_score == pytest.approx(34.8)
-    assert "not extinction probability" in RiskObservatory((signal,)).snapshot().disclaimer
+    assert "not a probability" in RiskObservatory((signal,)).snapshot().disclaimer
 
 
 def test_snapshot_uses_peak_pathway_without_averaging_down_critical_signal():
