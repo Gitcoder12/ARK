@@ -251,7 +251,7 @@ class ExpertForecast:
 
 @dataclass(frozen=True)
 class ForecastConsensus:
-    """A median of comparable exact estimates from independent forecasters."""
+    """A median of comparable exact estimates from separately named forecasters."""
 
     outcome_id: str
     horizon_start: date
