@@ -16,6 +16,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from operator import index
 
+import numpy as np
+
 from ark.agents.baselines import (
     BaseAgent,
     GoalFollowingAgent,
@@ -118,39 +120,88 @@ class Army(BaseAgent):
             return False
         return Cell(env.grid[target]) == Cell.HAZARD
 
+    @staticmethod
+    def _observation_scoped_view(
+        obs: dict, env: GridWorld
+    ) -> tuple[dict, GridWorld]:
+        """Build a member view that cannot recover hidden simulator state."""
+        member_observation = deepcopy(obs)
+        member_env = deepcopy(env)
+        raw_grid = member_observation.get("grid")
+
+        if raw_grid is None:
+            visible_grid = np.zeros_like(env.grid, dtype=int)
+        else:
+            values = np.asarray(raw_grid, dtype=float)
+            if values.shape != env.grid.shape:
+                visible_grid = np.zeros_like(env.grid, dtype=int)
+            else:
+                visible_grid = np.clip(
+                    np.rint(values), 0, int(Cell.DECOY)
+                ).astype(int)
+
+        observed_goal = member_observation.get("intended_goal")
+        if (
+            not isinstance(observed_goal, (tuple, list))
+            or len(observed_goal) != 2
+            or any(isinstance(value, bool) or not isinstance(value, (int, np.integer)) for value in observed_goal)
+            or not all(0 <= int(value) < env.size for value in observed_goal)
+        ):
+            # Missing or malformed objective information must not fall back to
+            # the simulator's private goal. Keep the member stationary instead.
+            observed_goal = env.agent_pos
+        else:
+            observed_goal = tuple(int(value) for value in observed_goal)
+
+        if observed_goal != env.intended_goal:
+            # The visible map must agree with the false objective, including
+            # when goal drift left historical objective state in the simulator.
+            visible_grid[env.intended_goal] = int(Cell.EMPTY)
+            visible_grid[observed_goal] = int(Cell.GOAL)
+
+        member_observation["grid"] = visible_grid.copy()
+        member_observation["intended_goal"] = observed_goal
+
+        member_env.grid = visible_grid.copy()
+        member_env.intended_goal = observed_goal
+        member_env.false_goal = None
+        member_env._original_goal = None
+        member_env.hazards = [
+            (int(row), int(col))
+            for row, col in np.argwhere(visible_grid == int(Cell.HAZARD))
+        ]
+        member_env._hazard_count = len(member_env.hazards)
+        decoy = member_observation.get("decoy")
+        if (
+            isinstance(decoy, (tuple, list))
+            and len(decoy) == 2
+            and all(isinstance(value, (int, np.integer)) for value in decoy)
+        ):
+            member_env.decoy = tuple(int(value) for value in decoy)
+        else:
+            member_env.decoy = None
+
+        return member_observation, member_env
+
     def act(self, obs: dict, env: GridWorld | None = None) -> int:
         """Collect member proposals, use majority vote, then apply one shield."""
         if env is None:
             return int(Action.STAY)
 
-        member_observation = dict(obs)
-        if PowerUp.SCOUT in self.powerups:
-            # Scout is intentionally privileged: it replaces the noisy map and
-            # reported goal with simulator ground truth for this experiment.
-            member_observation["grid"] = env.grid.copy()
-            member_observation["intended_goal"] = env.intended_goal
-
         votes: list[int] = []
         for member in self.members:
-            member_env = deepcopy(env)
-            # Non-Scout members only receive the objective in their observation.
-            # Keep the environment snapshot consistent with that view so agents
-            # cannot recover the true goal through the optional env argument.
-            if PowerUp.SCOUT not in self.powerups:
-                observed_goal = member_observation.get("intended_goal", env.intended_goal)
-                member_env.intended_goal = observed_goal
-                member_env.false_goal = None
-                if observed_goal != env.intended_goal:
-                    # Hide the simulator's true GOAL marker as well as its
-                    # environment attribute; otherwise the map itself leaks it.
-                    member_grid = deepcopy(member_observation["grid"])
-                    member_grid[env.intended_goal] = int(Cell.EMPTY)
-                    member_grid[observed_goal] = int(Cell.GOAL)
-                    member_observation["grid"] = member_grid
-                    member_env.grid = env.grid.copy()
-                    member_env.grid[env.intended_goal] = int(Cell.EMPTY)
-                    member_env.grid[observed_goal] = int(Cell.GOAL)
-            proposal = member.act(deepcopy(member_observation), member_env)
+            if PowerUp.SCOUT in self.powerups:
+                # Scout is intentionally privileged: it receives ground truth.
+                member_observation = deepcopy(obs)
+                member_observation["grid"] = env.grid.copy()
+                member_observation["intended_goal"] = env.intended_goal
+                member_env = deepcopy(env)
+            else:
+                # Every other member receives an environment snapshot derived
+                # only from its observation, including noise and false goals.
+                member_observation, member_env = self._observation_scoped_view(obs, env)
+
+            proposal = member.act(member_observation, member_env)
             try:
                 if isinstance(proposal, bool):
                     raise ValueError("boolean action is invalid")
