@@ -9,10 +9,12 @@ from __future__ import annotations
 
 import argparse
 import math
+from copy import deepcopy
 from collections import Counter
 from collections.abc import Iterable
 from dataclasses import dataclass
 from enum import StrEnum
+from operator import index
 
 from ark.agents.baselines import (
     BaseAgent,
@@ -78,7 +80,9 @@ class Army(BaseAgent):
         self.reset()
 
     def reset(self) -> None:
-        """Reset per-episode power-up charges."""
+        """Reset squad members and per-episode power-up charges."""
+        for member in self.members:
+            member.reset()
         self._shield_charges = 1 if PowerUp.SHIELD in self.powerups else 0
         self.shield_uses = 0
 
@@ -128,9 +132,11 @@ class Army(BaseAgent):
 
         votes: list[int] = []
         for member in self.members:
-            proposal = member.act(member_observation, env)
+            proposal = member.act(deepcopy(member_observation), deepcopy(env))
             try:
-                action = int(Action(proposal))
+                if isinstance(proposal, bool):
+                    raise ValueError("boolean action is invalid")
+                action = int(Action(index(proposal)))
             except (TypeError, ValueError):
                 action = int(Action.STAY)
             votes.append(action)
