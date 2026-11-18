@@ -8,11 +8,11 @@ through explicit rules.
 
 From the repository root:
 
-\`\`\`bash
+```bash
 pip install -e ".[dev]"
 ark-robopia
 streamlit run app.py
-\`\`\`
+```
 
 Open **ROBOPIA — The ARK Digital Commons** in the Streamlit sidebar. The page
 starts an eight-tick demonstration automatically. Use the controls to advance
@@ -72,8 +72,8 @@ prove a utopia.
 
 ## Architecture and limits
 
-The engine is in \`src/ark/robopia/core.py\`; the Streamlit dashboard is
-\`pages/4_Robopia_Digital_Commons.py\`; tests are in \`tests/test_robopia.py\`.
+The engine is in `src/ark/robopia/core.py`; the Streamlit dashboard is
+`pages/4_Robopia_Digital_Commons.py`; tests are in `tests/test_robopia.py`.
 
 This MVP uses six scripted agents and a small discrete-tick environment. It
 does not call external LLM APIs, execute arbitrary agent code, expose network
