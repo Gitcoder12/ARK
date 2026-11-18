@@ -256,7 +256,7 @@ Research limits remain: the Q-learning benchmark has not been run for empirical 
 
 ## Evidence-backed existential-risk observatory
 
-Run `ark-risk` for the sourced signal-pressure report. Run `streamlit run app.py` and open the **Existential-Risk Observatory** page for the dashboard. The signal-pressure index is not an extinction probability; see [the methodology](docs/EXISTENTIAL_RISK_OBSERVATORY.md).
+Run `ark-risk` for the sourced signal-pressure report. Run `streamlit run arkworld.py` and open the **Existential-Risk Observatory** page for the dashboard. The signal-pressure index is not an extinction probability; see [the methodology](docs/EXISTENTIAL_RISK_OBSERVATORY.md).
 
 
 ## Omelas Safeguard
@@ -277,7 +277,7 @@ Run ark-harmony for a synthetic report, or open Cross-Species Harmonizer in the 
 ## ARKWorld — Simulation Hub
 
 **ARKWorld is the umbrella hub for all ARK simulations and research environments.**
-Launch `streamlit run app.py` to open the central catalogue. It links the GridWorld
+Launch `streamlit run arkworld.py` to open the central catalogue. It links the GridWorld
 benchmark, Identity & Value Stability, Prompt Arena, Armies & Power-ups,
 Existential-Risk Observatory, Omelas Safeguard, Cross-Species Harmonizer, and
 ARKWorld Digital Commons.
