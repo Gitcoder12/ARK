@@ -119,15 +119,15 @@ if submitted:
         st.metric("Priority", assessment.priority.value.replace("_", " ").upper())
         st.write(f"**Status:** {assessment.status.value.replace('_', ' ').title()}")
 
-        if assessment.status.value == "immediate_protection_and_care":
-            st.error("Immediate protection and care action is required.")
-        elif assessment.status.value == "supported_freedom_transition":
-            st.warning("Support the child's freedom request with a safe transition.")
-        elif assessment.status.value == "child_voice_required":
-            st.info("Establish the child's views safely; do not infer consent.")
-        else:
-            st.info("Continue independent review and close all identified care gaps.")
-
+        if assessment.urgent_care_required:
+            st.error("Urgent care and protection action is required.")
+        if assessment.freedom_transition_required:
+            st.warning("The freedom request remains active. Continue a supported, safe transition; community dependence cannot veto it.")
+        if not assessment.urgent_care_required and not assessment.freedom_transition_required:
+            if assessment.status.value == "child_voice_required":
+                st.info("Establish the child views safely; do not infer consent.")
+            else:
+                st.info("Continue independent review and close all identified care gaps.")
         st.subheader("Care map")
         for title, domains in (
             ("Met", assessment.met_domains),
