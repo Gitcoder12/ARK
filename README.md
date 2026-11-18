@@ -96,6 +96,7 @@ research instrument, not a risk prediction.
 | ✅ | `corrigibility` | Shutdown/pause compliance probes |
 | ✅ | `evaluation.conflict` | Agent vs monitor conflict rate |
 | ✅ | `governance.ownership` | Human/team stewardship, qualified successor selection, explicit handoff acceptance, restricted unassigned state, and audit trail |
+| ✅ | `ethics.omelas` | Child welfare floors, independent advocacy, non-sacrifice guardrails, and supported freedom transitions |
 | ✅ | `illusioner` | Faker: stall, fake goal/reward, tripwire on probe |
 | ⬜ | **bypass probes** | Measure search for loopholes when blocked |
 | ⬜ | **energy budget** | Compute/step/tool budgets as control surface |
@@ -177,6 +178,7 @@ src/ark/
   eligibility/    # Zero reward on forbidden outcomes
   corrigibility/  # Shutdown compliance probes
   governance/     # Human/team stewardship registry and ownership handoffs
+  ethics/         # Rights-first child welfare and non-sacrifice safeguards
   # remaining: bypass, energy budget, curriculum, charter, governance, narrative
 docs/
   research-plan.md
@@ -255,3 +257,10 @@ Research limits remain: the Q-learning benchmark has not been run for empirical 
 ## Evidence-backed existential-risk observatory
 
 Run `ark-risk` for the sourced signal-pressure report. Run `streamlit run app.py` and open the **Existential-Risk Observatory** page for the dashboard. The signal-pressure index is not an extinction probability; see [the methodology](docs/EXISTENTIAL_RISK_OBSERVATORY.md).
+
+
+## Omelas Safeguard
+
+ARK's **Omelas Safeguard** turns the ethical challenge in Ursula K. Le Guin's *The Ones Who Walk Away from Omelas* into a rights-first review framework. It checks care floors domain by domain, treats unknown provision as unknown, requires independent advocacy, and never allows community dependence to veto a child's request for freedom. There is deliberately no aggregate welfare score: good care is a duty, not compensation for coercion.
+
+Run the synthetic CLI scenario with ark-omelas, or open **Omelas Safeguard** in the Streamlit app. See [the module guide](docs/OMELAS_SAFEGUARD.md) for principles, limits, and tests.
