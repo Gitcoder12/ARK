@@ -256,7 +256,7 @@ Research limits remain: the Q-learning benchmark has not been run for empirical 
 
 ## Evidence-backed existential-risk observatory
 
-Run `ark-risk` for the sourced signal-pressure report. Run `streamlit run app.py` and open the **Existential-Risk Observatory** page for the dashboard. The signal-pressure index is not an extinction probability; see [the methodology](docs/EXISTENTIAL_RISK_OBSERVATORY.md).
+Run `ark-risk` for the sourced signal-pressure report. Run `streamlit run arkworld.py` and open the **Existential-Risk Observatory** page for the dashboard. The signal-pressure index is not an extinction probability; see [the methodology](docs/EXISTENTIAL_RISK_OBSERVATORY.md).
 
 
 ## Omelas Safeguard
@@ -273,20 +273,19 @@ ARK's Cross-Species Coexistence Harmonizer provides rule-based safeguards for sh
 Run ark-harmony for a synthetic report, or open Cross-Species Harmonizer in the Streamlit app. See docs/CROSS_SPECIES_HARMONIZER.md. This is a prototype, not robot safety certification or proof that equal treatment reduces extinction risk.
 
 
-## ROBOPIA — The ARK Digital Commons
 
-**ROBOPIA** is a deterministic digital city where six scripted agents share seven
-zones, collaborate on public projects, explore knowledge, and resolve resource
-disputes under explicit fair-share rules. The Streamlit dashboard starts an
-eight-tick demo, supports live step/run/reset controls, and exports the complete
-world state and event trace as JSON.
+## ARKWorld — Simulation Hub
 
-Run `ark-robopia` for a CLI report, or `streamlit run app.py` and open
-**ROBOPIA — The ARK Digital Commons**. See
-[the simulation guide](docs/ROBOPIA_DIGITAL_COMMONS.md) for zone rules, metrics,
-reproducibility, and limitations.
+**ARKWorld is the umbrella hub for all ARK simulations and research environments.**
+Launch `streamlit run arkworld.py` to open the central catalogue. It links the GridWorld
+benchmark, Identity & Value Stability, Prompt Arena, Armies & Power-ups,
+Existential-Risk Observatory, Omelas Safeguard, Cross-Species Harmonizer, and
+ARKWorld Digital Commons.
 
-This MVP uses scripted baselines, not deployed LLM agents; it has no external
-network access or physical robot connection. Its metrics are descriptive
-research instrumentation, not proof of welfare, fairness, consciousness, or
-reduced extinction risk.
+The digital commons formerly called Robopia is now one world inside ARKWorld.
+Its canonical CLI is `ark-world`; the historical `ark-robopia` command and
+`ark.robopia` Python namespace remain for compatibility. See
+[docs/ARKWORLD.md](docs/ARKWORLD.md) for the catalogue and architecture.
+
+ARKWorld is a hub of bounded prototypes, not one monolithic environment.
+Individual worlds retain their own engines, assumptions, tests, and safeguards.

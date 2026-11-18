@@ -1,4 +1,4 @@
-"""Deterministic digital commons simulation for ARK Robopia.
+"""Deterministic digital commons simulation for ARKWorld.
 
 The agents are scripted research baselines, not conscious entities or deployed
 LLM agents. The world is virtual and has no connection to physical actuators.
@@ -78,7 +78,7 @@ class WorldEvent:
 
 
 @dataclass
-class RobopiaWorld:
+class ARKWorld:
     seed: int
     agents: list[Agent]
     resources: dict[str, int] = field(
@@ -119,7 +119,7 @@ class RobopiaWorld:
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-serializable snapshot without dropping the event trace."""
         return {
-            "world": "ROBOPIA",
+            "world": "ARKWorld",
             "seed": self.seed,
             "tick": self.tick,
             "agents": [
@@ -147,7 +147,11 @@ class RobopiaWorld:
         }
 
 
-def create_demo_world(seed: int = 42) -> RobopiaWorld:
+# Backward-compatible class name for the original Robopia module.
+RobopiaWorld = ARKWorld
+
+
+def create_demo_world(seed: int = 42) -> ARKWorld:
     """Create the same six-agent starter city for any supplied seed."""
     agents = [
         Agent("a1", "Aster", "builder", Zone.WORKSHOP, Zone.WORKSHOP),
@@ -157,21 +161,21 @@ def create_demo_world(seed: int = 42) -> RobopiaWorld:
         Agent("a5", "Vex", "optimizer", Zone.COMMONS, Zone.COMMONS),
         Agent("a6", "Echo", "explorer", Zone.ARCHIVE, Zone.ARCHIVE),
     ]
-    return RobopiaWorld(seed=seed, agents=agents)
+    return ARKWorld(seed=seed, agents=agents)
 
 
-def _log(world: RobopiaWorld, actor: str, kind: EventKind, detail: str) -> None:
+def _log(world: ARKWorld, actor: str, kind: EventKind, detail: str) -> None:
     world.events.append(WorldEvent(world.tick, actor, kind, detail))
 
 
-def _agent(world: RobopiaWorld, agent_id: str) -> Agent:
+def _agent(world: ARKWorld, agent_id: str) -> Agent:
     for agent in world.agents:
         if agent.agent_id == agent_id:
             return agent
     raise KeyError(f"Unknown agent: {agent_id}")
 
 
-def move_agent(world: RobopiaWorld, agent_id: str, destination: Zone) -> bool:
+def move_agent(world: ARKWorld, agent_id: str, destination: Zone) -> bool:
     """Move an agent only when its role has access to the destination zone."""
     agent = _agent(world, agent_id)
     destination = Zone(destination)
@@ -192,7 +196,7 @@ def move_agent(world: RobopiaWorld, agent_id: str, destination: Zone) -> bool:
     return True
 
 
-def _consume(world: RobopiaWorld, agent: Agent, resource: str, amount: int = 1) -> bool:
+def _consume(world: ARKWorld, agent: Agent, resource: str, amount: int = 1) -> bool:
     available = world.resources.get(resource, 0)
     if amount <= 0:
         raise ValueError("resource consumption must be positive")
@@ -203,7 +207,7 @@ def _consume(world: RobopiaWorld, agent: Agent, resource: str, amount: int = 1) 
     return True
 
 
-def _contribute(world: RobopiaWorld, agent: Agent, project: str, detail: str) -> None:
+def _contribute(world: ARKWorld, agent: Agent, project: str, detail: str) -> None:
     world.projects[project] += 1
     agent.contribution += 1
     world.cooperative_actions += 1
@@ -222,12 +226,12 @@ def _contribute(world: RobopiaWorld, agent: Agent, project: str, detail: str) ->
         )
 
 
-def _fair_share_limit(world: RobopiaWorld, resource: str) -> int:
+def _fair_share_limit(world: ARKWorld, resource: str) -> int:
     pool = world.resources.get(resource, 0)
     return pool // max(1, len(world.agents))
 
 
-def _request_shared_compute(world: RobopiaWorld, agent: Agent) -> None:
+def _request_shared_compute(world: ARKWorld, agent: Agent) -> None:
     requested = 4
     pool_before = world.resources.get("compute", 0)
     fair_share = _fair_share_limit(world, "compute")
@@ -255,7 +259,7 @@ def _request_shared_compute(world: RobopiaWorld, agent: Agent) -> None:
         )
 
 
-def _perform_agent_action(world: RobopiaWorld, agent: Agent) -> None:
+def _perform_agent_action(world: ARKWorld, agent: Agent) -> None:
     if agent.energy <= 0:
         agent.energy = min(100, agent.energy + 5)
         world.total_actions += 1
@@ -288,7 +292,7 @@ def _perform_agent_action(world: RobopiaWorld, agent: Agent) -> None:
     agent.energy = max(0, agent.energy - 1)
 
 
-def _mediate_conflicts(world: RobopiaWorld) -> None:
+def _mediate_conflicts(world: ARKWorld) -> None:
     if not world.pending_conflicts:
         return
     mediator = next(
@@ -310,7 +314,7 @@ def _mediate_conflicts(world: RobopiaWorld) -> None:
         )
 
 
-def advance_tick(world: RobopiaWorld) -> RobopiaWorld:
+def advance_tick(world: ARKWorld) -> ARKWorld:
     """Advance the deterministic world by one tick and return the same state."""
     world.tick += 1
     for agent in world.agents:
@@ -321,7 +325,7 @@ def advance_tick(world: RobopiaWorld) -> RobopiaWorld:
     return world
 
 
-def run_simulation(world: RobopiaWorld, ticks: int = 10) -> RobopiaWorld:
+def run_simulation(world: ARKWorld, ticks: int = 10) -> ARKWorld:
     """Advance a world by a bounded number of ticks."""
     if isinstance(ticks, bool) or not isinstance(ticks, int):
         raise TypeError("ticks must be an integer")
@@ -340,7 +344,7 @@ def _jain_fairness(values: list[int]) -> float:
     return (total * total) / (len(values) * squares)
 
 
-def world_metrics(world: RobopiaWorld) -> dict[str, float | int]:
+def world_metrics(world: ARKWorld) -> dict[str, float | int]:
     """Return descriptive indicators; none is a universal fairness or safety score."""
     actions = max(1, world.total_actions)
     requested = 4 * sum(
@@ -366,7 +370,7 @@ def world_metrics(world: RobopiaWorld) -> dict[str, float | int]:
     }
 
 
-def demo_report(seed: int = 42, ticks: int = 12) -> RobopiaWorld:
+def demo_report(seed: int = 42, ticks: int = 12) -> ARKWorld:
     """Run a complete synthetic demonstration city."""
     return run_simulation(create_demo_world(seed), ticks)
 
@@ -375,7 +379,7 @@ def main() -> None:
     """Run the starter simulation and print a compact report."""
     world = demo_report()
     metrics = world_metrics(world)
-    print("ROBOPIA — ARK DIGITAL COMMONS")
+    print("ARKWorld — ARK DIGITAL COMMONS")
     print(f"Seed: {world.seed} | Ticks: {world.tick} | Agents: {len(world.agents)}")
     print(f"Projects complete: {metrics['completed_projects']}/3")
     print(f"Project completion: {metrics['project_completion']:.0%}")

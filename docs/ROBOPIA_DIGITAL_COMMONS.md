@@ -1,6 +1,6 @@
-# ROBOPIA — The ARK Digital Commons
+# ARKWorld Digital Commons — Historical Module Guide
 
-ROBOPIA is a deterministic, virtual city in ARK where scripted agents share
+ARKWorld is a deterministic, virtual city in ARK where scripted agents share
 resources, work on public projects, explore knowledge, and resolve disputes
 through explicit rules.
 
@@ -10,11 +10,11 @@ From the repository root:
 
 ```bash
 pip install -e ".[dev]"
-ark-robopia
-streamlit run app.py
+ark-arkworld
+streamlit run arkworld.py
 ```
 
-Open **ROBOPIA — The ARK Digital Commons** in the Streamlit sidebar. The page
+Open **ARKWorld — The ARK Digital Commons** in the Streamlit sidebar. The page
 starts an eight-tick demonstration automatically. Use the controls to advance
 one tick, run ten ticks, reset the city with a chosen seed, or export the full
 world state and event trace as JSON.
@@ -73,7 +73,7 @@ prove a utopia.
 ## Architecture and limits
 
 The engine is in `src/ark/robopia/core.py`; the Streamlit dashboard is
-`pages/4_Robopia_Digital_Commons.py`; tests are in `tests/test_robopia.py`.
+`pages/4_ARKWorld_Digital_Commons.py`; tests are in `tests/test_arkworld.py`.
 
 This MVP uses six scripted agents and a small discrete-tick environment. It
 does not call external LLM APIs, execute arbitrary agent code, expose network

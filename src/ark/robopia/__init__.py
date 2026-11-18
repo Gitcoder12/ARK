@@ -1,4 +1,4 @@
-"""ARK Robopia digital commons simulation."""
+"""Backward-compatible Robopia imports for the ARKWorld digital commons."""
 
 from ark.robopia.core import (
     Agent,
