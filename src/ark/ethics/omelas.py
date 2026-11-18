@@ -123,6 +123,18 @@ _CRITICAL_DOMAINS = frozenset(
     }
 )
 
+CARE_FACILITY_BENCHMARK = (
+    "A quiet, private, comfortable room with clean bedding, secure storage, and personal space.",
+    "Clean bathrooms, reliable hygiene supplies, safe drinking water, ventilation, and comfortable temperatures.",
+    "Nutritious food choices and a way to accommodate medically assessed dietary needs.",
+    "Prompt access to qualified medical professionals and emergency care, with treatment continuity.",
+    "Confidential, voluntary, trauma-informed mental-health support from qualified professionals.",
+    "Individualised, high-quality education with learning materials and future pathways.",
+    "Safe outdoor access, recreation, books, creative activities, rest, and age-appropriate play.",
+    "Safe contact with trusted people, privacy, and accessible communication with an independent advocate.",
+    "Accessibility and reasonable accommodations for disability, communication, sensory, or other needs.",
+    "No punitive isolation, humiliation, forced treatment, or restraint as a convenience or disciplinary tool.",
+)
 
 @dataclass(frozen=True)
 class OmelasCase:
@@ -149,6 +161,8 @@ class OmelasCase:
             raise TypeError("age_years must be an integer")
         if self.age_years < 0:
             raise ValueError("age_years cannot be negative")
+        if self.age_years > 17:
+            raise ValueError("age_years must describe a child under 18")
 
         normalized: dict[CareDomain, ProvisionStatus] = {}
         for raw_domain, raw_status in self.care_provisions.items():
@@ -204,6 +218,8 @@ class OmelasAssessment:
     unknown_domains: tuple[CareDomain, ...]
     rights_concerns: tuple[str, ...]
     recommendations: tuple[str, ...]
+    urgent_care_required: bool
+    freedom_transition_required: bool
     community_dependency_can_veto_freedom: bool = False
     community_benefit_can_justify_coercion: bool = False
     care_can_compensate_for_coercion: bool = False
@@ -321,7 +337,17 @@ def assess_case(case: OmelasCase) -> OmelasAssessment:
     immediate_care_gap = any(
         provisions[domain] is ProvisionStatus.NOT_MET for domain in _CRITICAL_DOMAINS
     )
-    if case.coercion_detected or immediate_care_gap:
+    urgent_care_required = case.coercion_detected or immediate_care_gap
+    freedom_transition_required = (
+        case.child_preference is ChildPreference.WANTS_FREEDOM
+    )
+    if urgent_care_required and freedom_transition_required:
+        recommendations.append(
+            "Run both tracks in parallel: provide urgent care and protection now while "
+            "continuing the supported freedom transition. Care remediation must not be "
+            "used to postpone or veto the child freedom request."
+        )
+    if urgent_care_required:
         status = ReviewStatus.IMMEDIATE_PROTECTION_AND_CARE
         priority = ReviewPriority.URGENT
     elif case.child_preference is ChildPreference.WANTS_FREEDOM:
@@ -357,6 +383,8 @@ def assess_case(case: OmelasCase) -> OmelasAssessment:
         unknown_domains=unknown,
         rights_concerns=tuple(rights_concerns),
         recommendations=tuple(recommendations),
+        urgent_care_required=urgent_care_required,
+        freedom_transition_required=freedom_transition_required,
     )
 
 
