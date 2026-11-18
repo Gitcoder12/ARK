@@ -13,7 +13,7 @@ st.page_link(
     label="Open ARKWorld Digital Commons",
     icon="🌐",
 )
-st.page_link("app.py", label="Return to ARKWorld hub", icon="🏠")
+st.page_link("arkworld.py", label="Return to ARKWorld hub", icon="🏠")
 st.info(
     "Nothing was deleted. The original engine and Python import path are retained "
     "for compatibility; ARKWorld is the canonical user-facing name."
