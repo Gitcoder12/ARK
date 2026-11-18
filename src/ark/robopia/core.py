@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from enum import StrEnum
-from math import isfinite
 from typing import Any
 
 
