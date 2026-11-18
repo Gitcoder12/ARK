@@ -169,6 +169,9 @@ class OmelasCase:
                 ) from exc
             normalized[domain] = status
 
+        if not self.independent_advocate_available:
+            normalized[CareDomain.INDEPENDENT_ADVOCACY] = ProvisionStatus.NOT_MET
+
         object.__setattr__(self, "care_provisions", MappingProxyType(normalized))
         if not isinstance(self.child_preference, ChildPreference):
             try:
