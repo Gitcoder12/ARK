@@ -264,3 +264,10 @@ Run `ark-risk` for the sourced signal-pressure report. Run `streamlit run app.py
 ARK's **Omelas Safeguard** turns the ethical challenge in Ursula K. Le Guin's *The Ones Who Walk Away from Omelas* into a rights-first review framework. It checks care floors domain by domain, treats unknown provision as unknown, requires independent advocacy, and never allows community dependence to veto a child's request for freedom. There is deliberately no aggregate welfare score: good care is a duty, not compensation for coercion.
 
 Run the synthetic CLI scenario with ark-omelas, or open **Omelas Safeguard** in the Streamlit app. See [the module guide](docs/OMELAS_SAFEGUARD.md) for principles, limits, and tests.
+
+
+## Cross-Species Coexistence Harmonizer
+
+ARK's Cross-Species Coexistence Harmonizer provides rule-based safeguards for shared environments involving humans, animals, AI models, and robots. It evaluates interactions, fails closed on uncertain robot-motion safety, records AI-welfare uncertainty without claiming sentience, and preserves accountable operators and emergency shutdown.
+
+Run ark-harmony for a synthetic report, or open Cross-Species Harmonizer in the Streamlit app. See docs/CROSS_SPECIES_HARMONIZER.md. This is a prototype, not robot safety certification or proof that equal treatment reduces extinction risk.
