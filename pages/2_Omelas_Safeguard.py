@@ -11,8 +11,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from ark.ethics.omelas import (  # noqa: E402
-    CARE_DOMAINS,
     CARE_DOMAIN_LABELS,
+    CARE_DOMAINS,
     CARE_FACILITY_BENCHMARK,
     CareDomain,
     ChildPreference,
@@ -150,7 +150,9 @@ if submitted:
             for concern in assessment.rights_concerns:
                 st.write(f"- {concern}")
         else:
-            st.write("No concern was entered in this scenario; independent review remains necessary.")
+            st.write(
+                "No concern was entered in this scenario; independent review remains necessary."
+            )
 
         st.subheader("Required actions")
         for recommendation in assessment.recommendations:
