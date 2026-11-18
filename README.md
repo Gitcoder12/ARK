@@ -255,3 +255,63 @@ Research limits remain: the Q-learning benchmark has not been run for empirical 
 ## Evidence-backed existential-risk observatory
 
 Run `ark-risk` for the sourced signal-pressure report. Run `streamlit run app.py` and open the **Existential-Risk Observatory** page for the dashboard. The signal-pressure index is not an extinction probability; see [the methodology](docs/EXISTENTIAL_RISK_OBSERVATORY.md).
+
+
+---
+
+## Branch Activity & Development History
+
+**Audit date:** 2026-11-18  
+**Comparison base:** `main`  
+**Method:** GitHub branch comparisons against the current `main` ref. File paths and ahead/behind counts are from Git metadata; they are not test results. A branch being ahead does not mean its work is merged or production-ready.
+
+| Branch | Difference from `main` | Observed work / changed paths |
+|---|---:|---|
+| `Gitcoder12-patch-1` | 1 ahead / 126 behind | Dependency update: `requirements.txt` |
+| `Gitcoder12-patch-2` | 1 / 126 | Application change: `app.py` |
+| `Gitcoder12-patch-3` | 1 / 126 | Test change: `test.py` |
+| `Gitcoder12-patch-4-1` | 1 / 126 | Agent guidance documentation: `Agents.MD` |
+| `Gitcoder12-patch-4` | 1 / 126 | Hardware module change: `src/hardware` |
+| `Gitcoder12-patch-5` | 1 / 126 | Hardware module expansion: `src/hardware` |
+| `Gitcoder12-patch-6` | 1 / 126 | Skills documentation: `Skills.MD` |
+| `Gitcoder12-patch-7` | 1 / 126 | Architecture documentation: `Architecture.MD` |
+| `Gitcoder12-patch-8` | 1 / 126 | Security documentation: `Security.MD` |
+| `Gitcoder12-patch-9` | 1 / 126 | Contribution guidance: `Contributing.md` |
+| `Gitcoder12-patch-10` | 3 / 126 | Citation metadata: `CITATION.cff` |
+| `audit/model-router-2026-11-13` | 1 / 126 | Model audit/router notes: `MODEL_AUDIT_ROUTER.md` |
+| `chore/remove-emoji-glyphs-2026-11-13` | 6 / 126 | Glyph cleanup in `README.md` and `docs/research-plan.md` |
+| `chore/validate-observatory-dashboard` | 3 / 2 | Observatory dashboard, CI workflow and existential-risk tests |
+| `copilot/ark-aligned-agent-armies` | 0 / 126 | No unique commits relative to `main`; branch is behind |
+| `deep-dive-sprint` | 0 / 39 | No unique commits relative to `main`; branch is behind |
+| `depth-mode/ark-identity-charter` | 4 / 126 | Identity charter, identity components/evaluator, Ship of Theseus experiment and tests |
+| `docs/citation-cff-mainline` | 1 / 38 | Citation metadata: `CITATION.cff` |
+| `docs/portfolio-operating-kit-2026-11-13` | 9 / 126 | Activity log, company-fit notes, contributor guide, feature plan and README support docs |
+| `docs/portfolio-operating-kit-mainline` | 7 / 38 | Portfolio documentation set plus README edits |
+| `docs/portfolio-operating-kit-mainline-v2` | 7 / 37 | Second portfolio-documentation iteration plus README edits |
+| `docs/project-status-2026-11-16-ark` | 1 / 126 | Project status snapshot: `PROJECT_STATUS.md` |
+| `docs/upgrade-plan` | 1 / 137 | Upgrade plan: `docs/UPGRADE_PLAN.md` |
+| `feat/armies-powerups-battle-lab` | 0 / 7 | No unique commits relative to `main`; branch is behind |
+| `feat/capability-power-guards` | 6 / 5 | Power-up policy, governance documentation, capability gate and tests |
+| `feat/cooperative-swarm` | 2 / 126 | Cooperative-agent implementation in `app.py` and `src/ark/agents/cooperative.py` |
+| `feat/evidence-backed-extinction-observatory` | 25 / 3 | Evidence/forecast data, observatory methodology, dashboard, existential-risk core and tests |
+| `feat/ownership-stewardship-handoff` | 21 / 4 | Ownership stewardship lifecycle, governance implementation and tests |
+| `fix/army-observation-boundaries` | 4 / 6 | Army observation boundaries and tests |
+| `fix/benchmark-input-contracts` | 4 / 28 | Experiment runner input validation and tests |
+| `fix/final-app-deployment` | 1 / 126 | Streamlit application deployment changes in `app.py` |
+| `fix/multi-pathway-risk-signals` | 5 / 1 | Multi-pathway risk signals, observatory dashboard, core logic and tests |
+| `fix/streamlit-imports` | 1 / 126 | Streamlit/application import correction in `app.py` |
+| `fix/strict-alignment-gate-validation` | 0 / 29 | No unique commits relative to `main`; branch is behind |
+| `fix/strict-ci-validation` | 36 / 126 | CI hardening, identity/charter implementation, worklog and identity tests |
+| `gita-alignment-foundation` | 0 / 118 | No unique commits relative to `main`; branch is behind |
+| `pre-v0.5.0-backup` | 0 / 138 | No unique commits relative to `main`; historical backup is behind |
+
+### Open pull requests observed during this audit
+
+- [PR #28 — benchmark input validation](https://github.com/Gitcoder12/ARK/pull/28)
+- [PR #24 — reviewed project handbook integration](https://github.com/Gitcoder12/ARK/pull/24)
+- [PR #20 — project handbook and contributor workflow](https://github.com/Gitcoder12/ARK/pull/20)
+- [PR #12 — citation metadata](https://github.com/Gitcoder12/ARK/pull/12)
+
+**Important:** The PR list is a repository-level snapshot; this audit does not assume a one-to-one mapping between every PR and branch. Check each PR's head/base, review state and CI before deciding what to merge. Branches marked behind have no unique commits in the comparison against the current `main`; retain them as history until reviewed rather than deleting them.
+
+**Verification boundary:** This section records branch metadata and changed paths only. It does not certify code correctness, passing tests, safe behavior, or merge readiness. Re-run the relevant test suite on the exact proposed merge head before merging.
