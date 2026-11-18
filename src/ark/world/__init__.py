@@ -1,6 +1,7 @@
 """Canonical ARKWorld API for the digital commons simulation."""
 
 from ark.robopia.core import (
+    ARKWorld,
     Agent,
     EventKind,
     RobopiaWorld,
@@ -13,7 +14,6 @@ from ark.robopia.core import (
     world_metrics,
 )
 
-ARKWorld = RobopiaWorld
 create_world = create_demo_world
 
 __all__ = [
