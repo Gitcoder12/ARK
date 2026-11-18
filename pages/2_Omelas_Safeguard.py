@@ -122,7 +122,10 @@ if submitted:
         if assessment.urgent_care_required:
             st.error("Urgent care and protection action is required.")
         if assessment.freedom_transition_required:
-            st.warning("The freedom request remains active. Continue a supported, safe transition; community dependence cannot veto it.")
+            st.warning(
+                "The freedom request remains active. Continue a supported, safe transition; "
+                "community dependence cannot veto it."
+            )
         if not assessment.urgent_care_required and not assessment.freedom_transition_required:
             if assessment.status.value == "child_voice_required":
                 st.info("Establish the child views safely; do not infer consent.")
