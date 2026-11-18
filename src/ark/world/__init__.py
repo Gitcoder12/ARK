@@ -1,8 +1,8 @@
 """Canonical ARKWorld API for the digital commons simulation."""
 
 from ark.robopia.core import (
-    ARKWorld,
     Agent,
+    ARKWorld,
     EventKind,
     RobopiaWorld,
     Zone,
