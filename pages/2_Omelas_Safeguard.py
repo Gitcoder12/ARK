@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from ark.ethics.omelas import (  # noqa: E402
     CARE_DOMAINS,
     CARE_DOMAIN_LABELS,
+    CARE_FACILITY_BENCHMARK,
     CareDomain,
     ChildPreference,
     OmelasCase,
@@ -36,6 +37,11 @@ st.error(
     "Community benefit cannot veto a child's freedom. This page is a research demo, "
     "not a real-world child-protection or clinical system."
 )
+
+with st.expander("High-standard care facility checklist", expanded=True):
+    st.caption("These are care targets to verify independently, not a numerical score.")
+    for standard in CARE_FACILITY_BENCHMARK:
+        st.write(f"- {standard}")
 
 st.subheader("1. Scenario")
 st.write(
