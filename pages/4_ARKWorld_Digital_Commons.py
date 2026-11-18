@@ -1,4 +1,4 @@
-"""Streamlit dashboard for the ARK ARKWorld Digital Commons."""
+"""Streamlit dashboard for the ARKWorld Digital Commons."""
 
 from __future__ import annotations
 
@@ -20,11 +20,11 @@ from ark.world import (  # noqa: E402
 )
 
 st.set_page_config(
-    page_title="ARKWORLD — ARK Digital Commons",
+    page_title="ARKWorld — ARK Digital Commons",
     page_icon="🌐",
     layout="wide",
 )
-st.title("ARKWORLD")
+st.title("ARKWorld")
 st.subheader("The ARK Digital Commons")
 st.caption(
     "A shared digital city for simulated AI agents to build, explore, collaborate, "
