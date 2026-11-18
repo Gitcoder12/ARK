@@ -29,7 +29,10 @@ with left:
         "pages/5_Identity_Stability.py",
         label="Identity & Value Stability",
         icon="🧬",
-        help="Ship of Theseus experiments: memory drift, component replacement, and charter integrity.",
+        help=(
+            "Ship of Theseus experiments: memory drift, component replacement, "
+            "and charter integrity."
+        ),
     )
     st.markdown(
         "GridWorld benchmark, reward conflicts, goal drift, memory perturbations, "
@@ -41,7 +44,10 @@ with left:
         "pages/4_ARKWorld_Digital_Commons.py",
         label="ARKWorld Digital Commons",
         icon="🌐",
-        help="A shared virtual city with agents, zones, resources, public projects, and mediation.",
+        help=(
+            "A shared virtual city with agents, zones, resources, public projects, "
+            "and mediation."
+        ),
     )
     st.markdown(
         "The seven-zone digital city: scripted agents collaborate, share resources, "
@@ -75,7 +81,10 @@ with right:
         "pages/2_Omelas_Safeguard.py",
         label="Omelas Safeguard",
         icon="🛡️",
-        help="Rights-first child welfare review with independent advocacy and care floors.",
+        help=(
+            "Rights-first child welfare review with independent advocacy "
+            "and care floors."
+        ),
     )
     st.markdown(
         "A scenario reviewer for care provision, independent advocacy, and "
@@ -86,7 +95,10 @@ with right:
         "pages/3_Cross_Species_Harmonizer.py",
         label="Cross-Species Coexistence Harmonizer",
         icon="🤝",
-        help="Interaction review, robot-motion safety checks, AI-welfare uncertainty, and shutdown.",
+        help=(
+            "Interaction review, robot-motion safety checks, AI-welfare "
+            "uncertainty, and shutdown."
+        ),
     )
     st.markdown(
         "Rule-based safeguards for humans, animals, AI models, and robots. "
