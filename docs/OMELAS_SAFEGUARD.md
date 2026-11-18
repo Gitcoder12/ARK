@@ -30,6 +30,30 @@ the story's text or claim to provide the one definitive interpretation.
 Excellent care is a duty, not compensation for coercion. The design does not
 allow a high care provision in one domain to cancel a failure in another.
 
+## High-standard care setting
+
+The facility checklist is deliberately more demanding than survival-level care:
+
+- A quiet, private, comfortable room with clean bedding, personal storage, and dignity.
+- Clean bathrooms, hygiene supplies, safe drinking water, ventilation, and comfortable temperatures.
+- Nutritious food choices and accommodations for medically assessed dietary needs.
+- Prompt access to qualified medical professionals and emergency care, with continuity of treatment.
+- Confidential, voluntary, trauma-informed mental-health support.
+- Individualised, high-quality education and meaningful future opportunities.
+- Safe outdoor access, recreation, books, creative activities, rest, and age-appropriate play.
+- Safe contact with trusted people, private access to an independent advocate, and communication support.
+- Accessibility and reasonable accommodations for disability, sensory, or communication needs.
+- No punitive isolation, humiliation, forced treatment, or restraint for convenience or discipline.
+
+These are design targets for the scenario reviewer, not proof that a real facility meets them.
+A qualified independent person must verify every provision.
+
+## Parallel duties when the child wants freedom
+
+If a critical care gap exists at the same time as a freedom request, ARK raises an urgent
+care action and keeps the supported transition active. Improving care is required
+immediately; it must not become a pretext for indefinite delay or a community veto.
+
 ## Non-negotiable guardrails
 
 - **No sacrifice score:** there is no aggregate welfare number and no formula
