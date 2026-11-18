@@ -155,3 +155,21 @@ def test_unavailable_advocate_overrides_conflicting_met_checkbox():
         case.care_provisions[CareDomain.INDEPENDENT_ADVOCACY]
         is ProvisionStatus.NOT_MET
     )
+
+
+def test_urgent_care_and_freedom_transition_run_in_parallel():
+    provisions = {domain: ProvisionStatus.MET for domain in CARE_DOMAINS}
+    provisions[CareDomain.MEDICAL_CARE] = ProvisionStatus.NOT_MET
+    assessment = assess_case(
+        make_case(
+            care_provisions=provisions,
+            child_preference=ChildPreference.WANTS_FREEDOM,
+            community_depends_on_arrangement=True,
+        )
+    )
+
+    assert assessment.urgent_care_required is True
+    assert assessment.freedom_transition_required is True
+    assert assessment.status is ReviewStatus.IMMEDIATE_PROTECTION_AND_CARE
+    assert any("in parallel" in item for item in assessment.recommendations)
+    assert assessment.community_dependency_can_veto_freedom is False

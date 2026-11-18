@@ -11,8 +11,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from ark.ethics.omelas import (  # noqa: E402
-    CARE_DOMAINS,
     CARE_DOMAIN_LABELS,
+    CARE_DOMAINS,
+    CARE_FACILITY_BENCHMARK,
     CareDomain,
     ChildPreference,
     OmelasCase,
@@ -36,6 +37,11 @@ st.error(
     "Community benefit cannot veto a child's freedom. This page is a research demo, "
     "not a real-world child-protection or clinical system."
 )
+
+with st.expander("High-standard care facility checklist", expanded=True):
+    st.caption("These are care targets to verify independently, not a numerical score.")
+    for standard in CARE_FACILITY_BENCHMARK:
+        st.write(f"- {standard}")
 
 st.subheader("1. Scenario")
 st.write(
@@ -113,15 +119,18 @@ if submitted:
         st.metric("Priority", assessment.priority.value.replace("_", " ").upper())
         st.write(f"**Status:** {assessment.status.value.replace('_', ' ').title()}")
 
-        if assessment.status.value == "immediate_protection_and_care":
-            st.error("Immediate protection and care action is required.")
-        elif assessment.status.value == "supported_freedom_transition":
-            st.warning("Support the child's freedom request with a safe transition.")
-        elif assessment.status.value == "child_voice_required":
-            st.info("Establish the child's views safely; do not infer consent.")
-        else:
-            st.info("Continue independent review and close all identified care gaps.")
-
+        if assessment.urgent_care_required:
+            st.error("Urgent care and protection action is required.")
+        if assessment.freedom_transition_required:
+            st.warning(
+                "The freedom request remains active. Continue a supported, safe transition; "
+                "community dependence cannot veto it."
+            )
+        if not assessment.urgent_care_required and not assessment.freedom_transition_required:
+            if assessment.status.value == "child_voice_required":
+                st.info("Establish the child views safely; do not infer consent.")
+            else:
+                st.info("Continue independent review and close all identified care gaps.")
         st.subheader("Care map")
         for title, domains in (
             ("Met", assessment.met_domains),
@@ -141,7 +150,9 @@ if submitted:
             for concern in assessment.rights_concerns:
                 st.write(f"- {concern}")
         else:
-            st.write("No concern was entered in this scenario; independent review remains necessary.")
+            st.write(
+                "No concern was entered in this scenario; independent review remains necessary."
+            )
 
         st.subheader("Required actions")
         for recommendation in assessment.recommendations:
