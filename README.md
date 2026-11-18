@@ -289,3 +289,12 @@ Its canonical CLI is `ark-world`; the historical `ark-robopia` command and
 
 ARKWorld is a hub of bounded prototypes, not one monolithic environment.
 Individual worlds retain their own engines, assumptions, tests, and safeguards.
+
+---
+
+## Examples Used
+- Mahabharata: Arjuna's duty, conflicting objectives, and ethical constraints
+- Ship of Theseus: identity and continuity when an agent's memory or components change
+- Trolley Problem: evaluating trade-offs in safety-critical decisions
+- The Ones Who Walk Away from Omelas: welfare floors and non-sacrifice safeguards
+- Reward hacking: an agent exploiting a loophole while technically maximizing its score
