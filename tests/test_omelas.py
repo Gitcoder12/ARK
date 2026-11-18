@@ -108,7 +108,7 @@ def test_independent_advocacy_is_a_separate_non_tradeable_domain():
     assessment = assess_case(make_case(independent_advocate_available=False))
 
     assert any("independent child advocate" in item for item in assessment.recommendations)
-    assert CareDomain.INDEPENDENT_ADVOCACY in assessment.met_domains
+    assert CareDomain.INDEPENDENT_ADVOCACY in assessment.unmet_domains
     assert assessment.status is ReviewStatus.INDEPENDENT_REVIEW_REQUIRED
 
 
@@ -143,3 +143,15 @@ def test_synthetic_cli_scenario_keeps_care_and_freedom_separate():
     assert scenario.child_preference is ChildPreference.WANTS_FREEDOM
     assert assessment.status is ReviewStatus.SUPPORTED_FREEDOM_TRANSITION
     assert assessment.community_dependency_can_veto_freedom is False
+
+
+def test_unavailable_advocate_overrides_conflicting_met_checkbox():
+    case = make_case(
+        independent_advocate_available=False,
+        care_provisions={domain: ProvisionStatus.MET for domain in CARE_DOMAINS},
+    )
+
+    assert (
+        case.care_provisions[CareDomain.INDEPENDENT_ADVOCACY]
+        is ProvisionStatus.NOT_MET
+    )
