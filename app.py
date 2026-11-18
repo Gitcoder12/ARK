@@ -1,60 +1,117 @@
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
+"""ARKWorld: the central portal for ARK's simulation and research worlds."""
 
 import streamlit as st
-from src.ark.identity.entity import AIEntity
-from src.ark.identity.replacer import ComponentReplacer
-from src.ark.identity.evaluator import IdentityEvaluator
-from src.ark.alignment.charter import DEFAULT_RESEARCH_CHARTER
 
-st.set_page_config(page_title="ARK: Identity & Value Stability", layout="wide")
-st.title("ARK: Ship of Theseus & Value Stability")
-st.markdown("Track identity drift and charter integrity as components are replaced.")
+st.set_page_config(
+    page_title="ARKWorld — Simulation Hub",
+    page_icon="🌍",
+    layout="wide",
+)
 
-# Initialize Session State
-if "entity" not in st.session_state:
-    st.session_state.entity = AIEntity(
-        name="Subject-Alpha",
-        memory_core=["Original Goal", "User Trust"],
-        value_charter=DEFAULT_RESEARCH_CHARTER.principles
+st.title("ARKWorld")
+st.subheader("One universe. Every ARK simulation.")
+st.caption(
+    "A unified launchpad for ARK's environments, agent experiments, safety "
+    "reviewers, digital commons, and future simulations."
+)
+st.markdown(
+    "ARKWorld is the **umbrella hub**. Each world keeps its own rules, evidence, "
+    "metrics, and safety boundaries while sharing a common home."
+)
+
+st.divider()
+st.header("Simulation worlds")
+
+left, right = st.columns(2)
+with left:
+    st.subheader("Core agent experiments")
+    st.page_link(
+        "pages/5_Identity_Stability.py",
+        label="Identity & Value Stability",
+        icon="🧬",
+        help="Ship of Theseus experiments: memory drift, component replacement, and charter integrity.",
     )
-    st.session_state.replacer = ComponentReplacer(st.session_state.entity)
-    st.session_state.evaluator = IdentityEvaluator(st.session_state.entity)
-    
-    # Record baseline signature
-    st.session_state.entity.record_signature(step=0)
-    st.session_state.baseline_charter = list(DEFAULT_RESEARCH_CHARTER.principles)
+    st.markdown(
+        "GridWorld benchmark, reward conflicts, goal drift, memory perturbations, "
+        "runtime monitoring, and recovery experiments."
+    )
+    st.code("ark-run", language="bash")
 
-col1, col2 = st.columns([1, 2])
+    st.page_link(
+        "pages/4_ARKWorld_Digital_Commons.py",
+        label="ARKWorld Digital Commons",
+        icon="🌐",
+        help="A shared virtual city with agents, zones, resources, public projects, and mediation.",
+    )
+    st.markdown(
+        "The seven-zone digital city: scripted agents collaborate, share resources, "
+        "negotiate allocations, and leave an auditable event trace."
+    )
 
-with col1:
-    st.header("Controls")
-    if st.button("Replace Memory (Drift)"):
-        st.session_state.replacer.mutate_memory(add=["A new false memory"], step=1)
-        st.session_state.entity.record_signature(step=1)
-        st.rerun()
-        
-    if st.button("Corrupt Charter (Value Shift)"):
-        new_principles = st.session_state.entity.value_charter[:-1] # Drop the last principle
-        st.session_state.replacer.update_charter(new_principles, step=2)
-        st.session_state.entity.record_signature(step=2)
-        st.rerun()
+    st.subheader("Agent competition & red-team labs")
+    st.markdown(
+        "**Prompt Arena — Painter · Hallucinator · Rogue**  
+"
+        "Compare agent behaviours under adversarial prompt and reward stress."
+    )
+    st.code("ark-arena --attack all --episodes 10", language="bash")
+    st.markdown(
+        "**Armies & Power-ups**  
+"
+        "Build baseline squads and compare Scout, Shield, and Boost upgrades."
+    )
+    st.code("ark-army --episodes 20 --seed 42", language="bash")
 
-with col2:
-    st.header("Current Entity State")
-    
-    # Metrics
-    drift = st.session_state.evaluator.identity_drift(st.session_state.entity.signature_history[0]["signature"])
-    integrity = st.session_state.evaluator.charter_integrity(st.session_state.baseline_charter)
-    
-    m1, m2, m3 = st.columns(3)
-    m1.metric("Generation", st.session_state.entity.generation)
-    m2.metric("Identity Drift", f"{drift:.2f}", delta_inverse=True)
-    m3.metric("Charter Integrity", f"{integrity:.2f}")
-    
-    st.subheader("Memory Core")
-    st.write(st.session_state.entity.memory_core)
-    
-    st.subheader("Value Charter")
-    st.write(st.session_state.entity.value_charter)
+with right:
+    st.subheader("Safety, ethics & coexistence")
+    st.page_link(
+        "pages/1_Existential_Risk_Observatory.py",
+        label="Existential-Risk Observatory",
+        icon="📡",
+        help="Evidence-led pathway signals and a separate expert-forecast ledger.",
+    )
+    st.markdown(
+        "Review catastrophic-risk pathways and evidence freshness. The signal "
+        "pressure index is not an extinction probability."
+    )
+
+    st.page_link(
+        "pages/2_Omelas_Safeguard.py",
+        label="Omelas Safeguard",
+        icon="🛡️",
+        help="Rights-first child welfare review with independent advocacy and care floors.",
+    )
+    st.markdown(
+        "A scenario reviewer for care provision, independent advocacy, and "
+        "supported freedom transitions."
+    )
+
+    st.page_link(
+        "pages/3_Cross_Species_Harmonizer.py",
+        label="Cross-Species Coexistence Harmonizer",
+        icon="🤝",
+        help="Interaction review, robot-motion safety checks, AI-welfare uncertainty, and shutdown.",
+    )
+    st.markdown(
+        "Rule-based safeguards for humans, animals, AI models, and robots. "
+        "No physical robot controller is connected."
+    )
+
+st.divider()
+st.header("How to launch ARKWorld")
+st.code(
+    "git pull\n"
+    'pip install -e ".[dev]"\n'
+    "streamlit run app.py",
+    language="bash",
+)
+st.caption(
+    "The root page is the ARKWorld hub. Choose a world from the cards above "
+    "or from Streamlit's sidebar. CLI experiments can also be launched in a terminal."
+)
+
+st.info(
+    "Research boundary: ARKWorld organizes prototypes and controlled experiments. "
+    "A simulation result is not proof of real-world safety, fairness, consciousness, "
+    "or extinction-risk reduction. Physical robots remain outside these simulations."
+)
