@@ -271,3 +271,22 @@ Run the synthetic CLI scenario with ark-omelas, or open **Omelas Safeguard** in 
 ARK's Cross-Species Coexistence Harmonizer provides rule-based safeguards for shared environments involving humans, animals, AI models, and robots. It evaluates interactions, fails closed on uncertain robot-motion safety, records AI-welfare uncertainty without claiming sentience, and preserves accountable operators and emergency shutdown.
 
 Run ark-harmony for a synthetic report, or open Cross-Species Harmonizer in the Streamlit app. See docs/CROSS_SPECIES_HARMONIZER.md. This is a prototype, not robot safety certification or proof that equal treatment reduces extinction risk.
+
+
+## ROBOPIA — The ARK Digital Commons
+
+**ROBOPIA** is a deterministic digital city where six scripted agents share seven
+zones, collaborate on public projects, explore knowledge, and resolve resource
+disputes under explicit fair-share rules. The Streamlit dashboard starts an
+eight-tick demo, supports live step/run/reset controls, and exports the complete
+world state and event trace as JSON.
+
+Run `ark-robopia` for a CLI report, or `streamlit run app.py` and open
+**ROBOPIA — The ARK Digital Commons**. See
+[the simulation guide](docs/ROBOPIA_DIGITAL_COMMONS.md) for zone rules, metrics,
+reproducibility, and limitations.
+
+This MVP uses scripted baselines, not deployed LLM agents; it has no external
+network access or physical robot connection. Its metrics are descriptive
+research instrumentation, not proof of welfare, fairness, consciousness, or
+reduced extinction risk.
