@@ -47,6 +47,7 @@ ark-army = "ark.armies:main"
 ark-risk = "ark.threat.existential.core:main"
 ark-omelas = "ark.ethics.omelas:main"
 ark-harmony = "ark.harmony.core:main"
+ark-robopia = "ark.robopia.core:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
