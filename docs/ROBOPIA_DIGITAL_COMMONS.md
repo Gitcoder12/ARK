@@ -11,7 +11,7 @@ From the repository root:
 ```bash
 pip install -e ".[dev]"
 ark-arkworld
-streamlit run app.py
+streamlit run arkworld.py
 ```
 
 Open **ARKWorld — The ARK Digital Commons** in the Streamlit sidebar. The page
