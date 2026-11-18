@@ -10,7 +10,7 @@ organizes them without pretending that different experiments are one model.
 ```bash
 git pull
 pip install -e ".[dev]"
-streamlit run app.py
+streamlit run arkworld.py
 ```
 
 The root Streamlit page is the ARKWorld hub. Select a simulation from its cards
