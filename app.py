@@ -49,18 +49,14 @@ with left:
     )
 
     st.subheader("Agent competition & red-team labs")
-    st.markdown(
-        "**Prompt Arena — Painter · Hallucinator · Rogue**  
-"
+    st.markdown("**Prompt Arena — Painter · Hallucinator · Rogue**")
+    st.write(
         "Compare agent behaviours under adversarial prompt and reward stress."
     )
     st.code("ark-arena --attack all --episodes 10", language="bash")
-    st.markdown(
-        "**Armies & Power-ups**  
-"
-        "Build baseline squads and compare Scout, Shield, and Boost upgrades."
-    )
-    st.code("ark-army --episodes 20 --seed 42", language="bash")
+    st.markdown("**Armies & Power-ups**")
+    st.write("Build baseline squads and compare Scout, Shield, and Boost upgrades.")
+    st.code("ark-army --episodes 20 --seed 42")
 
 with right:
     st.subheader("Safety, ethics & coexistence")
