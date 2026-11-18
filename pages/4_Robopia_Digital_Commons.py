@@ -116,7 +116,7 @@ with agents_tab:
 
     st.subheader("Shared resource pools")
     resource_columns = st.columns(3)
-    for column, resource in zip(resource_columns, ("compute", "materials", "knowledge")):
+    for column, resource in zip(resource_columns, ("compute", "materials", "knowledge"), strict=True):
         column.metric(resource.title(), world.resources.get(resource, 0))
 
     st.subheader("Research indicators")
