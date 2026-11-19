@@ -122,7 +122,9 @@ else:
             st.write(paper.get("rationale", "No relevance note recorded."))
             st.markdown(f"[Open original source]({paper['url']})")
             if paper.get("doi"):
-                st.caption(f"DOI: {paper['doi']}")
+                st.caption(f"Publication DOI: {paper['doi']}")
+            if paper.get("preprint_doi"):
+                st.caption(f"Preprint DOI: {paper['preprint_doi']}")
             st.caption(f"Metadata source: {paper.get('metadata_source', 'Not recorded')}")
             if paper.get("metadata_note"):
                 st.warning(paper["metadata_note"])
