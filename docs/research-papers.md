@@ -2,7 +2,7 @@
 
 A curated, searchable bibliography supporting ARK's research questions, evaluation methods, and safeguards. The Streamlit page is available at `pages/6_Research_Library.py`; the structured catalogue is `data/research_library.json`.
 
-**Attribution policy:** author names are preserved in the original order shown by the canonical source. Venue and publication status are recorded separately. Preprints are not described as peer-reviewed publications. Candidate records with unresolved metadata are clearly isolated and are not presented as confirmed acceptances.
+**Attribution policy:** author names are preserved in the original order shown by the canonical publication record. Venue and publication status are recorded separately. Preprints are not described as peer-reviewed publications. Candidate records with unresolved metadata are clearly isolated and are not presented as confirmed acceptances.
 
 **Priority:** ARPI measures relevance to ARK's current roadmap only. It does not measure paper quality, author merit, or general scientific importance. See [Research Priority Index](research-priority.md).
 
@@ -142,7 +142,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 
 ### [Reflexion: Language Agents with Verbal Reinforcement Learning](https://papers.neurips.cc/paper_files/paper/2023/hash/1b44b878bb782e6954cd888628510e90-Abstract-Conference.html)
 
-- **Authors:** Noah Shinn, Federico Cassano, Edward Berman, Ashwin Gopinath, Karthik Narasimhan, Shunyu Yao
+- **Authors:** Noah Shinn, Federico Cassano, Ashwin Gopinath, Karthik Narasimhan, Shunyu Yao
 - **Year:** 2023
 - **Venue:** NeurIPS 2023 — main conference
 - **Status:** Published conference paper
@@ -241,16 +241,16 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Why it matters:** Broad interactive benchmark and failure-analysis reference for agent reasoning, decision-making, and instruction following.
 - **Metadata source:** arXiv and ICLR proceedings metadata
 
-### [GAIA: a benchmark for General AI Assistants](https://arxiv.org/abs/2311.12983)
+### [GAIA: a benchmark for General AI Assistants](https://proceedings.iclr.cc/paper_files/paper/2024/hash/25ae35b5b1738d80f1f03a8713e405ec-Abstract-Conference.html)
 
-- **Authors:** Grégoire Mialon, Clémentine Fourrier, Craig Swift, Thomas Wolf, Yann LeCun, Thomas Scialom
-- **Year:** 2023
-- **Venue:** arXiv preprint; subsequently presented as an ICLR benchmark
-- **Status:** Preprint / benchmark release
+- **Authors:** Grégoire Mialon, Clémentine Fourrier, Thomas Wolf, Yann LeCun, Thomas Scialom
+- **Year:** 2024
+- **Venue:** ICLR 2024 — main conference
+- **Status:** Published conference paper
 - **ARK priority:** P2 — Supporting relevance
 - **DOI:** 10.48550/arXiv.2311.12983
 - **Why it matters:** Useful for general assistant capability, tool-use, and multi-step task evaluation, though not a dedicated safety benchmark.
-- **Metadata source:** arXiv and author/institution research page
+- **Metadata source:** ICLR proceedings
 
 ### [OSWorld: Benchmarking Multimodal Agents for Open-Ended Tasks in Real Computer Environments](https://arxiv.org/abs/2404.07972)
 
