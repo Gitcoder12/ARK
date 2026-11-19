@@ -330,3 +330,12 @@ Inspect AI, Safety-Gymnasium and OpenAI Evals have established evaluation abstra
 
 ### Research validity and limitations
 Report seeds, environment distributions, baseline definitions, sample sizes, confidence intervals and ablations. Keep scripted agents distinct from learned agents; test for monitor-induced livelock and false interventions. A threat meter is not a calibrated probability of existential risk. This is a benchmark-scope comparison, not proof that ARK is superior or that an agent is safe.
+
+
+---
+
+## ARKBox — versioned scenarios and experiment records
+
+ARKBox stores validated GridWorld scenarios, verifies scenario content hashes and records experiment provenance including scenario hash, agent, seed, configuration, metrics, code revision and environment metadata. The first adapter uses ARK's existing GridWorld; it is not a physical-robot simulator.
+
+See [docs/ARKBOX.md](docs/ARKBOX.md) for installation, CLI and Python API examples.
