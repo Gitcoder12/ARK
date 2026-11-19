@@ -1,0 +1,1 @@
+# ARK Live Research Feed\n\n_Not synced yet. Run the research collector locally or trigger the Refresh ARK Research Feed GitHub Actions workflow._\n\nSee [the curated research library](research-papers.md) for foundational references.\n
