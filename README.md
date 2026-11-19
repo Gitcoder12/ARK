@@ -125,7 +125,7 @@ cd ARK
 
 # create venv
 python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
+source .venv/bin/activate   # Windows: .venv\\Scripts\\activate
 
 # install
 pip install -e ".[dev]"
@@ -247,8 +247,7 @@ Research limits remain: the Q-learning benchmark has not been run for empirical 
 
 - [Live research feed](docs/research-feed.md) — automatically refreshed daily from arXiv.
 - [Curated research papers](docs/research-papers.md) — categorized foundational literature and ARK publications.
-
-- [Research papers](docs/research-papers.md) — categorized literature on alignment, goal integrity, reward hacking, self-improvement, memory security, prompt injection, corrigibility, and agent/robotics evaluation. Includes a dedicated section for ARK publications.
+- [Research Priority Index](docs/research-priority.md) — provisional, transparent paper-to-ARK relevance tiers and scoring rubric; not a ranking of authors or scientific quality.
 
 ## Project documentation
 
