@@ -272,7 +272,7 @@ def main() -> int:
                 for paper in papers:
                     merge_paper(collected, paper)
             except (urllib.error.URLError, TimeoutError, ET.ParseError, OSError,
-                    ValueError, KeyError, TypeError) as exc:
+                    ValueError, KeyError, TypeError, ET.ParseError) as exc:
                 errors.append(f"{source} / {category}: {exc}")
             time.sleep(1)
     if not collected:
