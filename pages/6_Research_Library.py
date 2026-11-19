@@ -110,7 +110,7 @@ else:
                 st.markdown(f"**Research area:** {paper.get('category', 'Uncategorized')}")
                 author_text = ", ".join(paper.get("authors") or [])
                 if not author_text:
-                    author_text = "Not published / not independently verified"
+                    author_text = "Withheld pending source reconciliation"
                 st.markdown(f"**Authors (original order):** {author_text}")
                 st.markdown(f"**Year:** {paper.get('year', 'Not recorded')}")
                 st.markdown(f"**Venue:** {paper.get('venue', 'Not verified')}")
