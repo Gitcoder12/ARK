@@ -249,7 +249,7 @@ Research limits remain: the Q-learning benchmark has not been run for empirical 
 - [Curated research papers](docs/research-papers.md) — categorized foundational literature and ARK publications.
 - [Research Priority Index](docs/research-priority.md) — transparent paper-to-ARK relevance tiers and review protocol; not a ranking of authors or scientific quality.
 - [Structured research catalogue](data/research_library.json) — attributed records powering the searchable library.
-- **Searchable Research Library** — launch `streamlit run arkworld.py` and select **6_Research_Library** in the Streamlit sidebar to filter by topic and priority.
+- **Searchable Research Library** — launch `streamlit run arkworld.py` and select **Research Library** in the Streamlit sidebar to filter by topic and priority.
 
 ## Project documentation
 
