@@ -4,6 +4,8 @@ A curated reading map for research that informs ARK's experiments, evaluation me
 
 **Selection rule:** prioritize work that helps define a failure mode, build a reproducible test, measure agent behavior, or evaluate a mitigation. This is a focused starting bibliography, not an exhaustive survey.
 
+**Research priority:** see the [ARK Research Priority Index (ARPI)](research-priority.md) for a transparent, provisional ranking of paper-to-ARK relevance. ARPI does not rank authors or scientific quality; P3 means less directly applicable to the current roadmap, not useless.
+
 ## 1. Alignment foundations and goal integrity
 
 | Paper | Why it matters to ARK |
