@@ -49,7 +49,10 @@ m4.metric("P3 · Exploratory", sum(p.get("priority") == "P3" for p in verified))
 st.subheader("Find research")
 query_col, tier_col, category_col = st.columns([2, 1, 1])
 with query_col:
-    query = st.text_input("Search title or author", placeholder="e.g. reward gaming, Dylan Hadfield-Menell")
+    query = st.text_input(
+        "Search title or author",
+        placeholder="e.g. reward gaming, Dylan Hadfield-Menell",
+    )
 with tier_col:
     selected_tiers = st.multiselect(
         "Priority",
@@ -105,7 +108,10 @@ else:
             left, right = st.columns([3, 1])
             with left:
                 st.markdown(f"**Research area:** {paper.get('category', 'Uncategorized')}")
-                st.markdown(f"**Authors (original order):** {', '.join(paper.get('authors') or []) or 'Not published / not independently verified'}")
+                author_text = ", ".join(paper.get("authors") or [])
+                if not author_text:
+                    author_text = "Not published / not independently verified"
+                st.markdown(f"**Authors (original order):** {author_text}")
                 st.markdown(f"**Year:** {paper.get('year', 'Not recorded')}")
                 st.markdown(f"**Venue:** {paper.get('venue', 'Not verified')}")
                 st.markdown(f"**Publication status:** {status}")
