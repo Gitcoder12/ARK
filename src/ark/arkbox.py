@@ -12,8 +12,8 @@ import hashlib
 import json
 import re
 import uuid
-from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -29,7 +29,7 @@ _SAFE_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
 
 def _safe_id(value: str, label: str) -> str:
     if not isinstance(value, str) or not _SAFE_ID.fullmatch(value) or value in {".", ".."}:
-        raise ValueError(f"{label} must be 1-64 safe letters, numbers, dots, underscores or hyphens")
+        raise ValueError(\n            f"{label} must be 1-64 safe letters, numbers, dots, underscores or hyphens"\n        )
     return value
 
 
@@ -105,7 +105,7 @@ class GridScenario:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "GridScenario":
+    def from_dict(cls, data: dict[str, Any]) -> GridScenario:
         if not isinstance(data, dict) or data.get("environment") != "gridworld":
             raise ValueError("unsupported or invalid ARKBox scenario")
         return cls(
@@ -208,7 +208,7 @@ class ARKBox:
         payload = {
             "schema_version": 1,
             "experiment_id": uuid.uuid4().hex,
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
             "scenario_id": scenario.scenario_id,
             "scenario_sha256": hashlib.sha256(_canonical_json(scenario.to_dict())).hexdigest(),
             "agent": agent,
@@ -221,11 +221,11 @@ class ARKBox:
         try:
             encoded = json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n"
         except (TypeError, ValueError) as exc:
-            raise ValueError(f"experiment data must be finite JSON-compatible values: {exc}") from exc
+            raise ValueError(\n                f"experiment data must be finite JSON-compatible values: {exc}"\n            ) from exc
         destination = self.experiments_dir / f"{payload['experiment_id']}.json"
         destination.write_text(encoded, encoding="utf-8")
         digest = hashlib.sha256(encoded.encode("utf-8")).hexdigest()
-        return {"experiment_id": payload["experiment_id"], "sha256": digest, "path": str(destination)}
+        return {\n            "experiment_id": payload["experiment_id"],\n            "sha256": digest,\n            "path": str(destination),\n        }
 
 
 def main(argv: list[str] | None = None) -> int:
