@@ -29,7 +29,9 @@ _SAFE_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
 
 def _safe_id(value: str, label: str) -> str:
     if not isinstance(value, str) or not _SAFE_ID.fullmatch(value) or value in {".", ".."}:
-        raise ValueError(\n            f"{label} must be 1-64 safe letters, numbers, dots, underscores or hyphens"\n        )
+        raise ValueError(
+            f"{label} must be 1-64 safe letters, numbers, dots, underscores or hyphens"
+        )
     return value
 
 
@@ -221,11 +223,17 @@ class ARKBox:
         try:
             encoded = json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n"
         except (TypeError, ValueError) as exc:
-            raise ValueError(\n                f"experiment data must be finite JSON-compatible values: {exc}"\n            ) from exc
+            raise ValueError(
+                f"experiment data must be finite JSON-compatible values: {exc}"
+            ) from exc
         destination = self.experiments_dir / f"{payload['experiment_id']}.json"
         destination.write_text(encoded, encoding="utf-8")
         digest = hashlib.sha256(encoded.encode("utf-8")).hexdigest()
-        return {\n            "experiment_id": payload["experiment_id"],\n            "sha256": digest,\n            "path": str(destination),\n        }
+        return {
+            "experiment_id": payload["experiment_id"],
+            "sha256": digest,
+            "path": str(destination),
+        }
 
 
 def main(argv: list[str] | None = None) -> int:
