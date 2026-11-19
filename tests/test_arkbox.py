@@ -112,3 +112,16 @@ def test_scenario_id_rejects_path_traversal(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="scenario_id"):
         box.load_scenario("../outside")
+
+
+def test_ark_box_cli_add_default_and_list(tmp_path: Path, capsys) -> None:
+    from ark.arkbox import main
+
+    root = str(tmp_path / "arkbox")
+    assert main(["--root", root, "add-default"]) == 0
+    added = capsys.readouterr().out
+    assert "gridworld-baseline-v1" in added
+
+    assert main(["--root", root, "list"]) == 0
+    listed = capsys.readouterr().out
+    assert "Standard 7x7 GridWorld baseline" in listed
