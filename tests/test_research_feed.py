@@ -1,14 +1,22 @@
-from scripts.update_research_feed import (
-    category_query,
-    date_from_parts,
-    merge_paper,
-    reconstruct_abstract,
-    render_markdown,
-)
+from importlib.util import module_from_spec, spec_from_file_location
+from pathlib import Path
+
+MODULE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "update_research_feed.py"
+SPEC = spec_from_file_location("ark_research_feed", MODULE_PATH)
+assert SPEC is not None and SPEC.loader is not None
+RESEARCH_FEED = module_from_spec(SPEC)
+SPEC.loader.exec_module(RESEARCH_FEED)
+
+category_query = RESEARCH_FEED.category_query
+date_from_parts = RESEARCH_FEED.date_from_parts
+merge_paper = RESEARCH_FEED.merge_paper
+reconstruct_abstract = RESEARCH_FEED.reconstruct_abstract
+render_markdown = RESEARCH_FEED.render_markdown
 
 
-def test_category_query_builds_arxiv_or_query():
-    assert category_query(["AI alignment", "goal drift"]) == '"AI alignment" OR "goal drift"'
+def test_category_query_builds_provider_search_query():
+    query = category_query(["AI alignment", "goal drift"])
+    assert query == '"AI alignment" OR "goal drift"'
 
 
 def test_reconstruct_abstract_restores_word_order():
@@ -31,8 +39,12 @@ def test_merge_paper_deduplicates_doi_across_providers():
         "categories": [], "ark_category": "AI alignment and goal integrity",
         "source": "OpenAlex",
     }
-    second = {**first, "source": "Crossref", "abstract": "An abstract.",
-              "ark_category": "Corrigibility and runtime safeguards"}
+    second = {
+        **first,
+        "source": "Crossref",
+        "abstract": "An abstract.",
+        "ark_category": "Corrigibility and runtime safeguards",
+    }
     merge_paper(records, first)
     merge_paper(records, second)
     assert len(records) == 1
