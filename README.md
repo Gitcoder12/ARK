@@ -243,6 +243,10 @@ PR #18 merged the tabular Q-learning baseline, adversarial monitor probes, fail-
 
 Research limits remain: the Q-learning benchmark has not been run for empirical learned-policy performance reporting; the policy uses a partial-observation state; the monitor uses privileged simulator state; and the threat index is heuristic. These components do not establish general real-world alignment or safety.
 
+## Research library
+
+- [Research papers](docs/research-papers.md) — categorized literature on alignment, goal integrity, reward hacking, self-improvement, memory security, prompt injection, corrigibility, and agent/robotics evaluation. Includes a dedicated section for ARK publications.
+
 ## Project documentation
 
 - [Activity log](ACTIVITY_LOG.md) — dated project work and validation evidence.
