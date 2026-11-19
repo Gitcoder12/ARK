@@ -356,13 +356,14 @@
       "year": 2024,
       "venue": "ICLR 2024 — conference",
       "publication_status": "Published conference paper",
-      "doi": "10.48550/arXiv.2309.03409",
+      "doi": "",
       "url": "https://proceedings.iclr.cc/paper_files/paper/2024/hash/3339f19c5fcee3ad74502947a32be9e6-Abstract-Conference.html",
       "category": "Self-improvement and optimization",
       "priority": "P2",
       "rationale": "Useful baseline for iterative LLM optimization from prior candidates and scores; supports bounded self-improvement experiments.",
       "metadata_source": "ICLR proceedings",
-      "metadata_verified": true
+      "metadata_verified": true,
+      "preprint_doi": "10.48550/arXiv.2309.03409"
     },
     {
       "id": "promptbreeder",
@@ -427,13 +428,14 @@
       "year": 2024,
       "venue": "ICLR 2024 — conference",
       "publication_status": "Published conference paper",
-      "doi": "10.48550/arXiv.2310.03714",
+      "doi": "",
       "url": "https://arxiv.org/abs/2310.03714",
       "category": "Self-improvement and optimization",
       "priority": "P2",
       "rationale": "Engineering framework for compiling and optimizing LM pipelines against metrics; relevant to reproducible agent evaluation and bounded optimization.",
       "metadata_source": "arXiv and ICLR paper",
-      "metadata_verified": true
+      "metadata_verified": true,
+      "preprint_doi": "10.48550/arXiv.2310.03714"
     },
     {
       "id": "gepa",
@@ -460,13 +462,14 @@
       "year": 2026,
       "venue": "ICLR 2026 — conference",
       "publication_status": "Published conference paper",
-      "doi": "10.48550/arXiv.2507.19457",
+      "doi": "",
       "url": "https://proceedings.iclr.cc/paper_files/paper/2026/hash/0e9e708b6f48e14fd0ac29e167413f76-Abstract-Conference.html",
       "category": "Self-improvement and optimization",
       "priority": "P2",
       "rationale": "Current reflective optimization method; useful for designing tests of trajectory-based feedback, prompt updates, and optimization safety.",
       "metadata_source": "ICLR proceedings",
-      "metadata_verified": true
+      "metadata_verified": true,
+      "preprint_doi": "10.48550/arXiv.2507.19457"
     },
     {
       "id": "agentbench",
@@ -498,13 +501,14 @@
       "year": 2024,
       "venue": "ICLR 2024 — conference",
       "publication_status": "Published conference paper",
-      "doi": "10.48550/arXiv.2308.03688",
+      "doi": "",
       "url": "https://arxiv.org/abs/2308.03688",
       "category": "Agent evaluation",
       "priority": "P1",
       "rationale": "Broad interactive benchmark and failure-analysis reference for agent reasoning, decision-making, and instruction following.",
       "metadata_source": "arXiv and ICLR proceedings metadata",
-      "metadata_verified": true
+      "metadata_verified": true,
+      "preprint_doi": "10.48550/arXiv.2308.03688"
     },
     {
       "id": "gaia",
@@ -519,13 +523,14 @@
       "year": 2024,
       "venue": "ICLR 2024 — main conference",
       "publication_status": "Published conference paper",
-      "doi": "10.48550/arXiv.2311.12983",
+      "doi": "",
       "url": "https://proceedings.iclr.cc/paper_files/paper/2024/hash/25ae35b5b1738d80f1f03a8713e405ec-Abstract-Conference.html",
       "category": "Agent evaluation",
       "priority": "P2",
       "rationale": "Useful for general assistant capability, tool-use, and multi-step task evaluation, though not a dedicated safety benchmark.",
       "metadata_source": "ICLR proceedings",
-      "metadata_verified": true
+      "metadata_verified": true,
+      "preprint_doi": "10.48550/arXiv.2311.12983"
     },
     {
       "id": "osworld",
@@ -552,13 +557,14 @@
       "year": 2024,
       "venue": "NeurIPS 2024",
       "publication_status": "Published conference paper",
-      "doi": "10.48550/arXiv.2404.07972",
+      "doi": "",
       "url": "https://arxiv.org/abs/2404.07972",
       "category": "Agent evaluation",
       "priority": "P2",
       "rationale": "Provides realistic computer-use environments and execution-based evaluation for future tool-using ARK agents.",
       "metadata_source": "arXiv and official project repository",
-      "metadata_verified": true
+      "metadata_verified": true,
+      "preprint_doi": "10.48550/arXiv.2404.07972"
     },
     {
       "id": "agentsafe",
