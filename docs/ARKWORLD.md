@@ -67,3 +67,15 @@ robot safety certification, or reduced extinction risk. The digital commons
 agents are scripted baselines, not autonomous deployed AI systems. Physical
 robotics integrations require independent safety engineering and remain
 outside this hub.
+
+
+## Separation from ARKBox
+
+ARKWorld and ARKBox are different systems with different responsibilities.
+
+- **ARKWorld** is the simulation registry and launch hub. It organizes and launches the actual bounded simulation worlds and research tools.
+- **ARKBox** is the scenario and experiment library. It stores reusable environment definitions, scenario metadata, configuration snapshots, seeds and experiment records.
+
+ARKBox does not become a simulation world, and ARKWorld does not become a repository for experiment files. A world can load a versioned scenario from ARKBox, run it, and send its trace and metrics back as an experiment record. The simulation engine remains inside its own ARKWorld module.
+
+See [ARKBox](ARKBOX.md) for its storage format and current GridWorld adapter.
