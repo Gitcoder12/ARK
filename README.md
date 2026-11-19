@@ -245,6 +245,9 @@ Research limits remain: the Q-learning benchmark has not been run for empirical 
 
 ## Research library
 
+- [Live research feed](docs/research-feed.md) — automatically refreshed daily from arXiv.
+- [Curated research papers](docs/research-papers.md) — categorized foundational literature and ARK publications.
+
 - [Research papers](docs/research-papers.md) — categorized literature on alignment, goal integrity, reward hacking, self-improvement, memory security, prompt injection, corrigibility, and agent/robotics evaluation. Includes a dedicated section for ARK publications.
 
 ## Project documentation
