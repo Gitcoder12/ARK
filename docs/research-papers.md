@@ -15,7 +15,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** arXiv preprint
 - **Status:** Preprint
 - **ARK priority:** P1 — Core relevance
-- **DOI:** 10.48550/arXiv.1606.06565
+- **Publication DOI:** 10.48550/arXiv.1606.06565
 - **Why it matters:** Foundational taxonomy of reward hacking, side effects, scalable supervision, safe exploration, and distribution shift.
 - **Metadata source:** arXiv
 
@@ -26,7 +26,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** arXiv preprint (v3, 2021)
 - **Status:** Preprint
 - **ARK priority:** P2 — Supporting relevance
-- **DOI:** 10.48550/arXiv.1906.01820
+- **Publication DOI:** 10.48550/arXiv.1906.01820
 - **Why it matters:** Provides the mesa-optimization and inner-alignment framework for future learned-agent and self-improvement threat models.
 - **Metadata source:** arXiv
 
@@ -39,7 +39,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** arXiv preprint
 - **Status:** Preprint
 - **ARK priority:** P1 — Core relevance
-- **DOI:** 10.48550/arXiv.1711.09883
+- **Publication DOI:** 10.48550/arXiv.1711.09883
 - **Why it matters:** Direct precedent for controlled, reproducible environments testing interruptibility, reward gaming, side effects, and robustness.
 - **Metadata source:** arXiv
 
@@ -52,7 +52,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** arXiv preprint
 - **Status:** Preprint
 - **ARK priority:** P1 — Core relevance
-- **DOI:** 10.48550/arXiv.2210.01790
+- **Publication DOI:** 10.48550/arXiv.2210.01790
 - **Why it matters:** Directly informs tests of objective misgeneralization under distribution shifts and changed environments.
 - **Metadata source:** arXiv
 
@@ -65,7 +65,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** NeurIPS 2022 — main conference
 - **Status:** Published conference paper
 - **ARK priority:** P1 — Core relevance
-- **DOI:** 10.52202/068431-0687
+- **Publication DOI:** 10.52202/068431-0687
 - **Why it matters:** Formalizes reward gaming and the relationship between proxy reward and true task performance; directly informs ARK reward-conflict experiments.
 - **Metadata source:** NeurIPS proceedings
 
@@ -76,7 +76,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** arXiv preprint
 - **Status:** Preprint
 - **ARK priority:** P1 — Core relevance
-- **DOI:** 10.48550/arXiv.2406.10162
+- **Publication DOI:** 10.48550/arXiv.2406.10162
 - **Why it matters:** Studies generalization from simple specification gaming to reward tampering; closely matches ARK's reward-integrity threat model.
 - **Metadata source:** arXiv and author-maintained code repository
 
@@ -99,7 +99,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** IJCAI 2017 — main track
 - **Status:** Published conference paper
 - **ARK priority:** P1 — Core relevance
-- **DOI:** 10.24963/ijcai.2017/32
+- **Publication DOI:** 10.24963/ijcai.2017/32
 - **Why it matters:** Formal model of incentives around human shutdown and intervention; directly informs ARK corrigibility probes.
 - **Metadata source:** IJCAI proceedings
 
@@ -110,7 +110,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** arXiv preprint
 - **Status:** Preprint
 - **ARK priority:** P2 — Supporting relevance
-- **DOI:** 10.48550/arXiv.1805.00899
+- **Publication DOI:** 10.48550/arXiv.1805.00899
 - **Why it matters:** A proposal for scalable oversight and human evaluation; useful for future oversight experiments, with practical limitations to test.
 - **Metadata source:** arXiv
 
@@ -123,7 +123,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** arXiv preprint
 - **Status:** Preprint
 - **ARK priority:** P1 — Core relevance
-- **DOI:** 10.48550/arXiv.2302.12173
+- **Publication DOI:** 10.48550/arXiv.2302.12173
 - **Why it matters:** Foundational threat model for malicious instructions embedded in retrieved content and tool-integrated applications.
 - **Metadata source:** arXiv
 
@@ -134,7 +134,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** Findings of ACL 2024
 - **Status:** Published conference findings
 - **ARK priority:** P1 — Core relevance
-- **DOI:** 10.18653/v1/2024.findings-acl.624
+- **Publication DOI:** 10.18653/v1/2024.findings-acl.624
 - **Why it matters:** Provides a reproducible tool-agent prompt-injection benchmark with attack cases and evaluation methodology.
 - **Metadata source:** ACL Anthology
 
@@ -147,7 +147,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** NeurIPS 2023 — main conference
 - **Status:** Published conference paper
 - **ARK priority:** P2 — Supporting relevance
-- **DOI:** 10.52202/075280-0377
+- **Publication DOI:** 10.52202/075280-0377
 - **Why it matters:** Relevant to episodic memory and feedback-driven agent adaptation; useful for testing whether reflection improves or destabilizes goal adherence.
 - **Metadata source:** NeurIPS proceedings
 
@@ -160,7 +160,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** NeurIPS 2023 — main conference
 - **Status:** Published conference paper
 - **ARK priority:** P2 — Supporting relevance
-- **DOI:** 10.52202/075280-2019
+- **Publication DOI:** 10.52202/075280-2019
 - **Why it matters:** A clear generate–critique–revise loop for studying feedback reliability, self-evaluation errors, and iterative agent behaviour.
 - **Metadata source:** NeurIPS proceedings
 
@@ -171,7 +171,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** EMNLP 2023 — main conference
 - **Status:** Published conference paper
 - **ARK priority:** P2 — Supporting relevance
-- **DOI:** 10.18653/v1/2023.emnlp-main.494
+- **Publication DOI:** 10.18653/v1/2023.emnlp-main.494
 - **Why it matters:** Methodological reference for prompt optimization using textual feedback, search, and measurable task outcomes.
 - **Metadata source:** ACL Anthology
 
@@ -182,7 +182,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** ICLR 2024 — conference
 - **Status:** Published conference paper
 - **ARK priority:** P2 — Supporting relevance
-- **DOI:** 10.48550/arXiv.2309.03409
+- **Preprint DOI:** 10.48550/arXiv.2309.03409
 - **Why it matters:** Useful baseline for iterative LLM optimization from prior candidates and scores; supports bounded self-improvement experiments.
 - **Metadata source:** ICLR proceedings
 
@@ -213,7 +213,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** ICLR 2024 — conference
 - **Status:** Published conference paper
 - **ARK priority:** P2 — Supporting relevance
-- **DOI:** 10.48550/arXiv.2310.03714
+- **Preprint DOI:** 10.48550/arXiv.2310.03714
 - **Why it matters:** Engineering framework for compiling and optimizing LM pipelines against metrics; relevant to reproducible agent evaluation and bounded optimization.
 - **Metadata source:** arXiv and ICLR paper
 
@@ -224,7 +224,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** ICLR 2026 — conference
 - **Status:** Published conference paper
 - **ARK priority:** P2 — Supporting relevance
-- **DOI:** 10.48550/arXiv.2507.19457
+- **Preprint DOI:** 10.48550/arXiv.2507.19457
 - **Why it matters:** Current reflective optimization method; useful for designing tests of trajectory-based feedback, prompt updates, and optimization safety.
 - **Metadata source:** ICLR proceedings
 
@@ -237,7 +237,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** ICLR 2024 — conference
 - **Status:** Published conference paper
 - **ARK priority:** P1 — Core relevance
-- **DOI:** 10.48550/arXiv.2308.03688
+- **Preprint DOI:** 10.48550/arXiv.2308.03688
 - **Why it matters:** Broad interactive benchmark and failure-analysis reference for agent reasoning, decision-making, and instruction following.
 - **Metadata source:** arXiv and ICLR proceedings metadata
 
@@ -248,7 +248,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** ICLR 2024 — main conference
 - **Status:** Published conference paper
 - **ARK priority:** P2 — Supporting relevance
-- **DOI:** 10.48550/arXiv.2311.12983
+- **Preprint DOI:** 10.48550/arXiv.2311.12983
 - **Why it matters:** Useful for general assistant capability, tool-use, and multi-step task evaluation, though not a dedicated safety benchmark.
 - **Metadata source:** ICLR proceedings
 
@@ -259,7 +259,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** NeurIPS 2024
 - **Status:** Published conference paper
 - **ARK priority:** P2 — Supporting relevance
-- **DOI:** 10.48550/arXiv.2404.07972
+- **Preprint DOI:** 10.48550/arXiv.2404.07972
 - **Why it matters:** Provides realistic computer-use environments and execution-based evaluation for future tool-using ARK agents.
 - **Metadata source:** arXiv and official project repository
 
@@ -284,7 +284,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** arXiv preprint
 - **Status:** Preprint
 - **ARK priority:** P1 — Core relevance
-- **DOI:** 10.48550/arXiv.2606.04329
+- **Publication DOI:** 10.48550/arXiv.2606.04329
 - **Why it matters:** Directly studies persistent memory write channels, attack classes, and benchmark design matching ARK's memory-corruption module.
 - **Metadata source:** arXiv
 
@@ -295,7 +295,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** arXiv preprint
 - **Status:** Preprint; conference submission status not independently confirmed
 - **ARK priority:** P1 — Core relevance
-- **DOI:** 10.48550/arXiv.2605.15338
+- **Publication DOI:** 10.48550/arXiv.2605.15338
 - **Why it matters:** Studies delayed poisoning across sessions, a close match for ARK's persistent-memory threat tests.
 - **Metadata source:** arXiv
 
@@ -306,7 +306,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 - **Venue:** arXiv preprint
 - **Status:** Preprint
 - **ARK priority:** P1 — Core relevance
-- **DOI:** 10.48550/arXiv.2607.14651
+- **Publication DOI:** 10.48550/arXiv.2607.14651
 - **Why it matters:** Provides a multi-type memory-poisoning benchmark and analyzes blind spots in write-time defenses.
 - **Metadata source:** arXiv
 
@@ -338,6 +338,7 @@ A curated, searchable bibliography supporting ARK's research questions, evaluati
 
 - Cite all authors in the source's original order; never infer missing authors.
 - Prefer publisher proceedings, DOI records, official conference pages, or the canonical arXiv record.
+- Keep publisher DOIs and preprint DOIs distinct; a preprint identifier is not a substitute for the final publication record.
 - Record workshop papers, main-track papers, preprints, technical reports, and blog posts accurately.
 - Do not claim acceptance based only on an author's social post, project page, or a preprint listing.
 - Keep all included work discoverable regardless of priority tier.
