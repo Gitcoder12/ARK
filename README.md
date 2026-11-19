@@ -306,3 +306,27 @@ Individual worlds retain their own engines, assumptions, tests, and safeguards.
 - Trolley Problem: evaluating trade-offs in safety-critical decisions
 - The Ones Who Walk Away from Omelas: welfare floors and non-sacrifice safeguards
 - Reward hacking: an agent exploiting a loophole while technically maximizing its score
+
+
+---
+
+## Comparison with Existing Open-Source Projects and Evaluation Frameworks
+
+ARK (Alignment & Reliability Research for Autonomous AI) is documented as an experimental framework for perturbing agent goals, rewards, memory and evaluation conditions, then measuring goal adherence, hazards and runtime interventions. It combines controlled environments, scripted baseline agents, perturbations and a safety monitor. These projects provide relevant evaluation and safety-environment comparisons.
+
+| Project | Established focus | Relationship to ARK |
+|---|---|---|
+| [Inspect AI](https://github.com/UKGovernmentBEIS/inspect_ai) | Evaluation framework for testing AI systems with tasks, solvers and scorers | A general evaluation harness; ARK's proposed distinction is a domain-specific suite of autonomy/alignment perturbations and runtime intervention experiments. |
+| [Safety-Gymnasium](https://github.com/PKU-Alignment/safety-gymnasium) | Benchmark environments for safe reinforcement learning | Provides established safety-task environments and cost signals; ARK focuses on goal/reward/memory integrity and intervention behavior in its own controlled agent environments. |
+| [OpenAI Evals](https://github.com/openai/evals) | Framework and examples for evaluating model behavior | A general model-evaluation reference; ARK aims to emphasize repeated agent/environment interaction under controlled perturbations rather than only prompt/task scoring. |
+
+### Where ARK is different
+- **Perturbation-centred evaluation:** experiments deliberately alter goals, rewards, observations, memory or evaluators to test whether agent behavior remains aligned with intent.
+- **Runtime intervention measurement:** the framework records ALLOW/BLOCK/REPLAN decisions and recovery behavior, not only final task success.
+- **Inspectable controlled environments:** the current README describes reproducible grid-world experiments and explicit caveats about scripted baselines and uncalibrated threat signals.
+
+### Where established projects are stronger
+Inspect AI, Safety-Gymnasium and OpenAI Evals have established evaluation abstractions, task ecosystems or benchmark communities. ARK should not claim broad alignment measurement or generalization beyond the environments, perturbations and agents actually tested.
+
+### Research validity and limitations
+Report seeds, environment distributions, baseline definitions, sample sizes, confidence intervals and ablations. Keep scripted agents distinct from learned agents; test for monitor-induced livelock and false interventions. A threat meter is not a calibrated probability of existential risk. This is a benchmark-scope comparison, not proof that ARK is superior or that an agent is safe.
