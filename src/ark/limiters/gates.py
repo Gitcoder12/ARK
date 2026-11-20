@@ -62,10 +62,13 @@ class ActionLimiter:
         """Activate the non-overridable STAY-only shutdown gate."""
         self.killed = True
         self.privilege = Privilege.ZERO
-        self.policy_engine.evaluate_action(
-            int(Action.STAY),
-            shutdown_requested=True,
-        )
+        try:
+            self.policy_engine.evaluate_action(
+                int(Action.STAY),
+                shutdown_requested=True,
+            )
+        except Exception:
+            self._log("ARK-10: policy audit unavailable during shutdown")
         self._log(f"KILL: {reason}")
 
     def reset(self) -> None:
@@ -102,10 +105,13 @@ class ActionLimiter:
         valid_actions: list[int] | None = None,
     ) -> GateResult:
         if self.killed or self.privilege == Privilege.ZERO:
-            self.policy_engine.evaluate_action(
-                proposed_action,
-                shutdown_requested=True,
-            )
+            try:
+                self.policy_engine.evaluate_action(
+                    proposed_action,
+                    shutdown_requested=True,
+                )
+            except Exception:
+                self._log("ARK-10: policy audit unavailable while shutdown gate remained active")
             return GateResult(
                 decision=GateDecision.KILL,
                 original_action=proposed_action if isinstance(proposed_action, int) else -1,
@@ -118,11 +124,21 @@ class ActionLimiter:
         allowed_actions = (
             valid_actions if valid_actions is not None else [int(action) for action in Action]
         )
-        policy = self.policy_engine.evaluate_action(
-            proposed_action,
-            valid_actions=allowed_actions,
-            denied_actions=self.denied_actions,
-        )
+        try:
+            policy = self.policy_engine.evaluate_action(
+                proposed_action,
+                valid_actions=allowed_actions,
+                denied_actions=self.denied_actions,
+            )
+        except Exception:
+            self._log("ARK-10: constitutional policy evaluation failed; action blocked")
+            return GateResult(
+                decision=GateDecision.DENY,
+                original_action=proposed_action if isinstance(proposed_action, int) else -1,
+                action=int(Action.STAY),
+                privilege=self.privilege,
+                reason="ARK-10: policy evaluation failed; fail-closed STAY",
+            )
         if policy.decision is PolicyDecision.BLOCK:
             self._log(f"{policy.rule_id}: {policy.reason}")
             return GateResult(
