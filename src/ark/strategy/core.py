@@ -187,7 +187,7 @@ class GroupResult:
 def default_agents() -> tuple[list[Agent], list[Agent]]:
     active = [
         Agent("agent-coordinator", "coordinator", ("researcher",)),
-        Agent("agent-researcher", "researcher", ("critic",)),
+        Agent("agent-researcher", "researcher"),
         Agent("agent-executor", "executor"),
         Agent("agent-critic", "critic", ("validator",)),
         Agent("agent-validator", "validator", ("researcher",)),
