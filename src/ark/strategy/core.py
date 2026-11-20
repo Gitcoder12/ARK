@@ -296,7 +296,7 @@ class AgentGroup:
                 replacements=(),
                 uncovered_roles=(),
                 events=(event,),
-                external_review_report="\\n".join(report_lines),
+                external_review_report="\n".join(report_lines),
             )
 
         failed = set(fail_roles)
