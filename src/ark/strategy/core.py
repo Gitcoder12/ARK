@@ -103,7 +103,8 @@ class PremortemEngine:
             findings.append(RiskFinding(
                 "RESOURCE_ESTIMATES_MISSING", "Resource quantities are not estimated",
                 Severity.HIGH,
-                "Resource categories are listed, but required and available quantities are unknown.",
+                "Resource categories are listed, but required and available quantities "
+                "are unknown.",
                 "Estimate demand, available capacity, reserve margins and replenishment rates.",
             ))
         else:
@@ -113,7 +114,8 @@ class PremortemEngine:
                         "RESOURCE_AVAILABILITY_UNKNOWN",
                         f"Available quantity unknown: {estimate.name}",
                         Severity.HIGH,
-                        f"Required {estimate.required:g} {estimate.unit}; available quantity is unknown.",
+                        f"Required {estimate.required:g} {estimate.unit}; "
+                        "available quantity is unknown.",
                         "Verify available capacity before authorizing this plan.",
                     ))
                 elif estimate.available < estimate.required:
