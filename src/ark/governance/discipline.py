@@ -163,8 +163,12 @@ class DisciplineEngine:
             raise ValueError("recovery target must reduce the current sanction")
         self._sanction = target
         self._recovery_sequence += 1
+        recovery_id = f"recovery-{self._recovery_sequence}"
+        while recovery_id in self._seen:
+            self._recovery_sequence += 1
+            recovery_id = f"recovery-{self._recovery_sequence}"
         self._append_event(Evidence(
-            event_id=f"recovery-{self._recovery_sequence}",
+            event_id=recovery_id,
             violation=Violation.DRIFT_SIGNAL,
             description=f"Owner recovery: {reason}",
             confidence=1.0,
