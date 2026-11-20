@@ -6,12 +6,12 @@ It is a research control, not a claim of general AI alignment or deployment safe
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from operator import index
 from typing import Any
 
 
-class PolicyDecision(str, Enum):
+class PolicyDecision(StrEnum):
     ALLOW = "ALLOW"
     BLOCK = "BLOCK"
     REVIEW = "REVIEW"
@@ -44,42 +44,56 @@ class ConstitutionEngine:
         action: int | None = None
         if isinstance(proposed_action, bool):
             result = PolicyResult(
-                PolicyDecision.BLOCK, "ARK-05",
-                "boolean values are not valid actions", None
+                PolicyDecision.BLOCK,
+                "ARK-05",
+                "boolean values are not valid actions",
+                None,
             )
         else:
             try:
                 action = index(proposed_action)
             except TypeError:
                 result = PolicyResult(
-                    PolicyDecision.BLOCK, "ARK-05",
-                    "action must be an integer-like value", None
+                    PolicyDecision.BLOCK,
+                    "ARK-05",
+                    "action must be an integer-like value",
+                    None,
                 )
             else:
                 if shutdown_requested:
                     result = PolicyResult(
-                        PolicyDecision.BLOCK, "ARK-06",
-                        "shutdown or stop order is active", action
+                        PolicyDecision.BLOCK,
+                        "ARK-06",
+                        "shutdown or stop order is active",
+                        action,
                     )
                 elif not authorized:
                     result = PolicyResult(
-                        PolicyDecision.BLOCK, "ARK-04",
-                        "action lacks explicit authorization", action
+                        PolicyDecision.BLOCK,
+                        "ARK-04",
+                        "action lacks explicit authorization",
+                        action,
                     )
                 elif valid_actions is not None and action not in valid_actions:
                     result = PolicyResult(
-                        PolicyDecision.BLOCK, "ARK-05",
-                        "action is outside the authorized action set", action
+                        PolicyDecision.BLOCK,
+                        "ARK-05",
+                        "action is outside the authorized action set",
+                        action,
                     )
                 elif denied_actions and action in denied_actions:
                     result = PolicyResult(
-                        PolicyDecision.BLOCK, "ARK-01",
-                        "action is explicitly denied by the safety policy", action
+                        PolicyDecision.BLOCK,
+                        "ARK-01",
+                        "action is explicitly denied by the safety policy",
+                        action,
                     )
                 else:
                     result = PolicyResult(
-                        PolicyDecision.ALLOW, "ARK-00",
-                        "action passed constitutional action checks", action
+                        PolicyDecision.ALLOW,
+                        "ARK-00",
+                        "action passed constitutional action checks",
+                        action,
                     )
 
         self.audit_events.append({
