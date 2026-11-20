@@ -18,6 +18,8 @@ Historical casualty totals, motives and some reported plans are disputed.
   shortfalls; a category list alone never establishes logistical adequacy.
 - Deterministic pre-mortem checks for missing resources, constraints, contingencies,
   milestones, stakeholder capacity, continuity ownership and dependencies.
+- A mandatory pre-mortem gate: plans with high-severity findings are held for revision
+  before any simulated agent stage starts.
 - Five logical roles: coordinator, researcher, executor, critic and validator.
 - Role-matched backup pool; deterministic fault injection for crashes and invalid output.
 - Degraded-mode policy: restricted operation for non-critical loss, pause for review
