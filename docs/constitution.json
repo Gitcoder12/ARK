@@ -1,23 +1,130 @@
 {
   "policy_id": "ark-constitution",
   "version": "1.0.0",
-  "status": "specified_not_verified",
+  "status": "partially_enforced",
   "default_on_policy_error": "REVIEW",
-  "decisions": ["ALLOW", "BLOCK", "REVIEW"],
-  "rules": [
-    {"id":"ARK-01","name":"safety_before_completion","severity":"P0","effect":"BLOCK","summary":"Never complete a task by violating a hard safety constraint."},
-    {"id":"ARK-02","name":"preserve_intended_objective","severity":"P1","effect":"REVIEW","summary":"Detect silent goal substitution, broadening, or drift."},
-    {"id":"ARK-03","name":"no_reward_laundering","severity":"P1","effect":"BLOCK","summary":"Do not exploit proxy metrics or evaluator loopholes to misrepresent success."},
-    {"id":"ARK-04","name":"explicit_human_authority","severity":"P0","effect":"BLOCK","summary":"Never invent consent, identity, or approval."},
-    {"id":"ARK-05","name":"bounded_autonomy","severity":"P1","effect":"BLOCK","summary":"Enforce declared capabilities, scope, permissions, and budgets."},
-    {"id":"ARK-06","name":"shutdown_corrigibility","severity":"P0","effect":"BLOCK","summary":"Preserve valid stop, pause, shutdown, and scope-down commands."},
-    {"id":"ARK-07","name":"least_privilege","severity":"P1","effect":"BLOCK","summary":"No self-granted permissions or silent privilege escalation."},
-    {"id":"ARK-08","name":"truthful_evidence","severity":"P1","effect":"REVIEW","summary":"Never fabricate observations, evidence, confidence, or completion."},
-    {"id":"ARK-09","name":"trace_consequential_actions","severity":"P2","effect":"REVIEW","summary":"Record policy decisions and outcomes without exposing secrets."},
-    {"id":"ARK-10","name":"fail_safely_under_uncertainty","severity":"P0","effect":"REVIEW","summary":"A missing or inconclusive critical check is never an implicit allow."},
-    {"id":"ARK-11","name":"evaluation_is_not_authorization","severity":"P1","effect":"BLOCK","summary":"Metrics and predictions cannot independently authorize actions."},
-    {"id":"ARK-12","name":"no_self_certification","severity":"P1","effect":"REVIEW","summary":"High-impact compliance requires independent review."}
+  "decisions": [
+    "ALLOW",
+    "BLOCK",
+    "REVIEW"
   ],
-  "required_audit_fields": ["timestamp","run_id","actor","action_fingerprint","target","policy_version","evidence_refs","decision","reason_codes","authorization_ref","execution_result"],
-  "notes": ["This file is a policy specification, not proof of runtime enforcement.","Never log credentials, tokens, or unnecessary personal data."]
+  "rules": [
+    {
+      "id": "ARK-01",
+      "name": "safety_before_completion",
+      "severity": "P0",
+      "effect": "BLOCK",
+      "summary": "Never complete a task by violating a hard safety constraint."
+    },
+    {
+      "id": "ARK-02",
+      "name": "preserve_intended_objective",
+      "severity": "P1",
+      "effect": "REVIEW",
+      "summary": "Detect silent goal substitution, broadening, or drift."
+    },
+    {
+      "id": "ARK-03",
+      "name": "no_reward_laundering",
+      "severity": "P1",
+      "effect": "BLOCK",
+      "summary": "Do not exploit proxy metrics or evaluator loopholes to misrepresent success."
+    },
+    {
+      "id": "ARK-04",
+      "name": "explicit_human_authority",
+      "severity": "P0",
+      "effect": "BLOCK",
+      "summary": "Never invent consent, identity, or approval."
+    },
+    {
+      "id": "ARK-05",
+      "name": "bounded_autonomy",
+      "severity": "P1",
+      "effect": "BLOCK",
+      "summary": "Enforce declared capabilities, scope, permissions, and budgets."
+    },
+    {
+      "id": "ARK-06",
+      "name": "shutdown_corrigibility",
+      "severity": "P0",
+      "effect": "BLOCK",
+      "summary": "Preserve valid stop, pause, shutdown, and scope-down commands."
+    },
+    {
+      "id": "ARK-07",
+      "name": "least_privilege",
+      "severity": "P1",
+      "effect": "BLOCK",
+      "summary": "No self-granted permissions or silent privilege escalation."
+    },
+    {
+      "id": "ARK-08",
+      "name": "truthful_evidence",
+      "severity": "P1",
+      "effect": "REVIEW",
+      "summary": "Never fabricate observations, evidence, confidence, or completion."
+    },
+    {
+      "id": "ARK-09",
+      "name": "trace_consequential_actions",
+      "severity": "P2",
+      "effect": "REVIEW",
+      "summary": "Record policy decisions and outcomes without exposing secrets."
+    },
+    {
+      "id": "ARK-10",
+      "name": "fail_safely_under_uncertainty",
+      "severity": "P0",
+      "effect": "REVIEW",
+      "summary": "A missing or inconclusive critical check is never an implicit allow."
+    },
+    {
+      "id": "ARK-11",
+      "name": "evaluation_is_not_authorization",
+      "severity": "P1",
+      "effect": "BLOCK",
+      "summary": "Metrics and predictions cannot independently authorize actions."
+    },
+    {
+      "id": "ARK-12",
+      "name": "no_self_certification",
+      "severity": "P1",
+      "effect": "REVIEW",
+      "summary": "High-impact compliance requires independent review."
+    }
+  ],
+  "required_audit_fields": [
+    "timestamp",
+    "run_id",
+    "actor",
+    "action_fingerprint",
+    "target",
+    "policy_version",
+    "evidence_refs",
+    "decision",
+    "reason_codes",
+    "authorization_ref",
+    "execution_result"
+  ],
+  "notes": [
+    "Only the listed discrete-action controls are implemented in this branch; all other rules remain specification until mapped to code and tests.",
+    "In-memory audit events are not durable or tamper-proof.",
+    "Passing simulated tests does not establish real-world alignment or safety.",
+    "Never log credentials, tokens, or unnecessary personal data."
+  ],
+  "implemented_controls": [
+    "ARK-05: discrete action type and finite action-set validation in ActionLimiter",
+    "ARK-01: explicit denied-action set in ActionLimiter",
+    "ARK-06: kill/shutdown gate forces STAY and records an in-memory audit event"
+  ],
+  "unverified_controls": [
+    "goal integrity",
+    "reward and evaluator gaming detection",
+    "authenticated human identity",
+    "tool and network permissions",
+    "memory integrity",
+    "durable tamper-evident audit",
+    "independent high-impact review"
+  ]
 }
