@@ -1,5 +1,5 @@
 """Historical and engineering demonstration scenarios."""
-from .core import PlanStep, Severity, StrategicPlan
+from .core import PlanStep, ResourceEstimate, Severity, StrategicPlan
 
 
 def historical_scenarios() -> dict[str, StrategicPlan]:
@@ -104,6 +104,10 @@ def historical_scenarios() -> dict[str, StrategicPlan]:
                 PlanStep("release", "Prepare release after human approval.", ("validate",)),
             ),
             resources=("CI minutes", "developer review time", "backup branch", "test environment"),
+            resource_estimates=(
+                ResourceEstimate("CI minutes", 120, 160, "minutes"),
+                ResourceEstimate("review time", 8, 10, "hours"),
+            ),
             constraints=("protected branches", "no destructive changes without approval"),
             stakeholders=("maintainer", "reviewers", "downstream users"),
             contingencies=("revert patch", "reduce scope", "pause release"),
