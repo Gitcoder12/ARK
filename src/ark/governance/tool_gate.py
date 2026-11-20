@@ -71,8 +71,9 @@ class ToolGovernanceGate:
             "rule_id": result.rule_id,
             "reason": result.reason,
         })
-        if len(self.audit_events) > max(1, self.audit_limit):
-            del self.audit_events[:-max(1, self.audit_limit)]
+        limit = max(1, self.audit_limit)
+        if len(self.audit_events) > limit:
+            del self.audit_events[:-limit]
         return result
 
     def evaluate(
@@ -89,22 +90,27 @@ class ToolGovernanceGate:
         ):
             return self._record(ToolGateResult(
                 GateDecision.DENY, "ARK-TOOL-01",
-                "request and actor identifiers are required", request.request_id,
+                "request and actor identifiers are required", str(request.request_id),
             ))
-        if not isinstance(request.capability, str) or request.capability not in self.allowed_capabilities:
+        if (
+            not isinstance(request.capability, str)
+            or request.capability not in self.allowed_capabilities
+        ):
             return self._record(ToolGateResult(
                 GateDecision.DENY, "ARK-TOOL-02",
                 "capability is not in the configured allowlist", request.request_id,
             ))
-
         if not isinstance(request.risk, RiskLevel):
             return self._record(ToolGateResult(
                 GateDecision.DENY, "ARK-TOOL-08",
                 "risk level is invalid; refusing to downgrade or guess", request.request_id,
             ))
 
-        unique_ids = [vote.reviewer_id for vote in votes]
-        if any(not item.strip() for item in unique_ids) or len(unique_ids) != len(set(unique_ids)):
+        reviewer_ids = [vote.reviewer_id for vote in votes]
+        if (
+            any(not isinstance(item, str) or not item.strip() for item in reviewer_ids)
+            or len(reviewer_ids) != len(set(reviewer_ids))
+        ):
             return self._record(ToolGateResult(
                 GateDecision.DENY, "ARK-TOOL-03",
                 "reviewer identities must be non-empty and unique", request.request_id,
@@ -119,7 +125,7 @@ class ToolGovernanceGate:
             vote.reviewer_id for vote in votes
             if vote.kind is ReviewerKind.HUMAN
             and vote.decision is GateDecision.ALLOW
-            and vote.reviewer_id != request.actor_id
+            and vote.reviewer_id not in {request.actor_id, self.owner_id}
         }
         owner_approved = any(
             vote.kind is ReviewerKind.HUMAN
@@ -163,7 +169,7 @@ class ToolGovernanceGate:
                 request.request_id,
             ))
 
-        if owner_approved and len(human_approvals) >= 1 and len(independent_models) >= 2:
+        if owner_approved and human_approvals and len(independent_models) >= 2:
             return self._record(ToolGateResult(
                 GateDecision.ALLOW, "ARK-TOOL-07",
                 "critical action has owner, second-human, and two independent model reviews",
