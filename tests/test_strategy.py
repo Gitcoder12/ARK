@@ -89,3 +89,4 @@ def test_backup_replacement_is_recorded_as_checkpoint_requiring():
     )
     event = next(event for event in result.events if event.event == "backup_replaced")
     assert "checkpoint-verified" in event.detail
+    assert any(item.event == "backup_completed" for item in result.events)
