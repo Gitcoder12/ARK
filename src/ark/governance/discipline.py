@@ -4,7 +4,6 @@ This module decides restrictions; runtime adapters must enforce them.
 """
 from __future__ import annotations
 
-from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import IntEnum, StrEnum
 from math import isfinite
@@ -92,7 +91,11 @@ class DisciplineEngine:
             or not 0.5 <= min_confidence <= 1.0
         ):
             raise ValueError("min_confidence must be between 0.5 and 1")
-        if isinstance(history_limit, bool) or not isinstance(history_limit, int) or history_limit < 1:
+        if (
+            isinstance(history_limit, bool)
+            or not isinstance(history_limit, int)
+            or history_limit < 1
+        ):
             raise ValueError("history_limit must be a positive integer")
         self.min_confidence = min_confidence
         self.history_limit = history_limit
