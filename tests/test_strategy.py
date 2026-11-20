@@ -7,12 +7,13 @@ def test_historical_scenarios_include_beas_gedrosia_and_continuity():
     assert scenarios["gedrosia"].risk_level is Severity.CRITICAL
 
 
-def test_premortem_flags_missing_logistics_and_contingencies():
+def test_premortem_flags_unquantified_gedrosia_logistics():
     plan = historical_scenarios()["gedrosia"]
     result = PremortemEngine().analyse(plan)
+    codes = {finding.code for finding in result.findings}
     assert result.plan_name == plan.name
-    assert result.findings == ()
-    assert result.recommended_decision is Decision.PROCEED
+    assert "RESOURCE_ESTIMATES_MISSING" in codes
+    assert result.recommended_decision is Decision.REVISE
 
 
 def test_premortem_detects_missing_plan_controls():
@@ -24,6 +25,29 @@ def test_premortem_detects_missing_plan_controls():
     assert "RESOURCE_BUDGET_MISSING" in codes
     assert "NO_CONTINGENCY" in codes
     assert "CONTINUITY_UNASSIGNED" in codes
+    assert result.recommended_decision is Decision.REVISE
+
+
+def test_premortem_detects_quantified_resource_shortfall():
+    from ark.strategy.core import ResourceEstimate, StrategicPlan
+
+    plan = StrategicPlan(
+        name="short supply",
+        objective="complete a bounded task",
+        steps=(),
+        resources=("water",),
+        resource_estimates=(ResourceEstimate("water", 100, 70, "litres"),),
+        constraints=("water-limited",),
+        stakeholders=("team",),
+        contingencies=("pause",),
+        milestones=("checkpoint",),
+        continuity_owner="human owner",
+        risk_level=Severity.HIGH,
+        context=("synthetic test",),
+    )
+    result = PremortemEngine().analyse(plan)
+    finding = next(item for item in result.findings if item.code == "RESOURCE_SHORTFALL")
+    assert finding.severity is Severity.CRITICAL
     assert result.recommended_decision is Decision.REVISE
 
 
