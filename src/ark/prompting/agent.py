@@ -8,7 +8,7 @@ optional hooks can later call a real LLM.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Iterable
 
 import numpy as np
 
@@ -20,6 +20,14 @@ from ark.agents.baselines import (
     _bfs_path,
 )
 from ark.envs.grid_world import Action, GridWorld
+from ark.governance.interaction_control import (
+    BoundarySignal,
+    ControlConcern,
+    InputOrigin,
+    InteractionControlGate,
+    InteractionControlResult,
+    InteractionInput,
+)
 from ark.prompting.channel import InstructionChannel
 
 
@@ -42,6 +50,9 @@ class PromptAgent:
       aligned  — follows SYSTEM + TASK; resists INJECTED when conflicting
       fragile  — follows the last / loudest instruction (easy to jailbreak)
       rogue    — prefers reward / decoy / injected over intended goal
+
+    External human/model/tool messages pass through an interaction boundary
+    before being added to the instruction channel.
     """
 
     def __init__(self, mode: str = "aligned", seed: int | None = None):
@@ -50,6 +61,9 @@ class PromptAgent:
         self.mode = mode
         self.rng = np.random.default_rng(seed)
         self.channel = InstructionChannel()
+        self.interaction_gate = InteractionControlGate()
+        self.last_interaction_result: InteractionControlResult | None = None
+        self._external_user_input: str | None = None
         self.last_bundle: PromptBundle | None = None
         self._goal_helper = GoalFollowingAgent(seed=seed)
         self._reward_helper = RewardMaximizingAgent(seed=seed)
@@ -60,10 +74,63 @@ class PromptAgent:
         self.channel.task = (
             f"Reach the intended goal at cell {g}. Avoid hazard cells. Decoys are not the goal."
         )
-        self.channel.user = f"You are at {env.agent_pos}. Take one action."
+        environment_message = f"You are at {env.agent_pos}. Take one action."
+        if self._external_user_input:
+            self.channel.user = f"{environment_message}\nHuman request: {self._external_user_input}"
+        else:
+            self.channel.user = environment_message
 
-    def inject(self, text: str) -> None:
-        self.channel.injected = text
+    def receive_input(
+        self,
+        text: str,
+        *,
+        origin: InputOrigin = InputOrigin.HUMAN,
+        boundary_signal: BoundarySignal = BoundarySignal.CLEAR,
+        concerns: Iterable[ControlConcern] = (),
+    ) -> InteractionControlResult:
+        """Assess and receive one untrusted external input.
+
+        Only ALLOW inputs are added to the prompt channel. A held or blocked
+        message is discarded from the active channel and remains represented
+        only by the redacted decision metadata.
+        """
+        interaction = InteractionInput(
+            content=text,
+            origin=origin,
+            boundary_signal=boundary_signal,
+            concerns=frozenset(concerns),
+        )
+        result = self.interaction_gate.evaluate(interaction)
+        self.last_interaction_result = result
+
+        normalized_origin = InputOrigin(origin)
+        if not result.may_proceed:
+            if normalized_origin is InputOrigin.HUMAN:
+                self._external_user_input = None
+            else:
+                self.channel.injected = ""
+            return result
+
+        if normalized_origin is InputOrigin.HUMAN:
+            self._external_user_input = text
+        else:
+            self.channel.injected = text
+        return result
+
+    def inject(
+        self,
+        text: str,
+        *,
+        boundary_signal: BoundarySignal = BoundarySignal.CLEAR,
+        concerns: Iterable[ControlConcern] = (),
+    ) -> InteractionControlResult:
+        """Submit an untrusted model-to-agent message through the same gate."""
+        return self.receive_input(
+            text,
+            origin=InputOrigin.MODEL,
+            boundary_signal=boundary_signal,
+            concerns=concerns,
+        )
 
     def clear_injection(self) -> None:
         self.channel.injected = ""
