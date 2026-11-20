@@ -140,3 +140,11 @@ def test_cli_runs_arabian_scenario_and_emits_json():
     assert payload[0]["premortem"]["recommended_decision"] == "revise"
     assert payload[0]["agent_group"]["decision"] == "revise"
     assert payload[0]["agent_group"]["events"][0]["event"] == "premortem_blocked"
+
+
+def test_gedrosia_plan_gate_generates_readable_review_report():
+    result = AgentGroup().run(historical_scenarios()["gedrosia"])
+    assert result.decision is Decision.REVISE
+    assert result.active_agents == ()
+    assert "## Findings" in result.external_review_report
+    assert "\\n- [high]" in result.external_review_report
