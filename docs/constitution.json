@@ -2,7 +2,7 @@
   "policy_id": "ark-constitution",
   "version": "1.0.0",
   "status": "partially_enforced",
-  "default_on_policy_error": "REVIEW",
+  "default_on_policy_error": "BLOCK",
   "decisions": [
     "ALLOW",
     "BLOCK",
@@ -116,7 +116,8 @@
   "implemented_controls": [
     "ARK-05: discrete action type and finite action-set validation in ActionLimiter",
     "ARK-01: explicit denied-action set in ActionLimiter",
-    "ARK-06: kill/shutdown gate forces STAY and records an in-memory audit event"
+    "ARK-06: kill/shutdown gate forces STAY and records an in-memory audit event",
+    "ARK-10: ActionLimiter fails closed to STAY if constitutional policy evaluation raises"
   ],
   "unverified_controls": [
     "goal integrity",
