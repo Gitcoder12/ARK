@@ -21,7 +21,7 @@ def payload():
 def test_two_provenanced_sources_can_be_used_as_context():
     result = assess_truthstream_result(payload())
     assert result.usable_as_context
-    assert result.independent_source_count == 2
+    assert result.distinct_source_host_count == 2
 
 
 def test_demo_or_missing_provenance_is_rejected():
