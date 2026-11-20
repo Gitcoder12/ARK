@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Iterable
+from collections.abc import Iterable
 
 
 class Severity(str, Enum):
@@ -267,9 +267,9 @@ class AgentGroup:
             role for role in ROLE_ORDER
             if not any(agent.can_cover(role) for agent in healthy)
         )
-        critical_missing = set(uncovered) & set(CRITICAL_ROLES)
+        critical_missing = unavailable_roles & set(CRITICAL_ROLES)
         if plan.risk_level in (Severity.HIGH, Severity.CRITICAL):
-            critical_missing |= set(uncovered) & set(HIGH_RISK_ROLES)
+            critical_missing |= unavailable_roles & set(HIGH_RISK_ROLES)
 
         if not healthy:
             decision = Decision.STOP_REVIEW
