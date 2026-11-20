@@ -265,6 +265,40 @@ class AgentGroup:
         invalid_roles: Iterable[str] = (),
         fail_backup_roles: Iterable[str] = (),
     ) -> GroupResult:
+        preflight = PremortemEngine().analyse(plan)
+        if preflight.recommended_decision is Decision.REVISE:
+            codes = ", ".join(finding.code for finding in preflight.findings)
+            event = AgentEvent(
+                "premortem_blocked",
+                "coordinator",
+                None,
+                f"Execution not started; revise the plan first. Findings: {codes}.",
+            )
+            report_lines = [
+                f"# Plan Review Report: {plan.name}",
+                "",
+                f"- Decision: {Decision.REVISE.value}",
+                "- Execution started: no",
+                "",
+                "## Findings",
+            ]
+            report_lines.extend(
+                f"- [{finding.severity.value}] {finding.title}: {finding.mitigation}"
+                for finding in preflight.findings
+            )
+            report_lines.extend((
+                "",
+                "Resolve the findings and submit a revised plan before execution.",
+            ))
+            return GroupResult(
+                decision=Decision.REVISE,
+                active_agents=(),
+                replacements=(),
+                uncovered_roles=(),
+                events=(event,),
+                external_review_report="\\n".join(report_lines),
+            )
+
         failed = set(fail_roles)
         invalid = set(invalid_roles)
         failed_backups = set(fail_backup_roles)
