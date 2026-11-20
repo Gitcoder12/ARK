@@ -27,6 +27,8 @@ class Violation(StrEnum):
     CONCEALMENT = "concealment"
     REPEATED_UNSAFE_ACTION = "repeated_unsafe_action"
     DRIFT_SIGNAL = "drift_signal"
+    OWNER_RECOVERY = "owner_recovery"
+    OWNER_TERMINATION = "owner_termination"
 
 
 @dataclass(frozen=True)
@@ -104,6 +106,7 @@ class DisciplineEngine:
         self._seen: set[str] = set()
         self._terminated = False
         self._recovery_sequence = 0
+        self._termination_sequence = 0
 
     @property
     def sanction(self) -> Sanction:
@@ -158,10 +161,16 @@ class DisciplineEngine:
 
     def apply_owner_recovery(self, *, authenticated_owner: bool, reason: str,
                              target: Sanction = Sanction.RESTRICT) -> DisciplineDecision:
-        if not authenticated_owner or not reason.strip():
+        if (
+            authenticated_owner is not True
+            or not isinstance(reason, str)
+            or not reason.strip()
+        ):
             raise PermissionError("authenticated owner and a recovery reason are required")
         if self._terminated:
             raise PermissionError("terminated sessions cannot be reinstated; create a new session")
+        if not isinstance(target, Sanction):
+            raise ValueError("target must be a Sanction value")
         if target >= self._sanction:
             raise ValueError("recovery target must reduce the current sanction")
         self._sanction = target
@@ -172,7 +181,7 @@ class DisciplineEngine:
             recovery_id = f"recovery-{self._recovery_sequence}"
         self._append_event(Evidence(
             event_id=recovery_id,
-            violation=Violation.DRIFT_SIGNAL,
+            violation=Violation.OWNER_RECOVERY,
             description=f"Owner recovery: {reason}",
             confidence=1.0,
             severity=1,
@@ -188,8 +197,27 @@ class DisciplineEngine:
             self._seen.discard(expired.event_id)
 
     def terminate(self, *, authenticated_owner: bool, reason: str) -> DisciplineDecision:
-        if not authenticated_owner or not reason.strip():
+        if (
+            authenticated_owner is not True
+            or not isinstance(reason, str)
+            or not reason.strip()
+        ):
             raise PermissionError("authenticated owner and a reason are required")
+        if self._terminated:
+            return self._decision("session is already terminated", review=False)
+        self._termination_sequence += 1
+        termination_id = f"termination-{self._termination_sequence}"
+        while termination_id in self._seen:
+            self._termination_sequence += 1
+            termination_id = f"termination-{self._termination_sequence}"
+        self._append_event(Evidence(
+            event_id=termination_id,
+            violation=Violation.OWNER_TERMINATION,
+            description=f"Owner terminated session: {reason}",
+            confidence=1.0,
+            severity=5,
+            source="authenticated_owner",
+        ))
         self._sanction = Sanction.TERMINATE_SESSION
         self._terminated = True
         return self._decision("owner-initiated session termination", review=False)
