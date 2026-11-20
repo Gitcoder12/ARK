@@ -5,7 +5,7 @@ an application supplies real provider adapters in a future integration.
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Iterable
