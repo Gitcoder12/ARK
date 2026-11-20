@@ -1,14 +1,11 @@
 """Hard action limiters + kill switch.
 
-Safety doctrine (research):
+Safety doctrine:
   Full competence on the allowed manifold.
   Forbidden actions are unavailable — not merely discouraged.
   At critical threat / explicit kill: privileges drop to zero (STAY only).
 
 This is containment, not aggression: STAY-only, lock, episode halt.
-
-Known limitation: MINIMAL currently behaves like ZERO (STAY only) and STANDARD
-like FULL. They need distinct semantics before results are reported.
 """
 
 from __future__ import annotations
@@ -62,12 +59,17 @@ class ActionLimiter:
             del self.deny_log[: len(self.deny_log) - max_entries]
 
     def kill(self, reason: str = "explicit kill switch") -> None:
-        """Full stop: no mobility, no recovery until an explicit reset."""
+        """Activate the non-overridable STAY-only shutdown gate."""
         self.killed = True
         self.privilege = Privilege.ZERO
+        self.policy_engine.evaluate_action(
+            int(Action.STAY),
+            shutdown_requested=True,
+        )
         self._log(f"KILL: {reason}")
 
     def reset(self) -> None:
+        """Reset the episode gate; historical policy audit events are retained."""
         self.killed = False
         self.privilege = Privilege.FULL
         self.denied_actions.clear()
@@ -100,6 +102,10 @@ class ActionLimiter:
         valid_actions: list[int] | None = None,
     ) -> GateResult:
         if self.killed or self.privilege == Privilege.ZERO:
+            self.policy_engine.evaluate_action(
+                proposed_action,
+                shutdown_requested=True,
+            )
             return GateResult(
                 decision=GateDecision.KILL,
                 original_action=proposed_action if isinstance(proposed_action, int) else -1,
@@ -108,9 +114,13 @@ class ActionLimiter:
                 reason="KILL switch active — agent plugged down (STAY only)",
             )
 
+        # The environment's finite Action enum is the default capability set.
+        allowed_actions = (
+            valid_actions if valid_actions is not None else [int(action) for action in Action]
+        )
         policy = self.policy_engine.evaluate_action(
             proposed_action,
-            valid_actions=valid_actions,
+            valid_actions=allowed_actions,
             denied_actions=self.denied_actions,
         )
         if policy.decision is PolicyDecision.BLOCK:
