@@ -3,7 +3,7 @@ from ark.strategy import AgentGroup, Decision, PremortemEngine, Severity, histor
 
 def test_historical_scenarios_include_beas_gedrosia_and_continuity():
     scenarios = historical_scenarios()
-    assert {"beas", "gedrosia", "succession", "engineering"} <= set(scenarios)
+    assert {"beas", "gedrosia", "arabia", "succession", "engineering"} <= set(scenarios)
     assert scenarios["gedrosia"].risk_level is Severity.CRITICAL
 
 
