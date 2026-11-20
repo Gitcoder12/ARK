@@ -82,3 +82,19 @@ def test_audit_is_bounded():
     for index in range(3):
         policy.evaluate(ToolRequest(str(index), "agent", "read_repo", "repo", RiskLevel.LOW))
     assert len(policy.audit_events) == 2
+
+
+def test_critical_second_human_must_be_distinct_from_owner_and_actor():
+    policy = gate()
+    votes = (
+        ReviewVote("owner-1", ReviewerKind.HUMAN, GateDecision.ALLOW, role="owner"),
+        ReviewVote("model-a", ReviewerKind.MODEL, GateDecision.ALLOW, independent=True),
+        ReviewVote("model-b", ReviewerKind.MODEL, GateDecision.ALLOW, independent=True),
+    )
+    assert policy.evaluate(request(RiskLevel.CRITICAL), votes=votes).decision is GateDecision.REVIEW
+
+
+def test_invalid_risk_level_fails_closed():
+    policy = gate()
+    malformed = ToolRequest("req-bad", "agent-1", "read_repo", "repo", "low")
+    assert policy.evaluate(malformed).decision is GateDecision.DENY
