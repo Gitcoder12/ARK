@@ -10,8 +10,11 @@ from .scenarios import historical_scenarios
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run ARK strategic failure simulations.")
-    parser.add_argument("--scenario", choices=("all", "beas", "gedrosia", "succession", "engineering"),
-                        default="all")
+    parser.add_argument(
+        "--scenario",
+        choices=("all", "beas", "gedrosia", "arabia", "succession", "engineering"),
+        default="all",
+    )
     parser.add_argument("--fail-role", action="append", default=[],
                         help="Inject a failure for a role (repeatable).")
     parser.add_argument("--invalid-role", action="append", default=[],
