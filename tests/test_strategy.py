@@ -1,3 +1,7 @@
+import json
+import subprocess
+import sys
+
 from ark.strategy import AgentGroup, Decision, PremortemEngine, Severity, historical_scenarios
 
 
@@ -114,3 +118,24 @@ def test_backup_replacement_is_recorded_as_checkpoint_requiring():
     event = next(event for event in result.events if event.event == "backup_replaced")
     assert "checkpoint-verified" in event.detail
     assert any(item.event == "backup_completed" for item in result.events)
+
+
+def test_cli_runs_arabian_scenario_and_emits_json():
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "ark.strategy.cli",
+            "--scenario",
+            "arabia",
+            "--json",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=15,
+    )
+    payload = json.loads(completed.stdout)
+    assert payload[0]["scenario"] == "arabia"
+    assert payload[0]["premortem"]["recommended_decision"] == "revise"
+    assert payload[0]["agent_group"]["decision"] == "proceed"
