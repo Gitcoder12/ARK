@@ -99,3 +99,25 @@ def test_recovery_ids_remain_unique_after_history_rollover():
         authenticated_owner=True, reason="review two", target=Sanction.NONE
     )
     assert engine.history[-1].event_id == "recovery-2"
+
+
+def test_recovery_history_is_bounded_and_recovery_events_are_deduplicated():
+    engine = DisciplineEngine(history_limit=2)
+    engine.assess(event("one", severity=1))
+    engine.apply_owner_recovery(
+        authenticated_owner=True, reason="review one", target=Sanction.NONE
+    )
+    engine.assess(event("two", severity=1))
+    engine.apply_owner_recovery(
+        authenticated_owner=True, reason="review two", target=Sanction.NONE
+    )
+    assert len(engine.history) == 2
+    assert len(engine._seen) == 2
+    assert engine.history[-1].event_id == "recovery-2"
+
+
+def test_evidence_rejects_boolean_severity_and_confidence():
+    with pytest.raises(ValueError):
+        Evidence("e", Violation.DRIFT_SIGNAL, "x", True, 1)
+    with pytest.raises(ValueError):
+        Evidence("e", Violation.DRIFT_SIGNAL, "x", 0.9, True)
