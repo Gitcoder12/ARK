@@ -10,7 +10,10 @@ def historical_scenarios() -> dict[str, StrategicPlan]:
             objective="Continue the campaign east beyond the Beas River.",
             steps=(
                 PlanStep("assess_capacity", "Assess army readiness and willingness."),
-                PlanStep("secure_supply", "Verify food, water and route support.", ("assess_capacity",)),
+                PlanStep(
+                    "secure_supply", "Verify food, water and route support.",
+                    ("assess_capacity",),
+                ),
                 PlanStep("advance", "Continue east only if conditions remain acceptable.",
                          ("secure_supply",)),
             ),
@@ -21,7 +24,9 @@ def historical_scenarios() -> dict[str, StrategicPlan]:
             milestones=("readiness assessment", "supply confirmation", "staged advance"),
             continuity_owner="appointed field commander",
             risk_level=Severity.HIGH,
-            context=("Ancient accounts report that the army refused to continue at the Hyphasis/Beas.",
+            context=(
+                "Ancient accounts report that the army refused to continue "
+                "at the Hyphasis/Beas.",
                      "Scenario is a teaching reconstruction, not a definitive historical dataset."),
         ),
         "gedrosia": StrategicPlan(
@@ -40,7 +45,9 @@ def historical_scenarios() -> dict[str, StrategicPlan]:
             continuity_owner="designated logistics commander",
             risk_level=Severity.CRITICAL,
             context=("Ancient sources describe severe losses during the Gedrosian march.",
-                     "Exact casualty totals and motives are disputed; this is not a quantitative reconstruction."),
+                "Exact casualty totals and motives are disputed; "
+                "this is not a quantitative reconstruction.",
+            ),
         ),
         "arabia": StrategicPlan(
             name="Arabian expedition: ambitious uncompleted objective",
@@ -80,7 +87,9 @@ def historical_scenarios() -> dict[str, StrategicPlan]:
             continuity_owner="independent governing council",
             risk_level=Severity.HIGH,
             context=("The successor struggles after Alexander's death illustrate continuity risks.",
-                     "This scenario generalizes the lesson; it is not a claim that a specific plan existed."),
+                "This scenario generalizes the lesson; "
+                "it is not a claim that a specific plan existed.",
+            ),
         ),
         "engineering": StrategicPlan(
             name="Repository-wide automated refactor",
