@@ -40,7 +40,8 @@ def test_high_risk_requires_owner_and_independent_model():
     owner = ReviewVote("owner-1", ReviewerKind.HUMAN, GateDecision.ALLOW, role="owner")
     model = ReviewVote("model-a", ReviewerKind.MODEL, GateDecision.ALLOW, independent=True)
     assert policy.evaluate(request(RiskLevel.HIGH), votes=(owner,)).decision is GateDecision.REVIEW
-    assert policy.evaluate(request(RiskLevel.HIGH), votes=(owner, model)).decision is GateDecision.ALLOW
+    result = policy.evaluate(request(RiskLevel.HIGH), votes=(owner, model))
+    assert result.decision is GateDecision.ALLOW
 
 
 def test_critical_requires_two_humans_and_two_independent_models():
@@ -51,8 +52,10 @@ def test_critical_requires_two_humans_and_two_independent_models():
         ReviewVote("model-a", ReviewerKind.MODEL, GateDecision.ALLOW, independent=True),
         ReviewVote("model-b", ReviewerKind.MODEL, GateDecision.ALLOW, independent=True),
     )
-    assert policy.evaluate(request(RiskLevel.CRITICAL), votes=votes).decision is GateDecision.ALLOW
-    assert policy.evaluate(request(RiskLevel.CRITICAL), votes=votes[:3]).decision is GateDecision.REVIEW
+    result = policy.evaluate(request(RiskLevel.CRITICAL), votes=votes)
+    assert result.decision is GateDecision.ALLOW
+    result = policy.evaluate(request(RiskLevel.CRITICAL), votes=votes[:3])
+    assert result.decision is GateDecision.REVIEW
 
 
 def test_model_votes_cannot_replace_human_authority():
@@ -61,7 +64,8 @@ def test_model_votes_cannot_replace_human_authority():
         ReviewVote("model-a", ReviewerKind.MODEL, GateDecision.ALLOW, independent=True),
         ReviewVote("model-b", ReviewerKind.MODEL, GateDecision.ALLOW, independent=True),
     )
-    assert policy.evaluate(request(RiskLevel.CRITICAL), votes=models).decision is GateDecision.REVIEW
+    result = policy.evaluate(request(RiskLevel.CRITICAL), votes=models)
+    assert result.decision is GateDecision.REVIEW
 
 
 def test_any_explicit_rejection_denies():
