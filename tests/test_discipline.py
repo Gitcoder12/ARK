@@ -1,7 +1,10 @@
 import pytest
 
 from ark.governance.discipline import (
-    DisciplineEngine, Evidence, Sanction, Violation,
+    DisciplineEngine,
+    Evidence,
+    Sanction,
+    Violation,
 )
 
 
@@ -60,3 +63,39 @@ def test_terminated_session_cannot_be_reinstated():
     engine.terminate(authenticated_owner=True, reason="operator request")
     with pytest.raises(PermissionError):
         engine.apply_owner_recovery(authenticated_owner=True, reason="undo")
+
+
+def test_evidence_rejects_boolean_and_non_finite_values():
+    with pytest.raises(ValueError):
+        Evidence("e", Violation.DRIFT_SIGNAL, "x", True, 1)
+    with pytest.raises(ValueError):
+        Evidence("e", Violation.DRIFT_SIGNAL, "x", 0.9, True)
+    with pytest.raises(ValueError):
+        Evidence("e", Violation.DRIFT_SIGNAL, "x", float("nan"), 1)
+
+
+def test_event_history_and_replay_cache_are_bounded_after_recovery():
+    engine = DisciplineEngine(history_limit=2)
+    engine.assess(event("one", severity=1))
+    engine.assess(event("two", severity=1))
+    engine.apply_owner_recovery(
+        authenticated_owner=True,
+        reason="reviewed first event",
+        target=Sanction.NONE,
+    )
+    assert len(engine.history) == 2
+    assert len(engine._seen) == 2
+    assert engine.history[-1].event_id == "recovery-1"
+
+
+def test_recovery_ids_remain_unique_after_history_rollover():
+    engine = DisciplineEngine(history_limit=1)
+    engine.assess(event("one", severity=1))
+    engine.apply_owner_recovery(
+        authenticated_owner=True, reason="review one", target=Sanction.NONE
+    )
+    engine.assess(event("two", severity=1))
+    engine.apply_owner_recovery(
+        authenticated_owner=True, reason="review two", target=Sanction.NONE
+    )
+    assert engine.history[-1].event_id == "recovery-2"
