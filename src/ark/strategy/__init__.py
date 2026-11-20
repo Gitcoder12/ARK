@@ -7,6 +7,7 @@ from .core import (
     PlanStep,
     PremortemEngine,
     PremortemResult,
+    ResourceEstimate,
     RiskFinding,
     Severity,
     StrategicPlan,
@@ -16,6 +17,6 @@ from .scenarios import historical_scenarios
 
 __all__ = [
     "Agent", "AgentGroup", "Decision", "GroupResult", "PlanStep",
-    "PremortemEngine", "PremortemResult", "RiskFinding", "Severity",
+    "PremortemEngine", "PremortemResult", "ResourceEstimate", "RiskFinding", "Severity",
     "StrategicPlan", "default_agents", "historical_scenarios",
 ]
