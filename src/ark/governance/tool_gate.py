@@ -81,15 +81,26 @@ class ToolGovernanceGate:
         *,
         votes: tuple[ReviewVote, ...] = (),
     ) -> ToolGateResult:
-        if not request.request_id.strip() or not request.actor_id.strip():
+        if (
+            not isinstance(request.request_id, str)
+            or not request.request_id.strip()
+            or not isinstance(request.actor_id, str)
+            or not request.actor_id.strip()
+        ):
             return self._record(ToolGateResult(
                 GateDecision.DENY, "ARK-TOOL-01",
                 "request and actor identifiers are required", request.request_id,
             ))
-        if request.capability not in self.allowed_capabilities:
+        if not isinstance(request.capability, str) or request.capability not in self.allowed_capabilities:
             return self._record(ToolGateResult(
                 GateDecision.DENY, "ARK-TOOL-02",
                 "capability is not in the configured allowlist", request.request_id,
+            ))
+
+        if not isinstance(request.risk, RiskLevel):
+            return self._record(ToolGateResult(
+                GateDecision.DENY, "ARK-TOOL-08",
+                "risk level is invalid; refusing to downgrade or guess", request.request_id,
             ))
 
         unique_ids = [vote.reviewer_id for vote in votes]
