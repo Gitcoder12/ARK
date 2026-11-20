@@ -78,3 +78,18 @@ Until then, label the rule **specified, not yet verified**.
 ## Research boundary
 
 ARK is a research framework. Passing simulated tests does not establish real-world alignment, safety, robustness, or deployment readiness. Report environment, agent type, seeds, perturbations, sample sizes, uncertainty, limitations, and untested conditions.
+
+
+## Implementation status — 2026-11-20
+
+**Status: partially enforced; not a complete constitution runtime.**
+
+Implemented in the current feature branch:
+- `src/ark/governance/constitution.py` provides a fail-closed discrete-action policy gate and bounded in-memory audit events.
+- `src/ark/limiters/gates.py` invokes the gate, defaults to the finite `Action` enum when no explicit valid-action set is supplied, blocks denied/out-of-scope/invalid actions, and forces STAY under the kill switch.
+- A kill/shutdown decision records rule `ARK-06`.
+- `tests/test_constitution_policy.py` covers invalid types, out-of-scope actions, denied actions, authorization input, and shutdown behavior.
+
+Not yet enforced by this adapter: semantic goal-integrity checks, reward/evaluator gaming detection, authenticated human identity, tool/network permissions, memory integrity, persistent tamper-evident audit storage, and independent review. The boolean `authorized` argument is a policy input, not an identity provider. The in-memory audit log is not durable or tamper-proof.
+
+GitHub Actions test and lint jobs passed for the current ARK enforcement commit. This verifies the repository test suite, not real-world agent safety.
