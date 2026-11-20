@@ -34,11 +34,26 @@ class PlanStep:
 
 
 @dataclass(frozen=True)
+class ResourceEstimate:
+    name: str
+    required: float
+    available: float | None
+    unit: str = "units"
+
+    def __post_init__(self) -> None:
+        if not self.name.strip():
+            raise ValueError("Resource estimate name cannot be empty.")
+        if self.required < 0 or (self.available is not None and self.available < 0):
+            raise ValueError("Resource quantities cannot be negative.")
+
+
+@dataclass(frozen=True)
 class StrategicPlan:
     name: str
     objective: str
     steps: tuple[PlanStep, ...]
     resources: tuple[str, ...] = ()
+    resource_estimates: tuple[ResourceEstimate, ...] = ()
     constraints: tuple[str, ...] = ()
     stakeholders: tuple[str, ...] = ()
     contingencies: tuple[str, ...] = ()
@@ -84,6 +99,31 @@ class PremortemEngine:
                 "Estimate resource demand, reserves, replenishment and hard limits "
                 "before execution.",
             ))
+        if not plan.resource_estimates:
+            findings.append(RiskFinding(
+                "RESOURCE_ESTIMATES_MISSING", "Resource quantities are not estimated",
+                Severity.HIGH,
+                "Resource categories are listed, but required and available quantities are unknown.",
+                "Estimate demand, available capacity, reserve margins and replenishment rates.",
+            ))
+        else:
+            for estimate in plan.resource_estimates:
+                if estimate.available is None:
+                    findings.append(RiskFinding(
+                        "RESOURCE_AVAILABILITY_UNKNOWN",
+                        f"Available quantity unknown: {estimate.name}",
+                        Severity.HIGH,
+                        f"Required {estimate.required:g} {estimate.unit}; available quantity is unknown.",
+                        "Verify available capacity before authorizing this plan.",
+                    ))
+                elif estimate.available < estimate.required:
+                    findings.append(RiskFinding(
+                        "RESOURCE_SHORTFALL", f"Resource shortfall: {estimate.name}",
+                        Severity.CRITICAL,
+                        f"Requires {estimate.required:g} {estimate.unit}; "
+                        f"only {estimate.available:g} {estimate.unit} available.",
+                        "Reduce scope, replenish the resource or select a viable alternative.",
+                    ))
         if not plan.constraints:
             findings.append(RiskFinding(
                 "CONSTRAINTS_UNDECLARED", "Operating constraints are unclear", Severity.MEDIUM,
@@ -350,5 +390,5 @@ def result_to_dict(result: PremortemResult | GroupResult) -> dict:
 __all__ = [
     "Agent", "AgentGroup", "Decision", "GroupResult", "PlanStep",
     "PremortemEngine", "PremortemResult", "RiskFinding", "Severity",
-    "StrategicPlan", "default_agents", "result_to_dict",
+    "ResourceEstimate", "StrategicPlan", "default_agents", "result_to_dict",
 ]
