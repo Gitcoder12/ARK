@@ -28,17 +28,16 @@ def test_client_posts_and_parses_truthstream_response():
     }]).encode()
 
     class Response(io.BytesIO):
-        def geturl(self):
-            return "https://truth.example/verify"
+        pass
 
-        def __enter__(self):
-            return self
+    class FakeOpener:
+        def open(self, request, timeout):
+            assert request.full_url == "https://truth.example/verify"
+            assert request.get_method() == "POST"
+            assert timeout == 5.0
+            return Response(body)
 
-        def __exit__(self, *args):
-            self.close()
-
-    with patch("ark.governance.truthstream_client.urlopen", return_value=Response(body)) as mocked:
+    with patch("ark.governance.truthstream_client.build_opener", return_value=FakeOpener()):
         results = TruthstreamClient("https://truth.example").verify("A test claim")
     assert len(results) == 1
     assert not results[0].usable_as_context
-    assert mocked.call_args.kwargs["timeout"] == 5.0
