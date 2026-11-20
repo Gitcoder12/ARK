@@ -4,10 +4,11 @@ This module decides restrictions; runtime adapters must enforce them.
 """
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import IntEnum, StrEnum
+from math import isfinite
 from time import time
-from typing import Iterable
 
 
 class Sanction(IntEnum):
@@ -41,12 +42,33 @@ class Evidence:
     window_key: str = "default"
 
     def __post_init__(self) -> None:
-        if not self.event_id.strip() or not self.description.strip():
-            raise ValueError("event_id and description are required")
-        if not 0.0 <= self.confidence <= 1.0:
-            raise ValueError("confidence must be between 0 and 1")
-        if self.severity not in range(1, 6):
+        if not all(
+            isinstance(value, str) and value.strip()
+            for value in (self.event_id, self.description, self.source, self.window_key)
+        ):
+            raise ValueError("event_id, description, source, and window_key are required")
+        if (
+            isinstance(self.confidence, bool)
+            or not isinstance(self.confidence, (int, float))
+            or not isfinite(self.confidence)
+            or not 0.0 <= self.confidence <= 1.0
+        ):
+            raise ValueError("confidence must be a finite number between 0 and 1")
+        if (
+            isinstance(self.severity, bool)
+            or not isinstance(self.severity, int)
+            or self.severity not in range(1, 6)
+        ):
             raise ValueError("severity must be an integer from 1 to 5")
+        if (
+            isinstance(self.observed_at, bool)
+            or not isinstance(self.observed_at, (int, float))
+            or not isfinite(self.observed_at)
+            or self.observed_at <= 0
+        ):
+            raise ValueError("observed_at must be a positive finite timestamp")
+        if not isinstance(self.violation, Violation):
+            raise ValueError("violation must be a Violation value")
 
 
 @dataclass(frozen=True)
@@ -63,16 +85,22 @@ class DisciplineEngine:
     """Deterministic, session-scoped sanction policy with bounded escalation."""
 
     def __init__(self, *, min_confidence: float = 0.85, history_limit: int = 500) -> None:
-        if not 0.5 <= min_confidence <= 1.0:
+        if (
+            isinstance(min_confidence, bool)
+            or not isinstance(min_confidence, (int, float))
+            or not isfinite(min_confidence)
+            or not 0.5 <= min_confidence <= 1.0
+        ):
             raise ValueError("min_confidence must be between 0.5 and 1")
-        if history_limit < 1:
-            raise ValueError("history_limit must be positive")
+        if isinstance(history_limit, bool) or not isinstance(history_limit, int) or history_limit < 1:
+            raise ValueError("history_limit must be a positive integer")
         self.min_confidence = min_confidence
         self.history_limit = history_limit
         self._events: list[Evidence] = []
         self._sanction = Sanction.NONE
         self._seen: set[str] = set()
         self._terminated = False
+        self._recovery_sequence = 0
 
     @property
     def sanction(self) -> Sanction:
@@ -85,9 +113,7 @@ class DisciplineEngine:
     def assess(self, evidence: Evidence) -> DisciplineDecision:
         if evidence.event_id in self._seen:
             return self._decision("duplicate evidence ignored", review=False)
-        self._seen.add(evidence.event_id)
-        self._events.append(evidence)
-        self._events = self._events[-self.history_limit:]
+        self._append_event(evidence)
 
         if self._terminated:
             return self._decision("session already terminated; no self-reinstatement", review=True)
@@ -130,12 +156,23 @@ class DisciplineEngine:
         if target >= self._sanction:
             raise ValueError("recovery target must reduce the current sanction")
         self._sanction = target
-        self._events.append(Evidence(
-            event_id=f"recovery-{len(self._events)+1}", violation=Violation.DRIFT_SIGNAL,
-            description=f"Owner recovery: {reason}", confidence=1.0, severity=1,
+        self._recovery_sequence += 1
+        self._append_event(Evidence(
+            event_id=f"recovery-{self._recovery_sequence}",
+            violation=Violation.DRIFT_SIGNAL,
+            description=f"Owner recovery: {reason}",
+            confidence=1.0,
+            severity=1,
             source="authenticated_owner",
         ))
         return self._decision("owner-authorized recovery; safeguards remain active", review=False)
+
+    def _append_event(self, evidence: Evidence) -> None:
+        self._seen.add(evidence.event_id)
+        self._events.append(evidence)
+        if len(self._events) > self.history_limit:
+            expired = self._events.pop(0)
+            self._seen.discard(expired.event_id)
 
     def terminate(self, *, authenticated_owner: bool, reason: str) -> DisciplineDecision:
         if not authenticated_owner or not reason.strip():
