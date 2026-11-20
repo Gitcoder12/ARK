@@ -6,24 +6,24 @@ authenticate identities, classify intent, or provide OS-level isolation.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 
-class RiskLevel(str, Enum):
+class RiskLevel(StrEnum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
 
 
-class GateDecision(str, Enum):
+class GateDecision(StrEnum):
     ALLOW = "allow"
     REVIEW = "review"
     DENY = "deny"
 
 
-class ReviewerKind(str, Enum):
+class ReviewerKind(StrEnum):
     HUMAN = "human"
     MODEL = "model"
 
