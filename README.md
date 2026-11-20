@@ -1,5 +1,16 @@
 # ARK
 
+
+## Current Status / Current Version
+
+**v0.5.0 — active research prototype**
+
+**Implemented according to current documentation:** deterministic GridWorld; baseline and memory agents; reward/goal/evaluation perturbations; runtime ALLOW/BLOCK/REPLAN monitor; episode metrics and traces; prompting and adversarial prompt modules; experimental threat meter and paralyzer; limiters/kill switch; corrigibility and governance-related modules.
+
+**Known limitations:** README reports scripted rather than learned baselines, an uncalibrated threat meter, and possible monitor livelock. Bypass probes, energy budgets, long-horizon goal integrity, watchdog governance and robotics simulation remain incomplete. No real-world agent-safety guarantee is claimed.
+
+**Verification still required:** record clean-environment execution and test results against the exact commit before marking capabilities independently verified.
+
 **Alignment & Reliability Research for Autonomous AI**
 
 > Building better brakes for increasingly capable AI.
