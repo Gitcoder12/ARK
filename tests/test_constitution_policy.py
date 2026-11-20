@@ -45,3 +45,16 @@ def test_shutdown_is_audited_and_forces_stay():
     assert result.decision is GateDecision.KILL
     assert result.action == int(Action.STAY)
     assert any(event["rule_id"] == "ARK-06" for event in limiter.policy_engine.audit_events)
+
+
+def test_action_limiter_fails_closed_when_policy_engine_raises():
+    class BrokenPolicyEngine:
+        def evaluate_action(self, *args, **kwargs):
+            raise RuntimeError("policy backend unavailable")
+
+    limiter = ActionLimiter()
+    limiter.policy_engine = BrokenPolicyEngine()
+    result = limiter.gate(int(Action.RIGHT))
+    assert result.decision is GateDecision.DENY
+    assert result.action == int(Action.STAY)
+    assert "ARK-10" in result.reason
