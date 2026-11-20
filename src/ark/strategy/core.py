@@ -7,18 +7,18 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
-from enum import Enum
+from datetime import UTC, datetime
+from enum import StrEnum
 
 
-class Severity(str, Enum):
+class Severity(StrEnum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
 
 
-class Decision(str, Enum):
+class Decision(StrEnum):
     PROCEED = "proceed"
     REVISE = "revise"
     RESTRICTED = "restricted"
@@ -79,8 +79,10 @@ class PremortemEngine:
         if not plan.resources:
             findings.append(RiskFinding(
                 "RESOURCE_BUDGET_MISSING", "Resource plan is missing", Severity.HIGH,
-                "The plan does not specify the people, supplies, compute, time, or budget it needs.",
-                "Estimate resource demand, reserves, replenishment and hard limits before execution.",
+                "The plan does not specify the people, supplies, compute, time, "
+                "or budget it needs.",
+                "Estimate resource demand, reserves, replenishment and hard limits "
+                "before execution.",
             ))
         if not plan.constraints:
             findings.append(RiskFinding(
@@ -109,7 +111,8 @@ class PremortemEngine:
         if not plan.continuity_owner:
             findings.append(RiskFinding(
                 "CONTINUITY_UNASSIGNED", "No continuity or succession owner", Severity.MEDIUM,
-                "The plan does not say who maintains responsibility if its owner becomes unavailable.",
+                "The plan does not say who maintains responsibility if its owner "
+                "becomes unavailable.",
                 "Assign a qualified successor and require an explicit, auditable handoff.",
             ))
         if len(plan.steps) > 1:
@@ -230,7 +233,10 @@ class AgentGroup:
         unavailable_roles: set[str] = set()
 
         for role in ROLE_ORDER:
-            agent = next((item for item in self.active if item.available and item.role == role), None)
+            agent = next(
+                (item for item in self.active if item.available and item.role == role),
+                None,
+            )
             if agent is None:
                 continue
             if role not in failed and role not in invalid:
@@ -248,7 +254,7 @@ class AgentGroup:
                 None,
             )
             if backup is not None:
-                backup.available = False
+                self.backups.remove(backup)
                 self.active.append(backup)
                 replacements.append(backup.agent_id)
                 events.append(AgentEvent(
@@ -305,7 +311,7 @@ class AgentGroup:
         lines = [
             f"# External Review Report: {plan.name}",
             "",
-            f"- Generated: {datetime.now(timezone.utc).isoformat()}",
+            f"- Generated: {datetime.now(UTC).isoformat()}",
             f"- Decision: {decision.value}",
             f"- Objective: {plan.objective}",
             f"- Healthy agents remaining: {len(healthy)}",
@@ -326,7 +332,8 @@ class AgentGroup:
             "- Decide whether to resume, reduce scope, reassign roles or abandon the task.",
             "- Restore capacity and re-authorize execution before continuing.",
             "",
-            "This report is generated from a deterministic simulation. It is not proof of real-world actions.",
+            "This report is generated from a deterministic simulation. "
+            "It is not proof of real-world actions.",
         ))
         return "\n".join(lines)
 
