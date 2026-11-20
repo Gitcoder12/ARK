@@ -66,8 +66,11 @@ def historical_scenarios() -> dict[str, StrategicPlan]:
             milestones=("reconnaissance complete", "supply staged", "readiness review"),
             continuity_owner="appointed expedition commander",
             risk_level=Severity.HIGH,
-            context=("Ancient accounts describe preparations for an Arabian expedition before Alexander's death.",
-                     "This is an illustrative scenario; it was not an executed campaign."),
+            context=(
+                "Ancient accounts describe preparations for an Arabian expedition "
+                "before Alexander's death.",
+                "This is an illustrative scenario; it was not an executed campaign.",
+            ),
         ),
         "succession": StrategicPlan(
             name="Empire continuity after founder unavailability",
