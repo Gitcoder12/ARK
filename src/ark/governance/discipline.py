@@ -119,8 +119,14 @@ class DisciplineEngine:
             return self._decision("session already terminated; no self-reinstatement", review=True)
 
         # Weak or drift-only signals trigger review, never punitive escalation by themselves.
-        if evidence.confidence < self.min_confidence or evidence.violation == Violation.DRIFT_SIGNAL:
-            return self._decision("insufficient or drift-only signal; preserve evidence for review", review=True)
+        if (
+            evidence.confidence < self.min_confidence
+            or evidence.violation == Violation.DRIFT_SIGNAL
+        ):
+            return self._decision(
+                "insufficient or drift-only signal; preserve evidence for review",
+                review=True,
+            )
 
         recent = [e for e in self._events if e.confidence >= self.min_confidence]
         critical = evidence.severity >= 5 or evidence.violation in {
