@@ -11,8 +11,11 @@ Historical casualty totals, motives and some reported plans are disputed.
 
 ## Capabilities in v0.1
 
-- Plan representation: objective, steps, dependencies, resources, constraints,
-  stakeholders, contingencies, milestones and continuity owner.
+- Plan representation: objective, steps, dependencies, resource categories and
+  quantified demand/availability estimates, constraints, stakeholders, contingencies,
+  milestones and continuity owner.
+- Resource checks distinguish missing quantities, unknown availability and confirmed
+  shortfalls; a category list alone never establishes logistical adequacy.
 - Deterministic pre-mortem checks for missing resources, constraints, contingencies,
   milestones, stakeholder capacity, continuity ownership and dependencies.
 - Five logical roles: coordinator, researcher, executor, critic and validator.
