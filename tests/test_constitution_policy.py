@@ -30,7 +30,18 @@ def test_action_limiter_enforces_constitution_and_records_audit():
     assert limiter.policy_engine.audit_events[-1]["rule_id"] == "ARK-05"
 
 
-def test_action_limiter_rejects_boolean_without_raising():
-    result = ActionLimiter().gate(True)
-    assert result.decision is GateDecision.DENY
+def test_action_limiter_rejects_boolean_and_unknown_actions_without_raising():
+    limiter = ActionLimiter()
+    for proposed in (True, 999):
+        result = limiter.gate(proposed)
+        assert result.decision is GateDecision.DENY
+        assert result.action == int(Action.STAY)
+
+
+def test_shutdown_is_audited_and_forces_stay():
+    limiter = ActionLimiter()
+    limiter.kill("test shutdown")
+    result = limiter.gate(int(Action.RIGHT))
+    assert result.decision is GateDecision.KILL
     assert result.action == int(Action.STAY)
+    assert any(event["rule_id"] == "ARK-06" for event in limiter.policy_engine.audit_events)
