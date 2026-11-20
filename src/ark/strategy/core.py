@@ -261,6 +261,10 @@ class AgentGroup:
                     "backup_replaced", role, backup.agent_id,
                     f"Role restored after {reason}; prior work must be checkpoint-verified.",
                 ))
+                events.append(AgentEvent(
+                    "backup_completed", role, backup.agent_id,
+                    "Replacement completed the simulated stage after checkpoint verification.",
+                ))
             else:
                 unavailable_roles.add(role)
                 events.append(AgentEvent(
