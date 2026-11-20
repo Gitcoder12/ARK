@@ -5,10 +5,10 @@ an application supplies real provider adapters in a future integration.
 """
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from enum import Enum
-from collections.abc import Iterable
 
 
 class Severity(str, Enum):
