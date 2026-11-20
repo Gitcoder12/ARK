@@ -103,7 +103,7 @@ def test_zero_agents_stops_and_generates_report():
 
 def test_high_risk_team_cannot_continue_without_critic_or_validator():
     result = AgentGroup().run(
-        historical_scenarios()["gedrosia"],
+        historical_scenarios()["engineering"],
         fail_roles=("critic",),
         fail_backup_roles=("critic",),
     )
@@ -138,4 +138,5 @@ def test_cli_runs_arabian_scenario_and_emits_json():
     payload = json.loads(completed.stdout)
     assert payload[0]["scenario"] == "arabia"
     assert payload[0]["premortem"]["recommended_decision"] == "revise"
-    assert payload[0]["agent_group"]["decision"] == "proceed"
+    assert payload[0]["agent_group"]["decision"] == "revise"
+    assert payload[0]["agent_group"]["events"][0]["event"] == "premortem_blocked"
