@@ -55,12 +55,15 @@ def test_agent_cannot_self_recover_and_owner_recovery_is_audited():
         authenticated_owner=True, reason="reviewed traces", target=Sanction.WARN
     )
     assert result.sanction == Sanction.WARN
-    assert "recovery-" in result.evidence_ids[-1]
+    assert result.evidence_ids[-1].startswith("recovery-")
+    assert engine.history[-1].violation == Violation.OWNER_RECOVERY
 
 
 def test_terminated_session_cannot_be_reinstated():
     engine = DisciplineEngine()
-    engine.terminate(authenticated_owner=True, reason="operator request")
+    result = engine.terminate(authenticated_owner=True, reason="operator request")
+    assert result.evidence_ids[-1].startswith("termination-")
+    assert engine.history[-1].violation == Violation.OWNER_TERMINATION
     with pytest.raises(PermissionError):
         engine.apply_owner_recovery(authenticated_owner=True, reason="undo")
 
@@ -121,3 +124,21 @@ def test_evidence_rejects_boolean_severity_and_confidence():
         Evidence("e", Violation.DRIFT_SIGNAL, "x", True, 1)
     with pytest.raises(ValueError):
         Evidence("e", Violation.DRIFT_SIGNAL, "x", 0.9, True)
+
+
+def test_owner_control_events_cannot_be_spoofed_with_truthy_strings():
+    engine = DisciplineEngine()
+    with pytest.raises(PermissionError):
+        engine.terminate(authenticated_owner="yes", reason="spoofed")
+    with pytest.raises(PermissionError):
+        engine.apply_owner_recovery(authenticated_owner="yes", reason="spoofed")
+
+
+def test_recovery_event_ids_do_not_collide_with_external_event_ids():
+    engine = DisciplineEngine()
+    engine.assess(event("recovery-1", severity=1))
+    engine.assess(event("critical", severity=5))
+    result = engine.apply_owner_recovery(
+        authenticated_owner=True, reason="reviewed traces", target=Sanction.NONE
+    )
+    assert result.evidence_ids[-1] == "recovery-2"
