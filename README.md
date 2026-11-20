@@ -330,3 +330,8 @@ Inspect AI, Safety-Gymnasium and OpenAI Evals have established evaluation abstra
 
 ### Research validity and limitations
 Report seeds, environment distributions, baseline definitions, sample sizes, confidence intervals and ablations. Keep scripted agents distinct from learned agents; test for monitor-induced livelock and false interventions. A threat meter is not a calibrated probability of existential risk. This is a benchmark-scope comparison, not proof that ARK is superior or that an agent is safe.
+
+
+## Demos
+
+Runnable terminal examples for the constitutional action gate and benchmark commands: [docs/DEMOS.md](docs/DEMOS.md). These demonstrate the current discrete-action controls; they are not a general-purpose sandbox or proof of real-world alignment.
