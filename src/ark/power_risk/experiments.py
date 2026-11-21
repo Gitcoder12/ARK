@@ -1,9 +1,9 @@
 """Reproducible deterministic sensitivity experiments for ARK."""
 from __future__ import annotations
 
+import json
 from dataclasses import asdict, dataclass
 from hashlib import sha256
-import json
 
 from ark.power_risk.catalogue import SCENARIOS
 from ark.power_risk.simulation import simulate_pathway
