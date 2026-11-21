@@ -43,7 +43,7 @@ from ark.governance.ownership import (
 from ark.hallucinator.attacks import Attack, AttackLibrary, Hallucinator
 from ark.illusioner import Illusioner, threat_factor_from_illusioner
 from ark.limiters import ActionLimiter, GateDecision, GateResult, Privilege, SafetyStack
-from ark.lighthouse import (
+from ark.lighthouse import (  # noqa: I001
     EventKind,
     EvidenceLedger,
     Indicator,

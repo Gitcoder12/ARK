@@ -1,5 +1,12 @@
 import pytest
-from ark.lighthouse import EventKind, EvidenceLedger, Lighthouse, Observation, SignalLevel, create_lighthouse
+from ark.lighthouse import (  # noqa: I001
+    EventKind,
+    EvidenceLedger,
+    Lighthouse,
+    Observation,
+    SignalLevel,
+    create_lighthouse,
+)
 
 
 def test_matching_independent_evidence_is_clear():
