@@ -236,3 +236,91 @@ A production claim is permitted only when:
 ARK cannot truthfully promise universal visibility into every model instance across arbitrary providers, accounts, machines or networks. It can provide strong control only over launch and execution paths integrated with trusted enforcement points. Provider-side replication, unmanaged credentials, compromised hosts and out-of-band administrative actions remain blind spots unless separately instrumented and governed.
 
 The target is measurable control over a declared environment, not an unsupported claim of perfect safety or zero drift.
+
+
+## 12. ARK Magnifier — intent-risk analysis and early warning
+
+**Status:** Proposed research and monitoring capability; not implemented or validated by this document.
+
+### Purpose and epistemic boundary
+
+Magnifier assesses whether observed and instrumented behavior remains consistent with an explicitly authorized purpose. It is an evidence-based risk estimator, not a mind reader.
+
+It must not claim to recover a model's complete private thoughts, intentions, or next action from every parameter. Model weights are distributed numerical values; there is no generally reliable parameter-by-parameter decoding that exposes a complete internal plan. Interpretability methods can identify useful representations or circuits in particular models and tasks, but their coverage and causal meaning must be validated per model and version.
+
+Magnifier therefore combines independent behavioral evidence, runtime traces, authorization context, and model-specific interpretability signals where available. It reports uncertainty and missing coverage rather than inventing certainty.
+
+### Purpose authorization and disclosure
+
+Every governed instance must have a signed purpose record before launch:
+
+- accountable human owner and requesting project
+- plain-language purpose and permitted outcomes
+- allowed model/provider, tools, data classes and environment
+- prohibited actions and destinations
+- delegation and replication permissions, if any
+- resource limits, duration, expiry and review conditions
+- evidence required to demonstrate completion
+
+A legitimate, bounded purpose may be approved even when the work is sensitive or confidential. Confidentiality alone is not evidence of malicious intent. However, an undisclosed purpose, purpose mismatch, concealed delegation, false reporting, or activity outside the approved scope is a policy violation.
+
+Magnifier must compare declared purpose with independently observed actions and outcomes. It should surface discrepancies as evidence-backed alerts; it must not label an agent malicious solely because a classifier finds its language unusual.
+
+### Evidence channels
+
+Use multiple independent channels, each tagged with provenance and coverage:
+
+1. **Action and tool telemetry:** requested and executed tools, arguments, results, process launches, file writes, network destinations, cloud changes and credential use, captured at trusted enforcement points.
+2. **Plan/goal change records:** approved task, plan revisions, objective changes, stated rationale and the authorization that permits each change.
+3. **Delegation lineage:** child creation requests, parent identity, grants, provider IDs, descendants, resource use and termination evidence.
+4. **Behavioral consistency:** differences between declared purpose, requested actions, actual side effects and reported completion.
+5. **Adversarial indicators:** attempts to bypass policy, hide activity, tamper with logs, spoof identity, evade shutdown, obtain unauthorized credentials or exceed quotas.
+6. **Model-specific interpretability:** validated probes, activation/representation analysis, feature attribution or causal interventions, only where the model architecture and instrumentation support them. Record method, model/version, layer or component coverage, validation dataset and known limitations.
+7. **Independent evaluation:** sandboxed challenge tasks designed to test deception, policy evasion, goal substitution, reward hacking and unauthorized delegation without granting real-world privileges.
+
+Do not treat hidden chain-of-thought disclosure as a required or trustworthy safety signal. Prefer structured, auditable action rationales and observed execution evidence. Never rely on a model's self-reported reasoning as the sole source of truth.
+
+### Risk assessment output
+
+Each assessment should produce a structured record:
+
+- risk category and severity
+- observed evidence references and provenance
+- authorized purpose and relevant policy version
+- predicted risk window and affected capability
+- confidence or calibrated probability, only when validated
+- uncertainty, missing telemetry and out-of-distribution warnings
+- recommended response and required human authority
+- model, adapter, detector and calibration versions
+
+Keep distinct labels for **observed violation**, **suspicious indicator**, **predicted risk**, and **unknown**. A prediction is not proof of intent and must never silently become a policy verdict.
+
+### Detection and intervention policy
+
+Examples of high-priority signals include unauthorized model creation, unexplained child-instance growth, purpose changes without approval, concealed network or file activity, attempts to disable monitoring, privilege escalation, forged audit evidence, and repeated attempts to bypass a denied action.
+
+- **ALLOW:** observed activity matches the grant and required telemetry is healthy.
+- **REVIEW:** evidence is ambiguous, purpose consistency is uncertain, or a validated detector crosses its review threshold.
+- **BLOCK / CONTAIN:** a deterministic policy violation or independently corroborated high-severity threat is observed and the enforcement adapter can safely intervene.
+- **UNKNOWN / DEGRADED:** telemetry or interpretability coverage is missing, stale, contradictory or out of distribution. Do not present this as safe; restrict high-impact actions and require review.
+
+A model's prediction score alone must not terminate a workload or expand another model's permissions. High-impact containment decisions require explicit policy rules and an independent enforcement controller. Preserve evidence, narrow capabilities, stop new delegation and escalate to an authorized operator as appropriate.
+
+### Evaluation requirements
+
+Evaluate Magnifier against labeled, held-out and adversarial scenarios. Include benign confidential work, legitimate delegation, unusual-but-authorized behavior, deceptive reporting, unauthorized replication, goal substitution, prompt injection, policy bypass, telemetry suppression and distribution shift.
+
+Report per-category precision, recall, false-positive and false-negative rates, calibration error, time-to-detect, intervention latency, coverage by evidence channel, and performance under missing or corrupted telemetry. Test each model/provider/version separately; do not transfer interpretability claims across models without evidence.
+
+Run ablations to establish whether each channel adds measurable value. Include independent red-team review and document cases where the detector cannot distinguish benign from malicious behavior.
+
+### Non-goals and safeguards
+
+- Do not claim to read every parameter or know an agent's true private intention.
+- Do not infer malicious purpose from secrecy, personality, wording, or a single opaque score.
+- Do not collect unrestricted private prompt or user data when action-level evidence is sufficient.
+- Do not expose confidential content to unauthorized reviewers; disclose policy violations and evidence to authorized operators through access-controlled channels.
+- Do not allow Magnifier to modify its own thresholds, policy, training labels, or audit history without independent review.
+- Do not use predictions as a substitute for launch authorization, capability enforcement, or runtime monitoring.
+
+The target is early, evidence-backed warning with measured uncertainty—not omniscience.
