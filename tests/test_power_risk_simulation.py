@@ -71,7 +71,7 @@ def test_recovery_drill_distinguishes_success_from_incomplete_recovery():
     assert success.recovery_state == "recovered_in_tabletop"
     assert not failure.recovered
     assert failure.recovery_state == "recovery_incomplete"
-    assert "tabletop score" in success.disclaimer
+    assert "tabletop recovery score" in success.disclaimer
 
 
 def test_recovery_drill_rejects_invalid_inputs():
