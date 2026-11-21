@@ -9,17 +9,18 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
-from enum import Enum
+from enum import StrEnum
 import hashlib
 import json
 import math
 import re
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 from urllib.parse import urlparse
 from xml.etree import ElementTree
 
 
-class ResourceKind(str, Enum):
+class ResourceKind(StrEnum):
     NEWS = "news"
     RESEARCH = "research"
     SECURITY = "security"
@@ -28,7 +29,7 @@ class ResourceKind(str, Enum):
     OTHER = "other"
 
 
-class Severity(str, Enum):
+class Severity(StrEnum):
     INFO = "info"
     LOW = "low"
     MEDIUM = "medium"
@@ -170,7 +171,10 @@ def parse_resource_payload(
                     key = child.tag.rsplit("}", 1)[-1].lower()
                     if key == "link":
                         values[key] = child.attrib.get("href") or child.text
-                    elif key in {"title", "description", "summary", "content", "pubdate", "published", "updated", "category"}:
+                    elif key in {
+                        "title", "description", "summary", "content",
+                        "pubdate", "published", "updated", "category",
+                    }:
                         values[key] = child.attrib.get("term") or child.text
                 records.append(values)
     if isinstance(payload, Mapping):
@@ -234,7 +238,12 @@ def assess_problem_severity(
         "exposure": exposure, "evidence_quality": evidence_quality,
     }
     for name, value in values.items():
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 <= value <= 1:
+        if (
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not math.isfinite(value)
+            or not 0 <= value <= 1
+        ):
             raise ValueError(f"{name} must be a finite number between 0 and 1")
     weights = {
         "impact": 0.30, "likelihood": 0.25, "urgency": 0.20,
@@ -252,7 +261,10 @@ def assess_problem_severity(
     else:
         band = Severity.INFO
     confidence = round(0.25 + 0.75 * evidence_quality, 3)
-    rationale = tuple(f"{key}={value:.2f} (weight {weights[key]:.2f})" for key, value in values.items())
+    rationale = tuple(
+        f"{key}={value:.2f} (weight {weights[key]:.2f})"
+        for key, value in values.items()
+    )
     return SeverityAssessment(score, band, confidence, values, rationale)
 
 
@@ -265,10 +277,15 @@ class ResourceHub:
     def register(self, source: ResourceSource) -> None:
         existing = self.sources.get(source.source_id)
         if existing is not None and existing != source:
-            raise ValueError(f"source_id already registered with different metadata: {source.source_id}")
+            raise ValueError(
+                "source_id already registered with different metadata: "
+                f"{source.source_id}"
+            )
         self.sources[source.source_id] = source
 
-    def ingest(self, source_id: str, payload: Any, *, observed_at: str | None = None) -> tuple[ResourceItem, ...]:
+    def ingest(
+        self, source_id: str, payload: Any, *, observed_at: str | None = None
+    ) -> tuple[ResourceItem, ...]:
         source = self.sources.get(source_id)
         if source is None:
             raise KeyError(f"unknown resource source: {source_id}")
@@ -277,7 +294,9 @@ class ResourceHub:
             self.items[item.item_id] = item
         return parsed
 
-    def search(self, query: str, *, kinds: tuple[ResourceKind, ...] = ()) -> tuple[ResourceItem, ...]:
+    def search(
+        self, query: str, *, kinds: tuple[ResourceKind, ...] = ()
+    ) -> tuple[ResourceItem, ...]:
         terms = tuple(term.casefold() for term in query.split() if term)
         matches = []
         for item in self.items.values():
@@ -286,9 +305,17 @@ class ResourceHub:
             haystack = f"{item.title} {item.summary} {' '.join(item.tags)}".casefold()
             if all(term in haystack for term in terms):
                 matches.append(item)
-        return tuple(sorted(matches, key=lambda item: (item.published_at or "", item.item_id), reverse=True))
+        return tuple(
+            sorted(
+                matches,
+                key=lambda item: (item.published_at or "", item.item_id),
+                reverse=True,
+            )
+        )
 
-    def compare(self, assessments: Mapping[str, SeverityAssessment]) -> tuple[tuple[str, SeverityAssessment], ...]:
+    def compare(
+        self, assessments: Mapping[str, SeverityAssessment]
+    ) -> tuple[tuple[str, SeverityAssessment], ...]:
         return tuple(sorted(assessments.items(), key=lambda pair: (-pair[1].score, pair[0])))
 
     def propose_feature(
