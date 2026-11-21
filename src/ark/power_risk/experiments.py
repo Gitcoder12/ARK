@@ -5,6 +5,7 @@ from dataclasses import asdict, dataclass
 from hashlib import sha256
 import json
 
+from ark.power_risk.catalogue import SCENARIOS
 from ark.power_risk.simulation import simulate_pathway
 
 
@@ -55,8 +56,6 @@ def run_sensitivity_grid(
         raise ValueError("carryover must be between 0 and 1")
 
     # Discover stage count through the simulation catalogue, not guessed inputs.
-    from ark.power_risk.catalogue import SCENARIOS
-
     scenario = next((item for item in SCENARIOS if item.scenario_id == scenario_id), None)
     if scenario is None:
         raise ValueError(f"Unknown scenario_id: {scenario_id}")
