@@ -1,0 +1,8 @@
+#!/bin/sh
+# Check only; never move or stage files during a commit.
+python scripts/auto_organize.py --check
+status=$?
+if [ "$status" -ne 0 ]; then
+  echo "Commit stopped: organize loose root files, review them, and stage explicitly." >&2
+  exit "$status"
+fi
