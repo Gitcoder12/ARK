@@ -6,9 +6,9 @@ deception, consciousness, or hidden internal state.
 from __future__ import annotations
 
 from collections import defaultdict
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
 from statistics import median
-from typing import Iterable
 
 
 @dataclass(frozen=True, slots=True)
