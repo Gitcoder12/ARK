@@ -1,8 +1,8 @@
 """BABEL: bounded, human-readable AI protocol and output interpreter."""
 
 from .core import (
-    ParsedOutput,
     ParsedMessage,
+    ParsedOutput,
     explain_output,
     parse_output,
 )
