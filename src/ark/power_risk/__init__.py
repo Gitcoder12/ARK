@@ -14,6 +14,12 @@ from ark.power_risk.engine import (
     review_evidence,
     simulate_pressure,
 )
+from ark.power_risk.experiments import (
+    SensitivityCase,
+    SensitivityReport,
+    run_sensitivity_grid,
+    sensitivity_report_json,
+)
 from ark.power_risk.simulation import (
     PathwayResult,
     RecoveryResult,
@@ -51,4 +57,8 @@ __all__ = [
     "WatchRule",
     "WatchStatus",
     "assess_indicator",
+    "SensitivityCase",
+    "SensitivityReport",
+    "run_sensitivity_grid",
+    "sensitivity_report_json",
 ]
