@@ -71,7 +71,9 @@ def benchmark(
     durations: list[float] = []
     peak_bytes = 0
     for _ in range(iterations):
-        tracemalloc.start()
+        tracing_was_active = tracemalloc.is_tracing()
+        if not tracing_was_active:
+            tracemalloc.start()
         started = time.perf_counter()
         try:
             operation()
@@ -79,7 +81,8 @@ def benchmark(
             _, peak = tracemalloc.get_traced_memory()
             peak_bytes = max(peak_bytes, peak)
         finally:
-            tracemalloc.stop()
+            if not tracing_was_active:
+                tracemalloc.stop()
 
     median = statistics.median(durations)
     throughput = workload_units / median if workload_units and median > 0 else None
@@ -110,4 +113,4 @@ def write_json(results: list[BenchmarkResult], path: str | Path, *, run_metadata
     }
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\\n", encoding="utf-8")
+    destination.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
