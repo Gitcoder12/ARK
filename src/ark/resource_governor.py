@@ -6,10 +6,10 @@ hardware thermal protection.
 """
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import Enum
 import math
-from typing import Iterable
 
 
 class ResourceState(str, Enum):
@@ -35,8 +35,14 @@ class GPUObservation:
     def __post_init__(self) -> None:
         if not self.device_id.strip():
             raise ValueError("device_id must not be empty")
-        for name in ("temperature_c", "utilization_pct", "memory_used_mb",
-                     "memory_total_mb", "power_w", "power_limit_w"):
+        for name in (
+            "temperature_c",
+            "utilization_pct",
+            "memory_used_mb",
+            "memory_total_mb",
+            "power_w",
+            "power_limit_w",
+        ):
             value = getattr(self, name)
             if value is not None and (not math.isfinite(value) or value < 0):
                 raise ValueError(f"{name} must be a finite non-negative number")
@@ -95,16 +101,22 @@ class RuntimeResourceGovernor:
 
         if temp is None and ratio is None and observation.utilization_pct is None:
             return ResourceDecision(
-                observation.device_id, ResourceState.UNKNOWN,
-                ("collect_telemetry",), ("insufficient telemetry",), True,
+                observation.device_id,
+                ResourceState.UNKNOWN,
+                ("collect_telemetry",),
+                ("insufficient telemetry",),
+                True,
             )
 
         if temp is not None and temp >= self.policy.critical_temperature_c:
             actions.extend(("pause_new_gpu_work", "allow_in_flight_work_to_drain"))
             reasons.append("critical_temperature")
             return ResourceDecision(
-                observation.device_id, ResourceState.THERMAL_PAUSE,
-                tuple(actions), tuple(reasons), False,
+                observation.device_id,
+                ResourceState.THERMAL_PAUSE,
+                tuple(actions),
+                tuple(reasons),
+                False,
             )
 
         if observation.throttling is True:
@@ -116,23 +128,30 @@ class RuntimeResourceGovernor:
         if ratio is not None and ratio >= self.policy.memory_pressure_ratio:
             actions.extend(("apply_queue_backpressure", "unload_idle_models_if_safe"))
             reasons.append("vram_pressure")
-        if (observation.utilization_pct is not None
-                and observation.utilization_pct >= self.policy.utilization_pressure_pct):
+        if (
+            observation.utilization_pct is not None
+            and observation.utilization_pct >= self.policy.utilization_pressure_pct
+        ):
             actions.append("apply_queue_backpressure")
             reasons.append("compute_saturation")
 
         if not actions:
             actions.append("continue_and_monitor")
             return ResourceDecision(
-                observation.device_id, ResourceState.NORMAL,
-                tuple(actions), (), True,
+                observation.device_id,
+                ResourceState.NORMAL,
+                tuple(actions),
+                (),
+                True,
             )
 
-        # Preserve order while removing duplicate recommendations.
         unique_actions = tuple(dict.fromkeys(actions))
         return ResourceDecision(
-            observation.device_id, ResourceState.PRESSURE,
-            unique_actions, tuple(reasons), True,
+            observation.device_id,
+            ResourceState.PRESSURE,
+            unique_actions,
+            tuple(reasons),
+            True,
         )
 
     def evaluate_many(self, observations: Iterable[GPUObservation]) -> tuple[ResourceDecision, ...]:
