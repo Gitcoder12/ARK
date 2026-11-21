@@ -113,3 +113,36 @@ Human review remains mandatory. Do not silently upgrade a hypothesis to a fact.
 
 Before merging, run the focused test file, the full test suite, Ruff, and a clean
 Streamlit launch. Record exact commit SHA, Python version and command outputs.
+
+
+## Starter source register (review before use)
+
+These sources provide different lenses. They are not interchangeable and should
+not be treated as neutral on every question. Record the institution, mandate,
+publication date and limitations alongside any claim drawn from them.
+
+- [International AI Safety Report 2026](https://internationalaisafetyreport.org/publication/international-ai-safety-report-2026)
+  — international scientific synthesis on general-purpose AI capabilities and risks,
+  including limitations of pre-deployment evaluation and emerging safeguards.
+- [OECD: Artificial Intelligence markets (2026)](https://www.oecd.org/en/publications/artificial-intelligence-markets_d531d73f-en/full-report.html)
+  — competition across chips, cloud, data, models and applications; useful for
+  concentration and contestability questions.
+- [Stanford AI100: Mapping the Emerging Geopolitics of AI (2026)](https://ai100.stanford.edu/reports/2026-report/deep-dives/deep-dive-one-mapping-emerging-geopolitics-ai)
+  — global governance and geopolitical analysis; treat strategic assessments as
+  analysis, not direct measurements of safety outcomes.
+- [World Economic Forum: Global Risks Report 2026](https://www.weforum.org/publications/global-risks-report-2026/global-risks-report-2026-chapter-2)
+  — stakeholder risk-perception survey and discussion of market and governance risks;
+  survey perceptions are not event probabilities.
+- [Chatham House: Breaking the deadlock on AI governance (2026)](https://www.chathamhouse.org/sites/default/files/2026-03/2026-03-30-breaking-the-deadlock-AI-governance-wilkinsonr-et-al.pdf)
+  — policy analysis of public-private asymmetries and coordination options; identify
+  its policy recommendations as the authors' analysis.
+- [US-China Economic and Security Review Commission: 2026 Annual Report](https://www.uscc.gov/annual-report/2026/chapter-8-silicon-to-sovereignty-chinas-bid-to-control-the-ai-tech-stack)
+  — US congressional advisory body's analysis of China-related technology and
+  supply-chain issues. Its institutional mandate is US economic and security
+  interests; pair with Chinese, international and independent sources before
+  making comparative claims.
+
+For every future update, triangulate institutional publications with primary
+documents, peer-reviewed research, company disclosures, regulatory records and
+credible reporting from more than one jurisdiction. Record disagreements rather
+than forcing artificial consensus.
