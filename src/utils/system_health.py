@@ -58,10 +58,8 @@ def get_gpu_info() -> dict[str, Any]:
             }
     except ImportError:
         pass
-    except Exception as exc:
-        torch_error = f"{type(exc).__name__}: {exc}"
-    else:
-        torch_error = None
+    except Exception:
+        pass
 
     try:
         import GPUtil  # type: ignore[import-not-found]
