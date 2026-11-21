@@ -13,7 +13,7 @@ import re
 import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable
+from collections.abc import Iterable
 
 DEFAULT_EXTENSIONS = {
     ".py", ".md", ".rst", ".txt", ".toml", ".yaml", ".yml", ".json",
