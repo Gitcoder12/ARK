@@ -36,9 +36,9 @@ def test_default_rules_have_unique_ids_and_valid_inverse_thresholds():
 def test_higher_is_worse_indicator_classifies_normal_watch_and_alert():
     rule = WatchRule("risk", "Risk indicator", "index", 0.5, 0.8)
     today = date(2026, 11, 21)
-    assert assess_indicator(rule, observation("risk", value=0.2), as_of=today).status == WatchStatus.NORMAL
-    assert assess_indicator(rule, observation("risk", value=0.6), as_of=today).status == WatchStatus.WATCH
-    assert assess_indicator(rule, observation("risk", value=0.9), as_of=today).status == WatchStatus.ALERT
+    normal = assess_indicator(\n        rule, observation("risk", value=0.2), as_of=today\n    )\n    assert normal.status == WatchStatus.NORMAL
+    warning = assess_indicator(\n        rule, observation("risk", value=0.6), as_of=today\n    )\n    assert warning.status == WatchStatus.WATCH
+    alert = assess_indicator(\n        rule, observation("risk", value=0.9), as_of=today\n    )\n    assert alert.status == WatchStatus.ALERT
 
 
 def test_lower_is_worse_indicator_uses_inverse_thresholds():
@@ -49,9 +49,9 @@ def test_lower_is_worse_indicator_uses_inverse_thresholds():
         higher_is_worse=False,
     )
     today = date(2026, 11, 21)
-    assert assess_indicator(rule, observation("trust", value=0.8), as_of=today).status == WatchStatus.NORMAL
-    assert assess_indicator(rule, observation("trust", value=0.4), as_of=today).status == WatchStatus.WATCH
-    assert assess_indicator(rule, observation("trust", value=0.1), as_of=today).status == WatchStatus.ALERT
+    normal = assess_indicator(\n        rule, observation("trust", value=0.8), as_of=today\n    )\n    assert normal.status == WatchStatus.NORMAL
+    warning = assess_indicator(\n        rule, observation("trust", value=0.4), as_of=today\n    )\n    assert warning.status == WatchStatus.WATCH
+    alert = assess_indicator(\n        rule, observation("trust", value=0.1), as_of=today\n    )\n    assert alert.status == WatchStatus.ALERT
 
 
 def test_stale_and_unverified_evidence_never_produces_normal_status():
