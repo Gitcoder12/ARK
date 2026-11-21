@@ -236,7 +236,10 @@ EXPERIMENTS: tuple[ResearchExperiment, ...] = (
     ResearchExperiment(
         "ARK-PWR-001", "Competitive pressure and safety investment",
         "Higher perceived race pressure may reduce the share of resources allocated to assurance.",
-        "Compare synthetic organisations under controlled competition and assurance-budget settings.",
+        (
+            "Compare synthetic organisations under controlled competition "
+            "and assurance-budget settings."
+        ),
         "Use synthetic budgets only; do not infer intent or assign blame to real actors.",
     ),
     ResearchExperiment(
