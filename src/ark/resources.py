@@ -108,7 +108,7 @@ def _clean_text(value: Any, limit: int = 4000) -> str:
     if value is None:
         return ""
     text = re.sub(r"<[^>]*>", " ", str(value))
-    return re.sub(r"\\s+", " ", text).strip()[:limit]
+    return re.sub(r"\s+", " ", text).strip()[:limit]
 
 
 def _parse_date(value: Any) -> str | None:
@@ -141,7 +141,7 @@ def _severity(value: Any) -> Severity:
 
 def _stable_id(source_id: str, title: str, url: str | None) -> str:
     canonical = (url or title).strip().casefold()
-    return hashlib.sha256(f"{source_id}\\0{canonical}".encode("utf-8")).hexdigest()[:20]
+    return hashlib.sha256(f"{source_id}:{canonical}".encode("utf-8")).hexdigest()[:20]
 
 
 def parse_resource_payload(
