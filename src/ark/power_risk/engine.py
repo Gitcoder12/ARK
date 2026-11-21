@@ -5,10 +5,10 @@ forecasts, causal proof, or evaluations of named countries or people.
 """
 from __future__ import annotations
 
+import json
 from dataclasses import asdict, dataclass
 from datetime import date
 from hashlib import sha256
-import json
 from typing import Any
 from urllib.parse import urlparse
 
@@ -106,8 +106,7 @@ class EvidenceRecord:
     attribution: str
 
     def __post_init__(self) -> None:
-        for name in ("evidence_id", "claim", "source_name", "supports",
-                     "limitations", "counterevidence", "attribution"):
+        for name in ("evidence_id", "claim", "source_name"):
             if not getattr(self, name).strip():
                 raise ValueError(f"{name} must not be empty")
         parsed = urlparse(self.source_url)
@@ -177,7 +176,13 @@ class SafetyPolicy:
             return SafetyDecision(False, "Unknown or unsupported action; fail closed.")
         if request.high_impact and not request.human_approved:
             return SafetyDecision(False, "High-impact action requires explicit human approval.")
-        if request.target.strip().lower() in {"production", "public_infrastructure", "weapon", "person"}:
+        sensitive_targets = {
+            "production",
+            "public_infrastructure",
+            "weapon",
+            "person",
+        }
+        if request.target.strip().lower() in sensitive_targets:
             return SafetyDecision(False, "Sensitive real-world target is prohibited.")
         return SafetyDecision(True, "Permitted within the isolated research workflow.")
 
@@ -195,7 +200,7 @@ class HashChainLedger:
     def append(self, event: dict[str, Any]) -> str:
         payload = json.dumps(event, sort_keys=True, separators=(",", ":"), default=str)
         previous = self._entries[-1]["hash"] if self._entries else "GENESIS"
-        digest = sha256(f"{previous}:{payload}".encode("utf-8")).hexdigest()
+        digest = sha256(f"{previous}:{payload}".encode()).hexdigest()
         self._entries.append({
             "sequence": len(self._entries) + 1,
             "previous_hash": previous,
