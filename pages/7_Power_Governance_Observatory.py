@@ -26,6 +26,7 @@ from ark.power_risk import (  # noqa: E402
     SafetyPolicy,
     WatchObservation,
     assess_indicator,
+    review_evidence,
     run_sensitivity_grid,
     sensitivity_report_json,
     simulate_pathway,
@@ -56,7 +57,7 @@ if "ark_power_ledger" not in st.session_state:
 tabs = st.tabs([
     "Extinction scenarios", "Power & governance", "Synthetic simulator",
     "Safety controls", "Audit trail", "Early-warning watchlist",
-    "Reproducible experiments",
+    "Reproducible experiments", "Evidence review",
 ])
 
 with tabs[0]:
@@ -414,6 +415,68 @@ with tabs[6]:
             mime="application/json",
         )
         st.caption(report.interpretation)
+
+
+with tabs[7]:
+    st.subheader("Structured evidence review")
+    st.write(
+        "Record what a source supports, what it does not support, relevant "
+        "counterevidence and attribution. This checks completeness, not truth."
+    )
+    evidence_id = st.text_input("Evidence record ID")
+    claim = st.text_area("Specific claim being assessed")
+    source_name = st.text_input("Source author / institution", key="evidence_source")
+    source_url = st.text_input("Source HTTPS URL", key="evidence_url")
+    published_on = st.date_input(
+        "Publication date", value=date.today(), key="evidence_published"
+    )
+    accessed_on = st.date_input(
+        "Access date", value=date.today(), key="evidence_accessed"
+    )
+    evidence_class = st.selectbox(
+        "Evidence class",
+        options=[item.value for item in EvidenceClass],
+        key="evidence_class",
+    )
+    supports = st.text_area("What does the source directly support?")
+    limitations = st.text_area("Limitations and uncertainty", key="evidence_limitations")
+    counterevidence = st.text_area("Counterevidence / credible disagreement")
+    attribution = st.text_area("Attribution (who makes this claim?)")
+    if st.button("Review evidence record", key="review_evidence_record"):
+        try:
+            record = EvidenceRecord(
+                evidence_id=evidence_id,
+                claim=claim,
+                source_name=source_name,
+                source_url=source_url,
+                published_on=published_on,
+                accessed_on=accessed_on,
+                evidence_class=EvidenceClass(evidence_class),
+                supports=supports,
+                limitations=limitations,
+                counterevidence=counterevidence,
+                attribution=attribution,
+            )
+            review = review_evidence(record)
+            st.session_state.ark_power_last_evidence_review = review
+            st.session_state.ark_power_ledger.append({
+                "event_type": "evidence_record_review",
+                "evidence_id": review.evidence_id,
+                "metadata_complete": review.passed,
+                "missing_fields": review.missing_fields,
+                "source_name": source_name,
+                "source_url": source_url,
+            })
+        except (TypeError, ValueError) as error:
+            st.error(str(error))
+    review = st.session_state.get("ark_power_last_evidence_review")
+    if review is not None:
+        if review.passed:
+            st.success("Evidence metadata complete — human factual review still required.")
+        else:
+            st.warning("Evidence record incomplete.")
+            st.write("Missing: " + ", ".join(review.missing_fields))
+        st.caption(review.note)
 
 st.divider()
 st.caption(
