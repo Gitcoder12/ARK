@@ -17,7 +17,8 @@ def source(kind=ResourceKind.NEWS):
 def test_rss_items_are_normalized_and_deduplicated():
     feed = """<?xml version="1.0"?><rss><channel><item>
       <title>Critical library flaw</title><link>https://example.org/advisory/1</link>
-      <description>Upgrade the affected package.</description><pubDate>Fri, 21 Nov 2026 10:00:00 GMT</pubDate>
+      <description>Upgrade the affected package.</description>
+      <pubDate>Fri, 21 Nov 2026 10:00:00 GMT</pubDate>
     </item></channel></rss>"""
     items = parse_resource_payload(source(ResourceKind.SECURITY), feed)
     assert len(items) == 1
