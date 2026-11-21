@@ -12,7 +12,7 @@ not campaign for or against countries, political parties, companies or people.
 - `src/ark/power_risk/catalogue.py`: ten defensive existential-risk scenarios,
   six governance domains and six synthetic experiment specifications.
 - `src/ark/power_risk/engine.py`: transparent toy pressure model, evidence record
-  validation, fail-closed action policy and hash-chained session ledger.
+  validation, fail-closed action policy and hash-chained session ledger.\n- `src/ark/power_risk/simulation.py`: per-scenario causal-stage propagation and\n  recovery tabletop experiments using bounded synthetic inputs.
 - `pages/7_Power_Governance_Observatory.py`: Streamlit research dashboard.
 - `tests/test_power_risk.py`: catalogue, model, evidence, safety and audit tests.
 
@@ -60,7 +60,7 @@ not infer motives from outcomes. Allegations require attribution and corroborati
 
 ## Synthetic model
 
-The toy simulator accepts six values in [0, 1]:
+The incentive-pressure toy simulator accepts six values in [0, 1]:
 
 - competition pressure
 - market concentration
@@ -69,7 +69,7 @@ The toy simulator accepts six values in [0, 1]:
 - independent oversight strength
 - infrastructure resilience
 
-The output is a weighted, illustrative exposure index. The weights are
+The output is a weighted, illustrative exposure index. The scenario simulator\npropagates synthetic pressure across a selected scenario's causal stages and\nreduces residual exposure according to hypothetical safeguard coverage. The recovery\ntabletop combines detection delay, recovery capacity and intervention reliability.\nNeither simulator models real-world systems. The weights are
 explicit assumptions, not empirically fitted coefficients. The index is not
 an extinction probability, causal estimate, forecast or score for a real actor.
 Changing an input demonstrates model behaviour, not real-world causation.
