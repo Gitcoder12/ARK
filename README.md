@@ -400,3 +400,28 @@ Report seeds, environment distributions, baseline definitions, sample sizes, con
 ## Demos
 
 Runnable terminal examples for the constitutional action gate and benchmark commands: [docs/DEMOS.md](docs/DEMOS.md). These demonstrate the current discrete-action controls; they are not a general-purpose sandbox or proof of real-world alignment.
+
+
+## Power, Governance & Existential-Risk Observatory
+
+ARK now includes a defensive research extension connecting technical failure pathways
+with the institutional and economic conditions that may shape AI development.
+
+- **10 scenario families:** loss of control, multi-agent failure, human dependency,
+  concentrated power, socioeconomic disruption, dual-use misuse, conflict escalation,
+  infrastructure cascades and unsafe recursive improvement.
+- **6 governance domains:** geopolitical competition, corporate/investor influence,
+  political and regulatory incentives, compute/energy concentration, international
+  cooperation, and human/societal impact.
+- **Synthetic experiments:** transparent pressure model with explicit illustrative
+  weights; outputs are not extinction probabilities or real-actor scores.
+- **Safety controls:** fail-closed action policy, simulation-only boundary,
+  high-impact human approval, pause/shutdown availability and hash-chained session logs.
+- **Dashboard:** launch `streamlit run arkworld.py` and choose
+  **Power, Governance & Existential Risk** from the sidebar.
+
+Implementation guide: [docs/POWER_GOVERNANCE_OBSERVATORY.md](docs/POWER_GOVERNANCE_OBSERVATORY.md).
+
+All political-economy analysis is evidence-led and nonpartisan. ARK evaluates
+documented structures, actions and outcomes using consistent standards across
+jurisdictions and organisations. Hypotheses are not presented as established facts.

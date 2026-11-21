@@ -78,6 +78,20 @@ with right:
     )
 
     st.page_link(
+        "pages/7_Power_Governance_Observatory.py",
+        label="Power, Governance & Existential Risk",
+        icon="🛡️",
+        help=(
+            "Explore ten defensive extinction scenarios, geopolitical and corporate "
+            "incentives, synthetic experiments, safety controls and audit trails."
+        ),
+    )
+    st.markdown(
+        "Research how competition, private capital, regulation, infrastructure "
+        "concentration and international cooperation affect AI safety."
+    )
+
+    st.page_link(
         "pages/2_Omelas_Safeguard.py",
         label="Omelas Safeguard",
         icon="🛡️",
