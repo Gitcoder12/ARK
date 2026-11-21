@@ -195,7 +195,7 @@ class HashChainLedger:
 
     @property
     def entries(self) -> tuple[dict[str, Any], ...]:
-        return tuple(dict(entry) for entry in self._entries)
+        return tuple(json.loads(json.dumps(entry)) for entry in self._entries)
 
     def append(self, event: dict[str, Any]) -> str:
         payload = json.dumps(event, sort_keys=True, separators=(",", ":"), default=str)
