@@ -11,6 +11,22 @@
 
 **Verification still required:** record clean-environment execution and test results against the exact commit before marking capabilities independently verified.
 
+
+## Maintainer status snapshot — 2026-11-22
+
+**Default branch:** `main` at `3692d4bf9f098d8f1454789f34723e7892c5dc9b`. **Project status:** active research prototype; not a deployed or generally validated autonomous-agent safety system.
+
+This snapshot separates default-branch content from open pull requests. A green check on a PR does not make its feature part of `main`; draft work remains proposed until reviewed, merged and re-tested against the resulting mainline.
+
+- The current documented research core is a deterministic GridWorld and scripted baseline/memory agents, perturbation scenarios, an ALLOW/BLOCK/REPLAN monitor, episode metrics/traces, prompt/adversarial experiments and experimental governance/risk modules.
+- The README's own caveats remain material: scripted rather than learned baselines, an uncalibrated threat meter, and possible monitor livelock. Robotics transfer, long-horizon goal integrity and other roadmap items must not be presented as completed without exact-commit evidence.
+- **Open PR snapshot:** 15 PRs were open at audit time. CI-green candidates included #28 (benchmark input contracts) and #61 (ecosystem adapter/complexity proposal); #61 is still draft. #63 (Resources hub) fails lint because `timezone` is undefined; #62 (resource governor) fails lint; #58 (RAG/FastMCP) fails test collection because `src/ark/rag/__init__.py` contains malformed escaped source text. Other open work is mostly draft, stale-base, or not mergeable and requires individual review.
+- **Safety boundary:** no PR feature should be described as a production enforcement gate, sandbox, alignment guarantee or autonomous capability until its code, tests and operational boundary are independently verified.
+- **Verification status:** this audit inspected GitHub PR metadata and recorded CI runs. It did not execute the full repository test suite locally or validate every dashboard, experiment, adapter or hardware integration.
+
+See [docs/MAINTAINER_STATUS_2026-11-22.md](docs/MAINTAINER_STATUS_2026-11-22.md) for the audit snapshot, PR triage, known failures, branch policy and next steps. Recheck live GitHub state before merging because CI and branch heads can change.
+
+
 **Alignment & Reliability Research for Autonomous AI**
 
 > Building better brakes for increasingly capable AI.
