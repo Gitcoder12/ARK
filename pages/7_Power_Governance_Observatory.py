@@ -19,16 +19,18 @@ from ark.power_risk import (  # noqa: E402
     EXPERIMENTS,
     GOVERNANCE_DOMAINS,
     SCENARIOS,
-    EvidenceClass,
     ActionRequest,
+    EvidenceClass,
     HashChainLedger,
     PressureInputs,
     SafetyPolicy,
+    WatchObservation,
+    assess_indicator,
+    run_sensitivity_grid,
+    sensitivity_report_json,
     simulate_pathway,
     simulate_pressure,
     simulate_recovery,
-    assess_indicator,
-    WatchObservation,
 )
 
 st.set_page_config(
@@ -54,6 +56,7 @@ if "ark_power_ledger" not in st.session_state:
 tabs = st.tabs([
     "Extinction scenarios", "Power & governance", "Synthetic simulator",
     "Safety controls", "Audit trail", "Early-warning watchlist",
+    "Reproducible experiments",
 ])
 
 with tabs[0]:
@@ -345,6 +348,72 @@ with tabs[5]:
             f"Observation age: {assessment.age_days} days. "
             "Human review required. No probability is calculated."
         )
+
+
+with tabs[6]:
+    st.subheader("Reproducible sensitivity experiment")
+    st.write(
+        "Run a deterministic full-factorial grid across synthetic pressure and "
+        "safeguard settings. Repeated runs with the same inputs produce the same "
+        "experiment ID and results."
+    )
+    scenario_map = {f"{item.scenario_id} · {item.title}": item for item in SCENARIOS}
+    experiment_scenario = scenario_map[
+        st.selectbox("Experiment scenario", list(scenario_map), key="grid_scenario")
+    ]
+    pressure_levels = st.multiselect(
+        "Pressure levels",
+        options=[0.0, 0.25, 0.5, 0.75, 1.0],
+        default=[0.25, 0.5, 0.75],
+    )
+    safeguard_levels = st.multiselect(
+        "Safeguard coverage levels",
+        options=[0.0, 0.25, 0.5, 0.75, 1.0],
+        default=[0.0, 0.5, 1.0],
+    )
+    grid_carryover = st.slider(
+        "Stage carryover", 0.0, 1.0, 0.2, 0.05, key="grid_carryover"
+    )
+    if st.button("Run deterministic experiment grid", key="run_grid"):
+        try:
+            report = run_sensitivity_grid(
+                experiment_scenario.scenario_id,
+                pressure_levels=tuple(pressure_levels),
+                safeguard_levels=tuple(safeguard_levels),
+                carryover=grid_carryover,
+            )
+            st.session_state.ark_power_last_grid = report
+            st.session_state.ark_power_ledger.append({
+                "event_type": "sensitivity_grid",
+                "experiment_id": report.experiment_id,
+                "scenario_id": report.scenario_id,
+                "case_count": len(report.cases),
+            })
+        except (TypeError, ValueError) as error:
+            st.error(str(error))
+    report = st.session_state.get("ark_power_last_grid")
+    if report is not None:
+        st.metric("Experiment ID", report.experiment_id)
+        st.write(f"Cases evaluated: {len(report.cases)}")
+        st.dataframe(
+            [
+                {
+                    "Pressure": case.pressure,
+                    "Safeguard coverage": case.safeguard_coverage,
+                    "Peak residual": case.peak_residual,
+                    "Mean residual": case.mean_residual,
+                }
+                for case in report.cases
+            ],
+            use_container_width=True,
+        )
+        st.download_button(
+            "Export reproducible experiment JSON",
+            data=sensitivity_report_json(report),
+            file_name=f"ark_experiment_{report.experiment_id}.json",
+            mime="application/json",
+        )
+        st.caption(report.interpretation)
 
 st.divider()
 st.caption(
