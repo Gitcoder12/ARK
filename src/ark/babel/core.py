@@ -23,7 +23,8 @@ _LLAMA_MARKERS = {
 _MARKER_RE = re.compile(r"<\|[^>]+\|>|<think>|</think>")
 _HARMONY_RE = re.compile(
     r"<\|im_start\|>(.*?)<\|im_sep\|>(.*?)"
-    r"(?=<\|im_start\|>|<\|fim_suffix\|>|<\|im_end\|>|<\|ghissue\|>|$)",
+    r"(?P<ending><\|im_end\|>|<\|fim_suffix\|>|<\|ghissue\|>)?"
+    r"(?=<\|im_start\|>|$)",
     re.DOTALL,
 )
 _LLAMA_RE = re.compile(
@@ -66,13 +67,8 @@ def _parse_harmony(text: str) -> tuple[ParsedMessage, ...]:
     for match in _HARMONY_RE.finditer(text):
         header = match.group(1).strip()
         body = match.group(2).strip()
-        ending_match = re.search(
-            r"(<\|im_end\|>|<\|fim_suffix\|>|<\|ghissue\|>)\s*$",
-            body,
-        )
-        ending = ending_match.group(1) if ending_match else None
-        if ending:
-            body = body[: ending_match.start()].rstrip()
+        ending = match.group(3)
+        body = body.rstrip()
         channel = None
         if "<|meta_sep|>" in header:
             header, channel = header.split("<|meta_sep|>", 1)
