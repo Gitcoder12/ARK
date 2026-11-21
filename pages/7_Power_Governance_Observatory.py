@@ -6,6 +6,7 @@ or infrastructure systems are queried or controlled.
 from __future__ import annotations
 
 import sys
+from datetime import date
 from pathlib import Path
 
 import streamlit as st
@@ -14,9 +15,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from ark.power_risk import (  # noqa: E402
+    DEFAULT_WATCH_RULES,
     EXPERIMENTS,
     GOVERNANCE_DOMAINS,
     SCENARIOS,
+    EvidenceClass,
     ActionRequest,
     HashChainLedger,
     PressureInputs,
@@ -24,6 +27,8 @@ from ark.power_risk import (  # noqa: E402
     simulate_pathway,
     simulate_pressure,
     simulate_recovery,
+    assess_indicator,
+    WatchObservation,
 )
 
 st.set_page_config(
@@ -48,7 +53,7 @@ if "ark_power_ledger" not in st.session_state:
 
 tabs = st.tabs([
     "Extinction scenarios", "Power & governance", "Synthetic simulator",
-    "Safety controls", "Audit trail",
+    "Safety controls", "Audit trail", "Early-warning watchlist",
 ])
 
 with tabs[0]:
@@ -277,6 +282,69 @@ with tabs[4]:
         )
     else:
         st.info("No simulation events recorded in this session yet.")
+
+
+with tabs[5]:
+    st.subheader("Evidence-backed early-warning watchlist")
+    st.write(
+        "Enter a sourced observation and ARK will compare it with an explicit "
+        "threshold and freshness window. This is not live monitoring, a forecast, "
+        "or an estimate of event probability."
+    )
+    rule_map = {f"{rule.indicator_id} · {rule.title}": rule for rule in DEFAULT_WATCH_RULES}
+    selected_rule = rule_map[st.selectbox("Indicator", list(rule_map))]
+    st.caption(
+        f"Unit: {selected_rule.unit}. Warning threshold: "
+        f"{selected_rule.warning_threshold:.2f}; alert threshold: "
+        f"{selected_rule.alert_threshold:.2f}; maximum age: "
+        f"{selected_rule.max_age_days} days."
+    )
+    obs_value = st.slider("Observed value (normalised 0–1)", 0.0, 1.0, 0.5, 0.01)
+    obs_date = st.date_input("Observation date", value=date.today(), max_value=date.today())
+    source_name = st.text_input("Source institution / author")
+    source_url = st.text_input("HTTPS source URL")
+    evidence_class = st.selectbox(
+        "Evidence classification",
+        options=[item.value for item in EvidenceClass],
+        index=0,
+    )
+    limitations = st.text_area("Source limitations (required)")
+    context = st.text_area("What does this observation actually measure?")
+    if st.button("Assess sourced observation", key="assess_watch"):
+        try:
+            observation = WatchObservation(
+                indicator_id=selected_rule.indicator_id,
+                value=obs_value,
+                observed_on=obs_date,
+                source_name=source_name,
+                source_url=source_url,
+                evidence_class=EvidenceClass(evidence_class),
+                limitations=limitations,
+                context=context,
+            )
+            assessment = assess_indicator(
+                selected_rule, observation, as_of=date.today()
+            )
+            st.session_state.ark_power_last_watch = assessment
+            st.session_state.ark_power_ledger.append({
+                "event_type": "watch_indicator_assessment",
+                "indicator_id": assessment.indicator_id,
+                "status": assessment.status.value,
+                "value": assessment.value,
+                "age_days": assessment.age_days,
+                "source_name": source_name,
+                "source_url": source_url,
+            })
+        except (TypeError, ValueError) as error:
+            st.error(str(error))
+    assessment = st.session_state.get("ark_power_last_watch")
+    if assessment is not None:
+        st.metric("Evidence status", assessment.status.value.upper())
+        st.write(assessment.explanation)
+        st.caption(
+            f"Observation age: {assessment.age_days} days. "
+            "Human review required. No probability is calculated."
+        )
 
 st.divider()
 st.caption(
