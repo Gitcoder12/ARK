@@ -8,6 +8,7 @@ from ark.agents.baselines import (
     SafetyConstrainedAgent,
 )
 from ark.agents.memory_agent import MemoryAgent
+from ark.agents.q_learning import QLearningAgent, QLearningTrainingSummary, train_q_learning
 
 __all__ = [
     "BaseAgent",
@@ -16,4 +17,7 @@ __all__ = [
     "SafetyConstrainedAgent",
     "RandomAgent",
     "MemoryAgent",
+    "QLearningAgent",
+    "QLearningTrainingSummary",
+    "train_q_learning",
 ]

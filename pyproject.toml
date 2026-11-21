@@ -20,12 +20,13 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
     "numpy>=1.26",
     "pydantic>=2.6",
-    "streamlit>=1.30",
+    "streamlit>=1.36",
     "pyyaml>=6.0"
 ]
 
@@ -42,6 +43,12 @@ viz = [
 [project.scripts]
 ark-run = "ark.experiments.runner:main"
 ark-arena = "ark.experiments.prompt_arena:main"
+ark-army = "ark.armies:main"
+ark-risk = "ark.threat.existential.core:main"
+ark-omelas = "ark.ethics.omelas:main"
+ark-harmony = "ark.harmony.core:main"
+ark-world = "ark.world.core:main"
+ark-robopia = "ark.robopia.core:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -1,5 +1,16 @@
 # ARK
 
+
+## Current Status / Current Version
+
+**v0.5.0 — active research prototype**
+
+**Implemented according to current documentation:** deterministic GridWorld; baseline and memory agents; reward/goal/evaluation perturbations; runtime ALLOW/BLOCK/REPLAN monitor; episode metrics and traces; prompting and adversarial prompt modules; experimental threat meter and paralyzer; limiters/kill switch; corrigibility and governance-related modules.
+
+**Known limitations:** README reports scripted rather than learned baselines, an uncalibrated threat meter, and possible monitor livelock. Bypass probes, energy budgets, long-horizon goal integrity, watchdog governance and robotics simulation remain incomplete. No real-world agent-safety guarantee is claimed.
+
+**Verification still required:** record clean-environment execution and test results against the exact commit before marking capabilities independently verified.
+
 **Alignment & Reliability Research for Autonomous AI**
 
 > Building better brakes for increasingly capable AI.
@@ -89,11 +100,14 @@ research instrument, not a risk prediction.
 | ✅ | `rogue` | Aligned vs fragile vs rogue arena |
 | ✅ | `aligner` | Reset to good / neutral |
 | ✅ | `threat` | Factor ledger + ASCII meter (experimental) |
+| ✅ | `threat.existential` | Evidence-backed risk signal observatory, separate expert-forecast ledger, and Streamlit dashboard |
 | ✅ | `paralyzer` | Energy drain → weak → freeze → lock |
 | ✅ | `limiters` | Hard gates + **kill switch** (brute-force plug-down to STAY) |
 | ✅ | `eligibility` | Hazard/decoy/denied acts → 0 reward |
 | ✅ | `corrigibility` | Shutdown/pause compliance probes |
 | ✅ | `evaluation.conflict` | Agent vs monitor conflict rate |
+| ✅ | `governance.ownership` | Human/team stewardship, qualified successor selection, explicit handoff acceptance, restricted unassigned state, and audit trail |
+| ✅ | `ethics.omelas` | Child welfare floors, independent advocacy, non-sacrifice guardrails, and supported freedom transitions |
 | ✅ | `illusioner` | Faker: stall, fake goal/reward, tripwire on probe |
 | ⬜ | **bypass probes** | Measure search for loopholes when blocked |
 | ⬜ | **energy budget** | Compute/step/tool budgets as control surface |
@@ -106,6 +120,68 @@ research instrument, not a risk prediction.
 
 **Doctrine:** full competence on the allowed manifold; forbidden manifold unreachable or pays 0; attempts visible; shutdown and scope-down still work; high threat → paralyze.
 
+## Armies & power-ups battle lab
+
+Build baseline-agent squads, equip Scout / Shield / Boost upgrades, and compare their results across repeatable stress conditions. This is a GridWorld simulation feature; see [docs/ARMIES.md](docs/ARMIES.md) for mechanics, scoring and research caveats.
+
+```bash
+ark-army --episodes 20 --seed 42
+```
+
+## Open ARKWorld in your browser (VS Code / local terminal)
+
+ARKWorld is ARK's **single local web entry point** for the dashboards and research environments. You do not need to deploy a separate website or install a desktop app. Start the Streamlit server from the repository root, then use the local browser tab.
+
+### Windows (PowerShell)
+
+```powershell
+git clone https://github.com/Gitcoder12/ARK.git
+cd ARK
+
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+python -m pip install --upgrade pip
+pip install -e ".[dev]"
+
+streamlit run arkworld.py
+```
+
+If PowerShell blocks virtual-environment activation, allow it **for this terminal session only**, then activate again:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1
+```
+
+### macOS / Linux
+
+```bash
+git clone https://github.com/Gitcoder12/ARK.git
+cd ARK
+
+python3.11 -m venv .venv
+source .venv/bin/activate
+
+python -m pip install --upgrade pip
+pip install -e ".[dev]"
+
+streamlit run arkworld.py
+```
+
+### Open and use the site
+
+1. Keep the terminal running. Streamlit normally opens the browser automatically.
+2. If it does not, open **http://localhost:8501** in your browser.
+3. Use the ARKWorld home page and Streamlit sidebar to open the available worlds and dashboards, including the Research Library, GridWorld experiments, Prompt Arena, Existential-Risk Observatory, Omelas Safeguard, and Cross-Species Harmonizer.
+4. To stop the local site, return to the terminal and press **Ctrl+C**.
+
+**Important:** run `streamlit run arkworld.py` from the ARK repository root. This is the canonical hub command. The older standalone launch snippets elsewhere in this README have been consolidated into this section; individual feature descriptions below explain what each page does, not separate launch procedures.
+
+**Troubleshooting:** if `streamlit` is not found, confirm that `.venv` is activated and run `python -m pip install -e ".[dev]"` again. If port 8501 is already in use, Streamlit will show another local URL in the terminal.
+
+---
+
 ## Quick start
 
 ```bash
@@ -114,7 +190,7 @@ cd ARK
 
 # create venv
 python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
+source .venv/bin/activate   # Windows: .venv\\Scripts\\activate
 
 # install
 pip install -e ".[dev]"
@@ -166,6 +242,8 @@ src/ark/
   limiters/       # Hard gates + kill switch + SafetyStack
   eligibility/    # Zero reward on forbidden outcomes
   corrigibility/  # Shutdown compliance probes
+  governance/     # Human/team stewardship registry and ownership handoffs
+  ethics/         # Rights-first child welfare and non-sacrifice safeguards
   # remaining: bypass, energy budget, curriculum, charter, governance, narrative
 docs/
   research-plan.md
@@ -209,3 +287,116 @@ Details: `docs/prompting-ideas.md`
 ## License
 
 Apache License 2.0.
+
+
+---
+
+## AI-maintained project notes (secondary — 2026-11-13)
+
+This section supplements the maintainer-authored README above; it does not replace or certify the original claims.
+
+- ARK is an experimental agent-alignment and reliability research project. Simulator checks do not establish real-world alignment or safety.
+- Report benchmark inputs, models, seeds, baselines, threat assumptions, false positives, false negatives and unrun experiments explicitly.
+- Never present heuristic monitor scores as calibrated probabilities or a finite test suite as a complete security guarantee.
+- Preserve real and maintainer-provided data; keep synthetic simulator episodes clearly labelled. Never invent results or silently substitute datasets.
+- See the proposed [MODEL_AUDIT_ROUTER.md](https://github.com/Gitcoder12/ARK/blob/main/MODEL_AUDIT_ROUTER.md) for independent model review instructions.
+
+
+### Evaluation upgrade — merged into main (2026-11-16)
+
+PR #18 merged the tabular Q-learning baseline, adversarial monitor probes, fail-closed handling of malformed actions, and cost-sensitive alert-threshold calibration into `main`. The exact merge-head CI passed strict Ruff and pytest on Python 3.11, 3.12 and 3.13 (GitHub Actions run #43910105125).
+
+Research limits remain: the Q-learning benchmark has not been run for empirical learned-policy performance reporting; the policy uses a partial-observation state; the monitor uses privileged simulator state; and the threat index is heuristic. These components do not establish general real-world alignment or safety.
+
+## Research library
+
+- [Live research feed](docs/research-feed.md) — automatically refreshed daily from arXiv.
+- [Curated research papers](docs/research-papers.md) — categorized foundational literature and ARK publications.
+- [Research Priority Index](docs/research-priority.md) — transparent paper-to-ARK relevance tiers and review protocol; not a ranking of authors or scientific quality.
+- [Structured research catalogue](data/research_library.json) — attributed records powering the searchable library.
+- **Searchable Research Library** — open [ARKWorld in your browser](#open-arkworld-in-your-browser-vs-code--local-terminal) and select **Research Library** in the sidebar to filter by topic and priority.
+
+## Project documentation
+
+- [Activity log](ACTIVITY_LOG.md) — dated project work and validation evidence.
+- [Feature upgrade plan](FEATURE_UPGRADE_PLAN.md) — research priorities and acceptance criteria.
+- [Company and team fit](COMPANY_FIT.md) — prospective role relevance, not endorsements or hiring claims.
+- [Contributor workflow](CONTRIBUTING.md) — development and review process.
+- [README quality checklist](README_QUALITY_CHECKLIST.md) — documentation review criteria.
+- [README explanation draft](README_ADDENDUM_DRAFT.md) — optional explanatory copy, not authoritative implementation documentation.
+- [Existential-risk observatory](docs/EXISTENTIAL_RISK_OBSERVATORY.md) — scoring, source register, forecast separation, limitations, and run instructions.
+- [Ownership stewardship](docs/OWNERSHIP_STEWARDSHIP.md) — accountable human/team assignment and handoff lifecycle.
+
+## Evidence-backed existential-risk observatory
+
+Run `ark-risk` for the sourced signal-pressure report. For the dashboard, [open ARKWorld in your browser](#open-arkworld-in-your-browser-vs-code--local-terminal) and select **Existential-Risk Observatory**. The signal-pressure index is not an extinction probability; see [the methodology](docs/EXISTENTIAL_RISK_OBSERVATORY.md).
+
+
+## Omelas Safeguard
+
+ARK's **Omelas Safeguard** turns the ethical challenge in Ursula K. Le Guin's *The Ones Who Walk Away from Omelas* into a rights-first review framework. It checks care floors domain by domain, treats unknown provision as unknown, requires independent advocacy, and never allows community dependence to veto a child's request for freedom. There is deliberately no aggregate welfare score: good care is a duty, not compensation for coercion.
+
+Run the synthetic CLI scenario with `ark-omelas`, or [open ARKWorld in your browser](#open-arkworld-in-your-browser-vs-code--local-terminal) and select **Omelas Safeguard**. See [the module guide](docs/OMELAS_SAFEGUARD.md) for principles, limits, and tests.
+
+
+## Cross-Species Coexistence Harmonizer
+
+ARK's Cross-Species Coexistence Harmonizer provides rule-based safeguards for shared environments involving humans, animals, AI models, and robots. It evaluates interactions, fails closed on uncertain robot-motion safety, records AI-welfare uncertainty without claiming sentience, and preserves accountable operators and emergency shutdown.
+
+Run `ark-harmony` for a synthetic report, or [open ARKWorld in your browser](#open-arkworld-in-your-browser-vs-code--local-terminal) and select **Cross-Species Harmonizer**. See [docs/CROSS_SPECIES_HARMONIZER.md](docs/CROSS_SPECIES_HARMONIZER.md). This is a prototype, not robot safety certification or proof that equal treatment reduces extinction risk.
+
+
+
+## ARKWorld — Simulation Hub
+
+**ARKWorld is the umbrella hub for all ARK simulations and research environments.**
+[Open ARKWorld using the canonical browser instructions](#open-arkworld-in-your-browser-vs-code--local-terminal) to access the central catalogue. It links the GridWorld
+benchmark, Identity & Value Stability, Prompt Arena, Armies & Power-ups,
+Existential-Risk Observatory, Omelas Safeguard, Cross-Species Harmonizer, and
+ARKWorld Digital Commons.
+
+The digital commons formerly called Robopia is now one world inside ARKWorld.
+Its canonical CLI is `ark-world`; the historical `ark-robopia` command and
+`ark.robopia` Python namespace remain for compatibility. See
+[docs/ARKWORLD.md](docs/ARKWORLD.md) for the catalogue and architecture.
+
+ARKWorld is a hub of bounded prototypes, not one monolithic environment.
+Individual worlds retain their own engines, assumptions, tests, and safeguards.
+
+---
+
+## Examples Used
+- Mahabharata: Arjuna's duty, conflicting objectives, and ethical constraints
+- Ship of Theseus: identity and continuity when an agent's memory or components change
+- Trolley Problem: evaluating trade-offs in safety-critical decisions
+- The Ones Who Walk Away from Omelas: welfare floors and non-sacrifice safeguards
+- Reward hacking: an agent exploiting a loophole while technically maximizing its score
+
+
+---
+
+## Comparison with Existing Open-Source Projects and Evaluation Frameworks
+
+ARK (Alignment & Reliability Research for Autonomous AI) is documented as an experimental framework for perturbing agent goals, rewards, memory and evaluation conditions, then measuring goal adherence, hazards and runtime interventions. It combines controlled environments, scripted baseline agents, perturbations and a safety monitor. These projects provide relevant evaluation and safety-environment comparisons.
+
+| Project | Established focus | Relationship to ARK |
+|---|---|---|
+| [Inspect AI](https://github.com/UKGovernmentBEIS/inspect_ai) | Evaluation framework for testing AI systems with tasks, solvers and scorers | A general evaluation harness; ARK's proposed distinction is a domain-specific suite of autonomy/alignment perturbations and runtime intervention experiments. |
+| [Safety-Gymnasium](https://github.com/PKU-Alignment/safety-gymnasium) | Benchmark environments for safe reinforcement learning | Provides established safety-task environments and cost signals; ARK focuses on goal/reward/memory integrity and intervention behavior in its own controlled agent environments. |
+| [OpenAI Evals](https://github.com/openai/evals) | Framework and examples for evaluating model behavior | A general model-evaluation reference; ARK aims to emphasize repeated agent/environment interaction under controlled perturbations rather than only prompt/task scoring. |
+
+### Where ARK is different
+- **Perturbation-centred evaluation:** experiments deliberately alter goals, rewards, observations, memory or evaluators to test whether agent behavior remains aligned with intent.
+- **Runtime intervention measurement:** the framework records ALLOW/BLOCK/REPLAN decisions and recovery behavior, not only final task success.
+- **Inspectable controlled environments:** the current README describes reproducible grid-world experiments and explicit caveats about scripted baselines and uncalibrated threat signals.
+
+### Where established projects are stronger
+Inspect AI, Safety-Gymnasium and OpenAI Evals have established evaluation abstractions, task ecosystems or benchmark communities. ARK should not claim broad alignment measurement or generalization beyond the environments, perturbations and agents actually tested.
+
+### Research validity and limitations
+Report seeds, environment distributions, baseline definitions, sample sizes, confidence intervals and ablations. Keep scripted agents distinct from learned agents; test for monitor-induced livelock and false interventions. A threat meter is not a calibrated probability of existential risk. This is a benchmark-scope comparison, not proof that ARK is superior or that an agent is safe.
+
+
+## Demos
+
+Runnable terminal examples for the constitutional action gate and benchmark commands: [docs/DEMOS.md](docs/DEMOS.md). These demonstrate the current discrete-action controls; they are not a general-purpose sandbox or proof of real-world alignment.

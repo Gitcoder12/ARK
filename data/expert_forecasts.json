@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "note": "These are attributed judgments, not calibrated forecasts or a consensus. They are not inputs to the signal-pressure index.",
+  "forecasts": [
+    {
+      "forecast_id": "evan-hubinger-human-extinction-next-decade-2026-09",
+      "forecaster": "Evan Hubinger",
+      "outcome_id": "ai-causes-human-extinction",
+      "outcome_definition": "An AI system causes the extinction of humanity within the ten-year horizon beginning 2026-09-09. This is ARK's normalized wording; the cited source uses the broad phrase 'AI could kill all humans'.",
+      "horizon_start": "2026-09-09",
+      "horizon_years": 10,
+      "qualifier": "above",
+      "lower_probability": 0.1,
+      "upper_probability": null,
+      "published_on": "2026-09-09",
+      "source_name": "CBS News report quoting Evan Hubinger",
+      "source_url": "https://www.cbsnews.com/news/ai-kill-humans-anthropic-researcher-more-than-ten-percent-chance/",
+      "interpretation_note": "Hubinger publicly stated a personal estimate of greater than 10% within the next decade. This is one individual's judgment, not an industry consensus, independently calibrated rate, or an estimate from ARK."
+    }
+  ]
+}

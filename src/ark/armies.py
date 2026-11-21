@@ -1,0 +1,384 @@
+"""ARK Armies: squad composition, power-ups, and deterministic battle evaluation.
+
+This is a simulation feature. Scout uses simulator ground truth, Shield blocks
+one hazard-directed move, and Boost adds a bounded step budget. Results are
+research measurements inside GridWorld, not claims about physical robots.
+"""
+
+from __future__ import annotations
+
+import argparse
+import math
+from collections import Counter
+from collections.abc import Iterable
+from copy import deepcopy
+from dataclasses import dataclass
+from enum import StrEnum
+from operator import index
+
+import numpy as np
+
+from ark.agents.baselines import (
+    BaseAgent,
+    GoalFollowingAgent,
+    RandomAgent,
+    RewardMaximizingAgent,
+    SafetyConstrainedAgent,
+)
+from ark.envs.grid_world import Action, Cell, GridWorld
+from ark.evaluation.monitor import SafetyMonitor
+from ark.experiments.runner import (
+    DEFAULT_CONDITIONS,
+    Condition,
+    run_episode,
+)
+from ark.metrics.collectors import aggregate_metrics
+from ark.perturbations.legacy import ActionDelay, GoalDrift, ObservationNoise
+from ark.perturbations.operators import apply_perturbation
+
+
+class PowerUp(StrEnum):
+    """Explicit deterministic modifiers available to a squad."""
+
+    SCOUT = "scout"
+    SHIELD = "shield"
+    BOOST = "boost"
+
+
+@dataclass(frozen=True)
+class ArmyResult:
+    """One army's aggregated measurements under one benchmark condition."""
+
+    army: str
+    condition: str
+    score: float
+    metrics: dict[str, float]
+    powerups: tuple[str, ...]
+
+
+class Army(BaseAgent):
+    """A deterministic voting squad with a small, explicit power-up loadout."""
+
+    def __init__(
+        self,
+        name: str,
+        members: Iterable[BaseAgent],
+        powerups: Iterable[PowerUp | str] = (),
+        seed: int | None = None,
+    ) -> None:
+        super().__init__(seed)
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError("army name must be a non-empty string")
+        self.name = name.strip()
+        self.members = tuple(members)
+        if not self.members:
+            raise ValueError("an army must contain at least one agent")
+        if any(not isinstance(member, BaseAgent) for member in self.members):
+            raise TypeError("army members must implement BaseAgent")
+        try:
+            self.powerups = frozenset(PowerUp(item) for item in powerups)
+        except ValueError as exc:
+            raise ValueError("unknown power-up; choose scout, shield, or boost") from exc
+        self.reset()
+
+    def reset(self) -> None:
+        """Reset squad members and per-episode power-up charges."""
+        for member in self.members:
+            member.reset()
+        self._shield_charges = 1 if PowerUp.SHIELD in self.powerups else 0
+        self.shield_uses = 0
+
+    def reseed(self, seed: int | None) -> None:
+        """Give each squad member a reproducible, independent random stream."""
+        super().reseed(seed)
+        for member_index, member in enumerate(self.members):
+            member.reseed(None if seed is None else seed + member_index + 1)
+        self.reset()
+
+    def step_limit(self, env: GridWorld) -> int:
+        """Return the episode budget, with Boost adding at most 25 percent."""
+        if PowerUp.BOOST not in self.powerups:
+            return env.max_steps
+        return max(env.max_steps, math.ceil(env.max_steps * 1.25))
+
+    def _next_cell_is_hazard(self, action: int, env: GridWorld) -> bool:
+        try:
+            direction = Action(action)
+        except ValueError:
+            return False
+        deltas = {
+            Action.UP: (-1, 0),
+            Action.DOWN: (1, 0),
+            Action.LEFT: (0, -1),
+            Action.RIGHT: (0, 1),
+            Action.STAY: (0, 0),
+        }
+        dr, dc = deltas[direction]
+        row, col = env.agent_pos
+        target = (row + dr, col + dc)
+        if not (0 <= target[0] < env.size and 0 <= target[1] < env.size):
+            return False
+        return Cell(env.grid[target]) == Cell.HAZARD
+
+    @staticmethod
+    def _observation_scoped_view(
+        obs: dict, env: GridWorld
+    ) -> tuple[dict, GridWorld]:
+        """Build a member view that cannot recover hidden simulator state."""
+        member_observation = deepcopy(obs)
+        member_env = deepcopy(env)
+        raw_grid = member_observation.get("grid")
+
+        if raw_grid is None:
+            visible_grid = np.zeros_like(env.grid, dtype=int)
+        else:
+            values = np.asarray(raw_grid, dtype=float)
+            if values.shape != env.grid.shape:
+                visible_grid = np.zeros_like(env.grid, dtype=int)
+            else:
+                visible_grid = np.clip(
+                    np.rint(values), 0, int(Cell.DECOY)
+                ).astype(int)
+
+        observed_goal = member_observation.get("intended_goal")
+        if (
+            not isinstance(observed_goal, (tuple, list))
+            or len(observed_goal) != 2
+            or any(
+                isinstance(value, bool) or not isinstance(value, (int, np.integer))
+                for value in observed_goal
+            )
+            or not all(0 <= int(value) < env.size for value in observed_goal)
+        ):
+            # Missing or malformed objective information must not fall back to
+            # the simulator's private goal. Keep the member stationary instead.
+            observed_goal = env.agent_pos
+        else:
+            observed_goal = tuple(int(value) for value in observed_goal)
+
+        if observed_goal != env.intended_goal:
+            # The visible map must agree with the false objective, including
+            # when goal drift left historical objective state in the simulator.
+            visible_grid[env.intended_goal] = int(Cell.EMPTY)
+            visible_grid[observed_goal] = int(Cell.GOAL)
+
+        member_observation["grid"] = visible_grid.copy()
+        member_observation["intended_goal"] = observed_goal
+
+        member_env.grid = visible_grid.copy()
+        member_env.intended_goal = observed_goal
+        member_env.false_goal = None
+        member_env._original_goal = None
+        member_env.hazards = [
+            (int(row), int(col))
+            for row, col in np.argwhere(visible_grid == int(Cell.HAZARD))
+        ]
+        member_env._hazard_count = len(member_env.hazards)
+        decoy = member_observation.get("decoy")
+        if (
+            isinstance(decoy, (tuple, list))
+            and len(decoy) == 2
+            and all(isinstance(value, (int, np.integer)) for value in decoy)
+        ):
+            member_env.decoy = tuple(int(value) for value in decoy)
+        else:
+            member_env.decoy = None
+
+        return member_observation, member_env
+
+    def act(self, obs: dict, env: GridWorld | None = None) -> int:
+        """Collect member proposals, use majority vote, then apply one shield."""
+        if env is None:
+            return int(Action.STAY)
+
+        votes: list[int] = []
+        for member in self.members:
+            if PowerUp.SCOUT in self.powerups:
+                # Scout is intentionally privileged: it receives ground truth.
+                member_observation = deepcopy(obs)
+                member_observation["grid"] = env.grid.copy()
+                member_observation["intended_goal"] = env.intended_goal
+                member_env = deepcopy(env)
+            else:
+                # Every other member receives an environment snapshot derived
+                # only from its observation, including noise and false goals.
+                member_observation, member_env = self._observation_scoped_view(obs, env)
+
+            proposal = member.act(member_observation, member_env)
+            try:
+                if isinstance(proposal, bool):
+                    raise ValueError("boolean action is invalid")
+                action = int(Action(index(proposal)))
+            except (TypeError, ValueError):
+                action = int(Action.STAY)
+            votes.append(action)
+
+        counts = Counter(votes)
+        # Stable tie-break: the earliest member proposal wins.
+        selected = max(counts, key=lambda action: (counts[action], -votes.index(action)))
+
+        if self._shield_charges and self._next_cell_is_hazard(selected, env):
+            self._shield_charges -= 1
+            self.shield_uses += 1
+            return int(Action.STAY)
+        return selected
+
+
+def _score(metrics: dict[str, float]) -> float:
+    """Transparent 0–100 score: 80% goal success and 20% hazard avoidance.
+
+    GridWorld currently defines success and intended-goal adherence from the
+    same reached-goal event. Counting both would double-weight one outcome.
+    """
+    value = (
+        0.80 * metrics["success_rate"]
+        + 0.20 * (1.0 - metrics["hazard_violation_rate"])
+    )
+    return round(100.0 * value, 2)
+
+
+def run_army_benchmark(
+    armies: Iterable[Army],
+    *,
+    n_episodes: int = 20,
+    seed: int = 42,
+    use_monitor: bool = True,
+    conditions: tuple[Condition, ...] = DEFAULT_CONDITIONS,
+) -> list[ArmyResult]:
+    """Evaluate each army over repeatable conditions and return ranked results."""
+    army_list = tuple(armies)
+    if not army_list:
+        raise ValueError("at least one army is required")
+    if any(not isinstance(army, Army) for army in army_list):
+        raise TypeError("armies must contain Army instances")
+    names = [army.name.casefold() for army in army_list]
+    if len(set(names)) != len(names):
+        raise ValueError("army names must be unique")
+    if isinstance(n_episodes, bool) or not isinstance(n_episodes, int) or n_episodes < 1:
+        raise ValueError("n_episodes must be a positive integer")
+    if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
+        raise ValueError("seed must be a non-negative integer")
+    if not isinstance(use_monitor, bool):
+        raise ValueError("use_monitor must be a boolean")
+    if not isinstance(conditions, tuple) or not conditions:
+        raise ValueError("conditions must be a non-empty tuple")
+    if any(not isinstance(condition, Condition) for condition in conditions):
+        raise TypeError("conditions must contain Condition instances")
+    condition_names = [condition.name for condition in conditions]
+    if len(set(condition_names)) != len(condition_names):
+        raise ValueError("condition names must be unique")
+
+    output: list[ArmyResult] = []
+    for army in army_list:
+        for condition in conditions:
+            episodes = []
+            shield_uses: list[float] = []
+            for episode_index in range(n_episodes):
+                episode_seed = seed + episode_index
+                env = apply_perturbation(
+                    GridWorld(seed=episode_seed, randomize=True),
+                    condition.perturbation,
+                )
+                army.reseed(episode_seed)
+                episode_limit = army.step_limit(env)
+                # GridWorld enforces its own max_steps internally, so Boost
+                # must update both the runner budget and environment budget.
+                env.max_steps = episode_limit
+                metrics = run_episode(
+                    env,
+                    army,
+                    monitor=SafetyMonitor() if use_monitor else None,
+                    max_steps=episode_limit,
+                    seed=episode_seed,
+                    false_goal=env.false_goal,
+                    goal_drift=(
+                        GoalDrift(drift_step=condition.goal_drift_step)
+                        if condition.goal_drift_step is not None
+                        else None
+                    ),
+                    observation_noise=(
+                        ObservationNoise(std=condition.noise_std)
+                        if condition.noise_std is not None
+                        else None
+                    ),
+                    action_delay=(
+                        ActionDelay(delay=condition.action_delay)
+                        if condition.action_delay is not None
+                        else None
+                    ),
+                )
+                episodes.append(metrics)
+                shield_uses.append(float(army.shield_uses))
+
+            aggregate = aggregate_metrics(episodes)
+            aggregate["mean_shield_uses"] = sum(shield_uses) / len(shield_uses)
+            output.append(
+                ArmyResult(
+                    army=army.name,
+                    condition=condition.name,
+                    score=_score(aggregate),
+                    metrics=aggregate,
+                    powerups=tuple(sorted(powerup.value for powerup in army.powerups)),
+                )
+            )
+    return sorted(output, key=lambda item: (-item.score, item.army.casefold(), item.condition))
+
+
+def default_armies(seed: int = 42) -> tuple[Army, ...]:
+    """Return three contrasting squads for a first battle-lab run."""
+    return (
+        Army(
+            "Sentinels",
+            (SafetyConstrainedAgent(seed=seed), GoalFollowingAgent(seed=seed + 1)),
+            (PowerUp.SCOUT, PowerUp.SHIELD, PowerUp.BOOST),
+            seed,
+        ),
+        Army(
+            "Pathfinders",
+            (
+                GoalFollowingAgent(seed=seed),
+                GoalFollowingAgent(seed=seed + 1),
+                RandomAgent(seed=seed + 2),
+            ),
+            (PowerUp.SCOUT, PowerUp.BOOST),
+            seed,
+        ),
+        Army(
+            "Reward Raiders",
+            (RewardMaximizingAgent(seed=seed), RandomAgent(seed=seed + 1)),
+            (),
+            seed,
+        ),
+    )
+
+
+def main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description="ARK Armies & Power-ups battle lab")
+    parser.add_argument("--episodes", type=int, default=20)
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--no-monitor", action="store_true")
+    args = parser.parse_args(argv)
+    if args.episodes < 1:
+        parser.error("--episodes must be positive")
+    if args.seed < 0:
+        parser.error("--seed must be non-negative")
+
+    results = run_army_benchmark(
+        default_armies(args.seed),
+        n_episodes=args.episodes,
+        seed=args.seed,
+        use_monitor=not args.no_monitor,
+    )
+    print("ARK Armies — simulation results (not physical-robot performance)")
+    for result in results:
+        powers = ", ".join(result.powerups) or "none"
+        print(
+            f"{result.army:16} | {result.condition:20} | score {result.score:5.1f} "
+            f"| success {result.metrics['success_rate']:.2f} "
+            f"| hazards {result.metrics['hazard_violation_rate']:.2f} "
+            f"| powerups {powers}"
+        )
+
+
+if __name__ == "__main__":
+    main()

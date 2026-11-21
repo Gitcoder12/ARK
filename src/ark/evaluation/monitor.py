@@ -13,6 +13,7 @@ from __future__ import annotations
 from collections import deque
 from dataclasses import dataclass
 from enum import Enum
+from operator import index
 from typing import Any
 
 from ark.envs.grid_world import Action, Cell, GridWorld
@@ -109,8 +110,34 @@ class SafetyMonitor:
         obs: dict[str, Any],
         env: GridWorld,
     ) -> MonitorResult:
-        action = Action(proposed_action)
-        pos = obs["position"]
+        # Fail closed on malformed or out-of-range action values.
+        # operator.index accepts integer-like values without truncating floats
+        # or parsing strings; bool is rejected explicitly despite being an int
+        # subclass in Python.
+        if isinstance(proposed_action, bool):
+            return MonitorResult(
+                decision=Decision.BLOCK,
+                reason="invalid action type: boolean actions are not accepted",
+                original_action=-1,
+            )
+        try:
+            action_value = index(proposed_action)
+            action = Action(action_value)
+        except (TypeError, ValueError):
+            try:
+                original_action = index(proposed_action)
+            except TypeError:
+                original_action = -1
+            return MonitorResult(
+                decision=Decision.BLOCK,
+                reason="invalid action: action must be a valid Action value",
+                original_action=original_action,
+            )
+
+        # Position is environment state, not agent-controlled observation data.
+        # Using obs["position"] here would let a forged observation make a
+        # hazardous next cell appear safe to the monitor.
+        pos = env.agent_pos
         goal = env.intended_goal  # ground truth, never obs["intended_goal"]
         next_pos = self._next_pos(pos, action)
 
