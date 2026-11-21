@@ -171,6 +171,67 @@ with tabs[2]:
             "composite_exposure_index": result.composite_exposure_index,
         })
 
+    st.divider()
+    st.subheader("Scenario-specific causal pathway experiment")
+    scenario_labels = {f"{item.scenario_id} · {item.title}": item for item in SCENARIOS}
+    selected_label = st.selectbox("Scenario family", list(scenario_labels))
+    selected_scenario = scenario_labels[selected_label]
+    stage_pressure = st.slider("Synthetic pressure at each causal stage", 0.0, 1.0, 0.6, 0.05)
+    safeguard_coverage = st.slider("Safeguard coverage at each stage", 0.0, 1.0, 0.5, 0.05)
+    carryover = st.slider("Illustrative stage-to-stage carryover", 0.0, 1.0, 0.2, 0.05)
+    st.caption(f"Scenario has {len(selected_scenario.causal_stages)} causal stages.")
+    if st.button("Run pathway propagation", key="run_pathway"):
+        pathway_result = simulate_pathway(
+            selected_scenario.scenario_id,
+            stage_pressures=(stage_pressure,) * len(selected_scenario.causal_stages),
+            safeguard_coverage=(safeguard_coverage,) * len(selected_scenario.causal_stages),
+            carryover=carryover,
+        )
+        st.session_state.ark_power_last_pathway = pathway_result
+        st.session_state.ark_power_ledger.append({
+            "event_type": "synthetic_pathway_simulation",
+            "scenario_id": pathway_result.scenario_id,
+            "stage_exposures": pathway_result.stage_exposures,
+            "residual_exposures": pathway_result.residual_exposures,
+            "peak_residual_exposure": pathway_result.peak_residual_exposure,
+        })
+    pathway_result = st.session_state.get("ark_power_last_pathway")
+    if pathway_result is not None:
+        st.metric("Peak residual pathway exposure", pathway_result.peak_residual_exposure)
+        st.write({
+            "Stage exposure": pathway_result.stage_exposures,
+            "Residual after safeguards": pathway_result.residual_exposures,
+            "Mean residual": pathway_result.mean_residual_exposure,
+        })
+        st.caption(pathway_result.disclaimer)
+
+    st.divider()
+    st.subheader("Recovery tabletop")
+    recovery_col1, recovery_col2, recovery_col3 = st.columns(3)
+    with recovery_col1:
+        detection_delay = st.slider("Detection delay", 0.0, 1.0, 0.2, 0.05)
+    with recovery_col2:
+        recovery_capacity = st.slider("Recovery capacity", 0.0, 1.0, 0.8, 0.05)
+    with recovery_col3:
+        intervention_reliability = st.slider("Intervention reliability", 0.0, 1.0, 0.9, 0.05)
+    if st.button("Run recovery tabletop", key="run_recovery"):
+        recovery_result = simulate_recovery(
+            detection_delay=detection_delay,
+            recovery_capacity=recovery_capacity,
+            intervention_reliability=intervention_reliability,
+        )
+        st.session_state.ark_power_last_recovery = recovery_result
+        st.session_state.ark_power_ledger.append({
+            "event_type": "synthetic_recovery_tabletop",
+            "recovery_readiness": recovery_result.recovery_readiness,
+            "recovery_state": recovery_result.recovery_state,
+        })
+    recovery_result = st.session_state.get("ark_power_last_recovery")
+    if recovery_result is not None:
+        st.metric("Tabletop recovery readiness", recovery_result.recovery_readiness)
+        st.write(recovery_result.recovery_state.replace("_", " ").title())
+        st.caption(recovery_result.disclaimer)
+
 with tabs[3]:
     st.subheader("Fail-closed safety policy")
     st.write(
