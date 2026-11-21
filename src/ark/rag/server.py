@@ -5,14 +5,14 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from ark.rag.store import LocalKnowledgeBase
-
 try:
     from fastmcp import FastMCP
 except ImportError as exc:  # pragma: no cover - optional dependency
     raise RuntimeError(
         "FastMCP is optional. Install ARK with: pip install 'ark-alignment[rag]'"
     ) from exc
+
+from ark.rag.store import LocalKnowledgeBase
 
 ROOTS = tuple(
     item for item in os.environ.get("ARK_RAG_ROOTS", "").split(os.pathsep) if item.strip()
