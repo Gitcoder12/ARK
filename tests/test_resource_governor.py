@@ -41,12 +41,15 @@ def test_throttling_and_temperature_warning_reduce_concurrency_once():
     assert decision.actions.count("reduce_gpu_concurrency") == 1
 
 
-@pytest.mark.parametrize("kwargs", [
-    {"temperature_c": float("nan")},
-    {"utilization_pct": 101},
-    {"memory_used_mb": 11, "memory_total_mb": 10},
-    {"power_w": 300, "power_limit_w": 200},
-])
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"temperature_c": float("nan")},
+        {"utilization_pct": 101},
+        {"memory_used_mb": 11, "memory_total_mb": 10},
+        {"power_w": 300, "power_limit_w": 200},
+    ],
+)
 def test_invalid_observations_are_rejected(kwargs):
     with pytest.raises(ValueError):
         GPUObservation("gpu0", **kwargs)
@@ -59,5 +62,6 @@ def test_policy_thresholds_are_validated():
 
 def test_evaluate_many_preserves_input_order():
     governor = RuntimeResourceGovernor()
-    result = governor.evaluate_many([GPUObservation("gpu1"), GPUObservation("gpu2", temperature_c=95)])
+    observations = [GPUObservation("gpu1"), GPUObservation("gpu2", temperature_c=95)]
+    result = governor.evaluate_many(observations)
     assert [item.device_id for item in result] == ["gpu1", "gpu2"]
