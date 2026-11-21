@@ -14,14 +14,16 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from ark.power_risk import (  # noqa: E402
-    ActionRequest,
     EXPERIMENTS,
     GOVERNANCE_DOMAINS,
+    SCENARIOS,
+    ActionRequest,
     HashChainLedger,
     PressureInputs,
-    SCENARIOS,
     SafetyPolicy,
+    simulate_pathway,
     simulate_pressure,
+    simulate_recovery,
 )
 
 st.set_page_config(
