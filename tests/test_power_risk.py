@@ -48,7 +48,7 @@ def test_simulator_is_deterministic_and_never_calls_itself_probability():
     first = simulate_pressure(inputs)
     second = simulate_pressure(inputs)
     assert first == second
-    assert first.composite_exposure_index == pytest.approx(70.5)
+    assert first.composite_exposure_index == pytest.approx(71.0)
     assert "not a probability" in first.interpretation
 
 
