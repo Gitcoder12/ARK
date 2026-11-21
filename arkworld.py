@@ -78,6 +78,20 @@ with right:
     )
 
     st.page_link(
+        "pages/7_Power_Governance_Observatory.py",
+        label="Power, Governance & Existential Risk",
+        icon="🛡️",
+        help=(
+            "Explore ten defensive extinction scenarios, geopolitical and corporate "
+            "incentives, synthetic experiments, safety controls and audit trails."
+        ),
+    )
+    st.markdown(
+        "Research how competition, private capital, regulation, infrastructure "
+        "concentration and international cooperation affect AI safety."
+    )
+
+    st.page_link(
         "pages/2_Omelas_Safeguard.py",
         label="Omelas Safeguard",
         icon="🛡️",
@@ -110,7 +124,7 @@ st.header("How to launch ARKWorld")
 st.code(
     "git pull\n"
     'pip install -e ".[dev]"\n'
-    "streamlit run app.py",
+    "streamlit run arkworld.py",
     language="bash",
 )
 st.caption(
