@@ -215,7 +215,7 @@ class HashChainLedger:
             payload = json.dumps(
                 entry["event"], sort_keys=True, separators=(",", ":"), default=str
             )
-            expected = sha256(f"{previous}:{payload}".encode("utf-8")).hexdigest()
+            expected = sha256(f"{previous}:{payload}".encode()).hexdigest()
             if entry["sequence"] != expected_sequence:
                 return False
             if entry["previous_hash"] != previous or entry["hash"] != expected:
