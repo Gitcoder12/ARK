@@ -21,6 +21,7 @@ from ark.power_risk import (  # noqa: E402
     SCENARIOS,
     ActionRequest,
     EvidenceClass,
+    EvidenceRecord,
     HashChainLedger,
     PressureInputs,
     SafetyPolicy,
