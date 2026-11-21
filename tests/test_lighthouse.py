@@ -1,11 +1,11 @@
 import pytest
 from ark.lighthouse import (
-    create_lighthouse,
     EventKind,
     EvidenceLedger,
     Lighthouse,
     Observation,
     SignalLevel,
+    create_lighthouse,
 )
 
 

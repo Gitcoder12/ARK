@@ -9,9 +9,9 @@ import hashlib
 import hmac
 import json
 import math
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass, field
 from enum import Enum
-from collections.abc import Mapping
 from typing import Any
 
 
