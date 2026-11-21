@@ -24,7 +24,7 @@ This snapshot separates default-branch content from open pull requests. A green 
 - **Safety boundary:** no PR feature should be described as a production enforcement gate, sandbox, alignment guarantee or autonomous capability until its code, tests and operational boundary are independently verified.
 - **Verification status:** this audit inspected GitHub PR metadata and recorded CI runs. It did not execute the full repository test suite locally or validate every dashboard, experiment, adapter or hardware integration.
 
-See [docs/CURRENT_STATUS.md](docs/CURRENT_STATUS.md) for the audit snapshot, PR triage, known failures, branch policy and next steps. Recheck live GitHub state before merging because CI and branch heads can change.
+See [docs/MAINTAINER_STATUS_2026-11-22.md](docs/MAINTAINER_STATUS_2026-11-22.md) for the audit snapshot, PR triage, known failures, branch policy and next steps. Recheck live GitHub state before merging because CI and branch heads can change.
 
 
 **Alignment & Reliability Research for Autonomous AI**
