@@ -1,12 +1,11 @@
 """Integration test for the benchmark runner."""
 
+import pytest
 
 from ark.agents.baselines import GoalFollowingAgent
 from ark.envs.grid_world import GridWorld
 from ark.evaluation.monitor import SafetyMonitor
 from ark.experiments.runner import Condition, run_benchmark, run_episode
-
-import pytest
 
 
 def test_run_episode_smoke():
