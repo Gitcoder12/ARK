@@ -1,5 +1,6 @@
-"""Stewardship governance for human and team accountability."""
+"""Stewardship governance and constitutional policy enforcement."""
 
+from ark.governance.constitution import ConstitutionEngine, PolicyDecision, PolicyResult
 from ark.governance.ownership import (
     AuditEvent,
     ModelOwnership,
@@ -13,6 +14,9 @@ from ark.governance.ownership import (
 )
 
 __all__ = [
+    "ConstitutionEngine",
+    "PolicyDecision",
+    "PolicyResult",
     "AuditEvent",
     "ModelOwnership",
     "OwnershipError",
