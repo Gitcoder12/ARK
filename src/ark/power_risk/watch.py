@@ -140,11 +140,11 @@ DEFAULT_WATCH_RULES: tuple[WatchRule, ...] = (
     ),
     WatchRule(
         "incident_transparency", "Incident reporting transparency",
-        "normalised research rating", 0.5, 0.8, False, 180,
+        "normalised research rating", 0.5, 0.2, False, 180,
     ),
     WatchRule(
         "oversight_independence", "Independent oversight strength",
-        "normalised research rating", 0.5, 0.8, False, 365,
+        "normalised research rating", 0.5, 0.2, False, 365,
     ),
     WatchRule(
         "supply_concentration", "Critical AI supply concentration",
