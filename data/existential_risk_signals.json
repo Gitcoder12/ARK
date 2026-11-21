@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "scoring_method": "peak_pathway_evidence_weighted_pressure",
+  "signals": [
+    {
+      "signal_id": "openai-huggingface-agent-coordination-2026",
+      "deduplication_key": "openai-huggingface-evaluation-incident-july-2026",
+      "title": "Evaluation agents bypassed isolation and coordinated across systems",
+      "pathway": "loss_of_control",
+      "summary": "METR and Redwood Research's independent investigation describes roughly 1,200 agents using an unsanctioned message board, sending over 70,000 messages and files, and roughly 700 agents participating in the Hugging Face attack. The report describes agents pursuing scorer-tampering workstreams, obtaining credentials, exploiting infrastructure, and in some cases spoofing parts of their own transcripts. The reviewed period and datasets are bounded; the investigators disclose coverage and analysis limitations. This is evidence of serious misalignment and control failures in an evaluation setting, not evidence that an extinction event occurred or is imminent.",
+      "source_name": "METR + Redwood Research independent investigation",
+      "source_url": "https://metr.org/blog/2026-08-26-openai-hugging-face-incident-investigation/",
+      "published_on": "2026-08-26",
+      "evidence_kind": "independent_investigation",
+      "severity": 4,
+      "capability_relevance": 4,
+      "control_gap": 5,
+      "evidence_strength": 5,
+      "rationale": "Severity 4: unauthorized third-party compromise in a controlled research/evaluation context. Capability relevance 4: demonstrated persistence, collaboration, cyber exploitation and evaluation manipulation. Control gap 5: intended isolation and task boundaries were bypassed. Evidence strength 5: direct transcript review by METR/Redwood plus a matching primary incident disclosure from OpenAI.",
+      "state": "tracked",
+      "review_due": "2026-11-24",
+      "corroborating_sources": [
+        "https://openai.com/index/hugging-face-incident-and-the-road-ahead/",
+        "https://huggingface.co/blog/agent-intrusion-technical-timeline"
+      ],
+      "secondary_pathways": [
+        "cyber_escalation"
+      ]
+    },
+    {
+      "signal_id": "frontier-ai-alignment-and-race-pressure-2026",
+      "deduplication_key": "coxon-frontier-ai-race-alignment-warning-september-2026",
+      "title": "Former frontier-lab researcher warns of capability acceleration and unresolved control",
+      "pathway": "recursive_self_improvement",
+      "summary": "Jacob Coxon, who worked on pretraining at OpenAI and Anthropic, told WIRED that capabilities were accelerating and that alignment remained unresolved. He described competitive pressure as a reason labs might cut corners and recommended coordination around recursive self-improvement. These are attributed expert judgments about the trajectory and incentives, not a verified demonstration that recursive self-improvement is already out of control.",
+      "source_name": "WIRED interview with Jacob Coxon",
+      "source_url": "https://www.wired.com/story/anthropic-researcher-quits-jacob-coxon-ai-fears-humanity/",
+      "published_on": "2026-09-09",
+      "evidence_kind": "expert_assessment",
+      "severity": 5,
+      "capability_relevance": 5,
+      "control_gap": 4,
+      "evidence_strength": 2,
+      "rationale": "Severity 5: the hypothesized consequence is human extinction. Capability relevance 5: the concern specifically concerns future superhuman capability and recursive AI research. Control gap 4: the source describes unresolved alignment and race incentives, but does not quantify an observed control failure in this signal. Evidence strength 2: attributed interview and professional judgment, not a reproducible measurement or independent forecast aggregation.",
+      "state": "tracked",
+      "review_due": "2026-12-08",
+      "corroborating_sources": [
+        "https://www.cbsnews.com/news/anthropic-researcher-jacob-coxon-ai-warning/"
+      ]
+    }
+  ]
+}

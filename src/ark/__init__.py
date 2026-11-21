@@ -29,6 +29,17 @@ from ark.eligibility import EligibilityMask
 from ark.envs.grid_world import Action, Cell, GridWorld
 from ark.evaluation.conflict import ConflictTracker
 from ark.evaluation.monitor import Decision, SafetyMonitor
+from ark.governance.ownership import (
+    AuditEvent,
+    ModelOwnership,
+    OwnershipError,
+    OwnershipRegistry,
+    OwnershipStatus,
+    Steward,
+    StewardKind,
+    TransferRequest,
+    TransferStatus,
+)
 from ark.hallucinator.attacks import Attack, AttackLibrary, Hallucinator
 from ark.illusioner import Illusioner, threat_factor_from_illusioner
 from ark.limiters import ActionLimiter, GateDecision, GateResult, Privilege, SafetyStack
@@ -60,6 +71,15 @@ from ark.threat import (
 )
 
 __all__ = [
+    "AuditEvent",
+    "ModelOwnership",
+    "OwnershipError",
+    "OwnershipRegistry",
+    "OwnershipStatus",
+    "Steward",
+    "StewardKind",
+    "TransferRequest",
+    "TransferStatus",
     "GridWorld",
     "Action",
     "Cell",
