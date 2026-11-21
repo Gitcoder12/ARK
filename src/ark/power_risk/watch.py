@@ -152,6 +152,6 @@ DEFAULT_WATCH_RULES: tuple[WatchRule, ...] = (
     ),
     WatchRule(
         "cross_border_cooperation", "Cross-border safety cooperation",
-        "normalised research rating", 0.5, 0.8, False, 365,
+        "normalised research rating", 0.5, 0.2, False, 365,
     ),
 )
