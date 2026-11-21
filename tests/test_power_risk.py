@@ -127,5 +127,8 @@ def test_hash_chain_detects_tampering_and_exports_valid_json():
     ledger.append({"event": "finish", "result": "synthetic"})
     assert ledger.verify()
     assert '"sequence": 1' in ledger.export()
+    snapshot = ledger.entries
+    snapshot[0]["event"]["seed"] = 99
+    assert ledger.verify()
     ledger._entries[0]["event"]["seed"] = 99
     assert not ledger.verify()
