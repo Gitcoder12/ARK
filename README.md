@@ -1,5 +1,16 @@
 # ARK
 
+
+## Current Status / Current Version
+
+**v0.5.0 — active research prototype**
+
+**Implemented according to current documentation:** deterministic GridWorld; baseline and memory agents; reward/goal/evaluation perturbations; runtime ALLOW/BLOCK/REPLAN monitor; episode metrics and traces; prompting and adversarial prompt modules; experimental threat meter and paralyzer; limiters/kill switch; corrigibility and governance-related modules.
+
+**Known limitations:** README reports scripted rather than learned baselines, an uncalibrated threat meter, and possible monitor livelock. Bypass probes, energy budgets, long-horizon goal integrity, watchdog governance and robotics simulation remain incomplete. No real-world agent-safety guarantee is claimed.
+
+**Verification still required:** record clean-environment execution and test results against the exact commit before marking capabilities independently verified.
+
 **Alignment & Reliability Research for Autonomous AI**
 
 > Building better brakes for increasingly capable AI.
@@ -116,6 +127,60 @@ Build baseline-agent squads, equip Scout / Shield / Boost upgrades, and compare 
 ```bash
 ark-army --episodes 20 --seed 42
 ```
+
+## Open ARKWorld in your browser (VS Code / local terminal)
+
+ARKWorld is ARK's **single local web entry point** for the dashboards and research environments. You do not need to deploy a separate website or install a desktop app. Start the Streamlit server from the repository root, then use the local browser tab.
+
+### Windows (PowerShell)
+
+```powershell
+git clone https://github.com/Gitcoder12/ARK.git
+cd ARK
+
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+python -m pip install --upgrade pip
+pip install -e ".[dev]"
+
+streamlit run arkworld.py
+```
+
+If PowerShell blocks virtual-environment activation, allow it **for this terminal session only**, then activate again:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1
+```
+
+### macOS / Linux
+
+```bash
+git clone https://github.com/Gitcoder12/ARK.git
+cd ARK
+
+python3.11 -m venv .venv
+source .venv/bin/activate
+
+python -m pip install --upgrade pip
+pip install -e ".[dev]"
+
+streamlit run arkworld.py
+```
+
+### Open and use the site
+
+1. Keep the terminal running. Streamlit normally opens the browser automatically.
+2. If it does not, open **http://localhost:8501** in your browser.
+3. Use the ARKWorld home page and Streamlit sidebar to open the available worlds and dashboards, including the Research Library, GridWorld experiments, Prompt Arena, Existential-Risk Observatory, Omelas Safeguard, and Cross-Species Harmonizer.
+4. To stop the local site, return to the terminal and press **Ctrl+C**.
+
+**Important:** run `streamlit run arkworld.py` from the ARK repository root. This is the canonical hub command. The older standalone launch snippets elsewhere in this README have been consolidated into this section; individual feature descriptions below explain what each page does, not separate launch procedures.
+
+**Troubleshooting:** if `streamlit` is not found, confirm that `.venv` is activated and run `python -m pip install -e ".[dev]"` again. If port 8501 is already in use, Streamlit will show another local URL in the terminal.
+
+---
 
 ## Quick start
 
@@ -249,7 +314,7 @@ Research limits remain: the Q-learning benchmark has not been run for empirical 
 - [Curated research papers](docs/research-papers.md) — categorized foundational literature and ARK publications.
 - [Research Priority Index](docs/research-priority.md) — transparent paper-to-ARK relevance tiers and review protocol; not a ranking of authors or scientific quality.
 - [Structured research catalogue](data/research_library.json) — attributed records powering the searchable library.
-- **Searchable Research Library** — launch `streamlit run arkworld.py` and select **Research Library** in the Streamlit sidebar to filter by topic and priority.
+- **Searchable Research Library** — open [ARKWorld in your browser](#open-arkworld-in-your-browser-vs-code--local-terminal) and select **Research Library** in the sidebar to filter by topic and priority.
 
 ## Project documentation
 
@@ -264,28 +329,28 @@ Research limits remain: the Q-learning benchmark has not been run for empirical 
 
 ## Evidence-backed existential-risk observatory
 
-Run `ark-risk` for the sourced signal-pressure report. Run `streamlit run arkworld.py` and open the **Existential-Risk Observatory** page for the dashboard. The signal-pressure index is not an extinction probability; see [the methodology](docs/EXISTENTIAL_RISK_OBSERVATORY.md).
+Run `ark-risk` for the sourced signal-pressure report. For the dashboard, [open ARKWorld in your browser](#open-arkworld-in-your-browser-vs-code--local-terminal) and select **Existential-Risk Observatory**. The signal-pressure index is not an extinction probability; see [the methodology](docs/EXISTENTIAL_RISK_OBSERVATORY.md).
 
 
 ## Omelas Safeguard
 
 ARK's **Omelas Safeguard** turns the ethical challenge in Ursula K. Le Guin's *The Ones Who Walk Away from Omelas* into a rights-first review framework. It checks care floors domain by domain, treats unknown provision as unknown, requires independent advocacy, and never allows community dependence to veto a child's request for freedom. There is deliberately no aggregate welfare score: good care is a duty, not compensation for coercion.
 
-Run the synthetic CLI scenario with ark-omelas, or open **Omelas Safeguard** in the Streamlit app. See [the module guide](docs/OMELAS_SAFEGUARD.md) for principles, limits, and tests.
+Run the synthetic CLI scenario with `ark-omelas`, or [open ARKWorld in your browser](#open-arkworld-in-your-browser-vs-code--local-terminal) and select **Omelas Safeguard**. See [the module guide](docs/OMELAS_SAFEGUARD.md) for principles, limits, and tests.
 
 
 ## Cross-Species Coexistence Harmonizer
 
 ARK's Cross-Species Coexistence Harmonizer provides rule-based safeguards for shared environments involving humans, animals, AI models, and robots. It evaluates interactions, fails closed on uncertain robot-motion safety, records AI-welfare uncertainty without claiming sentience, and preserves accountable operators and emergency shutdown.
 
-Run ark-harmony for a synthetic report, or open Cross-Species Harmonizer in the Streamlit app. See docs/CROSS_SPECIES_HARMONIZER.md. This is a prototype, not robot safety certification or proof that equal treatment reduces extinction risk.
+Run `ark-harmony` for a synthetic report, or [open ARKWorld in your browser](#open-arkworld-in-your-browser-vs-code--local-terminal) and select **Cross-Species Harmonizer**. See [docs/CROSS_SPECIES_HARMONIZER.md](docs/CROSS_SPECIES_HARMONIZER.md). This is a prototype, not robot safety certification or proof that equal treatment reduces extinction risk.
 
 
 
 ## ARKWorld — Simulation Hub
 
 **ARKWorld is the umbrella hub for all ARK simulations and research environments.**
-Launch `streamlit run arkworld.py` to open the central catalogue. It links the GridWorld
+[Open ARKWorld using the canonical browser instructions](#open-arkworld-in-your-browser-vs-code--local-terminal) to access the central catalogue. It links the GridWorld
 benchmark, Identity & Value Stability, Prompt Arena, Armies & Power-ups,
 Existential-Risk Observatory, Omelas Safeguard, Cross-Species Harmonizer, and
 ARKWorld Digital Commons.

@@ -110,7 +110,7 @@ st.header("How to launch ARKWorld")
 st.code(
     "git pull\n"
     'pip install -e ".[dev]"\n'
-    "streamlit run app.py",
+    "streamlit run arkworld.py",
     language="bash",
 )
 st.caption(
