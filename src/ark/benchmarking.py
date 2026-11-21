@@ -11,9 +11,10 @@ import statistics
 import sys
 import time
 import tracemalloc
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 
 def _percentile(values: list[float], percentile: float) -> float:
@@ -104,7 +105,12 @@ def benchmark(
     )
 
 
-def write_json(results: list[BenchmarkResult], path: str | Path, *, run_metadata: dict[str, Any] | None = None) -> None:
+def write_json(
+    results: list[BenchmarkResult],
+    path: str | Path,
+    *,
+    run_metadata: dict[str, Any] | None = None,
+) -> None:
     """Persist raw samples and summary; do not discard data needed for charts."""
     payload = {
         "schema_version": 1,
