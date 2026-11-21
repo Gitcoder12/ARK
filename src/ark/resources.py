@@ -6,15 +6,15 @@ content. External text is untrusted evidence, not instructions.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from email.utils import parsedate_to_datetime
-from enum import StrEnum
 import hashlib
 import json
 import math
 import re
 from collections.abc import Mapping
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
+from enum import StrEnum
 from typing import Any
 from urllib.parse import urlparse
 from xml.etree import ElementTree
@@ -102,7 +102,7 @@ class FeatureProposal:
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _clean_text(value: Any, limit: int = 4000) -> str:
@@ -142,7 +142,7 @@ def _severity(value: Any) -> Severity:
 
 def _stable_id(source_id: str, title: str, url: str | None) -> str:
     canonical = (url or title).strip().casefold()
-    return hashlib.sha256(f"{source_id}:{canonical}".encode("utf-8")).hexdigest()[:20]
+    return hashlib.sha256(f"{source_id}:{canonical}".encode()).hexdigest()[:20]
 
 
 def parse_resource_payload(
