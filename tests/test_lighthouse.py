@@ -1,4 +1,5 @@
 import pytest
+
 from ark.lighthouse import (
     EventKind,
     EvidenceLedger,
