@@ -45,6 +45,7 @@ gpu = [
 ]
 
 [project.scripts]
+ark = "ark.cli:main"
 ark-run = "ark.experiments.runner:main"
 ark-arena = "ark.experiments.prompt_arena:main"
 ark-army = "ark.armies:main"
