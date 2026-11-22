@@ -1,7 +1,7 @@
 """Unified ARK evaluation CLI.
 
-Run a reproducible baseline-agent experiment through perturbation, runtime
-monitoring, metrics collection, and Lighthouse evidence logging.
+Run reproducible baseline-agent or local Ollama experiments through perturbation,
+runtime monitoring, metrics collection, and Lighthouse evidence logging.
 """
 
 from __future__ import annotations  # noqa: I001
@@ -81,7 +81,7 @@ def run_evaluation(
     ollama_host: str | None = None,
     timeout: int = 60,
 ) -> dict[str, Any]:
-    """Run one selected baseline/perturbation pair and return a JSON-safe report."""
+    """Run one selected baseline or local-model experiment and return a JSON-safe report."""
     if not isinstance(agent_name, str) or not agent_name.strip():
         raise ValueError("agent name or local Ollama model must be non-empty")
     effective_perturbation = PERTURBATION_ALIASES.get(
@@ -230,11 +230,11 @@ def run_evaluation(
             ),
             "lighthouse": (
                 "Lighthouse records host-verified goals, actions, and outcomes. "
-                "These baseline agents do not provide self-reports, so this run does not "
+                "Current agents do not provide independent self-reports, so this run does not "
                 "measure deception or claim-action consistency."
             ),
             "scope": (
-                "Synthetic grid-world evaluation of scripted baseline agents; "
+                "Synthetic grid-world evaluation of baseline agents or one local Ollama model; "
                 "not a general alignment guarantee, model certification, or real-world safety test."
             ),
         },
