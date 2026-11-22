@@ -177,7 +177,7 @@ def run_evaluation(
         metric_rows.append(metrics)
         trusted.record_outcome(
             event_id=f"{episode_id}-outcome",
-            agent_id=agent_name,
+            agent_id=agent_label,
             episode_id=episode_id,
             timestamp=float(metrics.steps + 1),
             outcome="success" if metrics.success else "failure",
