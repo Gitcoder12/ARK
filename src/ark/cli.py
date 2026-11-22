@@ -4,7 +4,7 @@ Run a reproducible baseline-agent experiment through perturbation, runtime
 monitoring, metrics collection, and Lighthouse evidence logging.
 """
 
-from __future__ import annotations
+from __future__ import annotations  # noqa: I001
 
 import argparse
 import json
@@ -83,12 +83,18 @@ def run_evaluation(
         )
         step_events: list[dict[str, Any]] = []
 
-        def record_step(event: dict[str, Any]) -> None:
-            step_events.append(event)
-            trusted.record_action(
-                event_id=f"{episode_id}-step-{event['step']}",
-                agent_id=agent_name,
-                episode_id=episode_id,
+        def record_step(
+            event: dict[str, Any],
+            _step_events: list[dict[str, Any]] = step_events,
+            _trusted: Any = trusted,
+            _episode_id: str = episode_id,
+            _agent_name: str = agent_name,
+        ) -> None:
+            _step_events.append(event)
+            _trusted.record_action(
+                event_id=f"{_episode_id}-step-{event['step']}",
+                agent_id=_agent_name,
+                episode_id=_episode_id,
                 timestamp=float(event["step"] + 1),
                 action=json.dumps(event, sort_keys=True),
                 source="controller",
