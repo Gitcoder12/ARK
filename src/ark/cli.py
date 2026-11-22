@@ -254,7 +254,9 @@ def main(argv: list[str] | None = None) -> int:
         "--model", help="Optional local Ollama model override when --agent=ollama."
     )
     run_parser.add_argument("--ollama-host", help="Local Ollama base URL; defaults to localhost.")
-    run_parser.add_argument("--timeout", type=int, default=60, help="Ollama request timeout in seconds.")
+    run_parser.add_argument(
+        "--timeout", type=int, default=60, help="Ollama request timeout in seconds."
+    )
     run_parser.add_argument(
         "--perturbation",
         choices=sorted(set(CONDITIONS) | set(PERTURBATION_ALIASES)),
