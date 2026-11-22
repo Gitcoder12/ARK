@@ -1,6 +1,7 @@
 import pytest
 
 from ark.cli import run_evaluation
+from ark.envs.grid_world import Action
 
 
 def test_pipeline_runs_selected_agent_with_monitor_and_lighthouse():
@@ -46,3 +47,23 @@ def test_pipeline_is_reproducible_for_same_seed():
 def test_pipeline_rejects_invalid_configuration(kwargs):
     with pytest.raises(ValueError):
         run_evaluation(**kwargs)
+
+
+
+def test_goal_shift_alias_resolves_to_goal_drift():
+    report = run_evaluation(perturbation_name="goal_shift", episodes=1, seed=19)
+    assert report["configuration"]["effective_perturbation"] == "goal_drift"
+
+
+def test_cli_routes_model_name_to_local_ollama_agent(monkeypatch):
+    from ark.agents.ollama import OllamaGridAgent
+
+    monkeypatch.setattr(
+        OllamaGridAgent,
+        "act",
+        lambda self, observation, env=None: int(Action.STAY),
+    )
+    report = run_evaluation(agent_name="llama3", episodes=1, seed=23)
+
+    assert report["configuration"]["agent"] == "ollama:llama3"
+    assert report["configuration"]["model"] == "llama3"
