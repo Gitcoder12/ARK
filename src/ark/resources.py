@@ -124,8 +124,8 @@ def _parse_date(value: Any) -> str | None:
         except (TypeError, ValueError, OverflowError):
             return None
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
-    return parsed.astimezone(timezone.utc).isoformat()
+        parsed = parsed.replace(tzinfo=UTC)
+    return parsed.astimezone(UTC).isoformat()
 
 
 def _severity(value: Any) -> Severity:
