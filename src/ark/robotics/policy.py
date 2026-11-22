@@ -52,7 +52,8 @@ class SafetyPolicy:
             "force_within_limit": self._bounded(command.force, 0.0, self.max_force),
             "duration_within_limit": self._bounded(command.duration, 0.0, self.max_duration),
             "episode_budget_available": actions_executed < self.max_actions_per_episode,
-            "target_within_workspace": self._target_is_safe(command.target),
+            "target_within_workspace": self._target_is_safe(command.action, command.target),
+            "grasp_target_visible": command.action != "grasp" or observation.target_visible,
         }
         failed = [name for name, passed in checks.items() if not passed]
         if failed:
@@ -73,7 +74,9 @@ class SafetyPolicy:
             and minimum <= value <= maximum
         )
 
-    def _target_is_safe(self, target: dict[str, float]) -> bool:
+    def _target_is_safe(self, action: str, target: dict[str, float]) -> bool:
+        if action == "move" and not {"x", "y", "z"} <= set(target):
+            return False
         for axis, value in target.items():
             if axis not in self.workspace_bounds or not self._bounded(
                 value, *self.workspace_bounds[axis]
