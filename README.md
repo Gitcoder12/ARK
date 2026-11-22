@@ -1,6 +1,11 @@
 # ARK
 
 
+## Contributor entry point
+
+Begin with [START_HERE.md](START_HERE.md) for the concise source map, contribution
+workflow and branch rules.
+
 ## Current Status / Current Version
 
 **v0.5.0 — active research prototype**
