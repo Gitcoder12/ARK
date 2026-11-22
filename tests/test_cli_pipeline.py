@@ -20,6 +20,10 @@ def test_pipeline_runs_selected_agent_with_monitor_and_lighthouse():
         item["lighthouse_evidence"]["independent_observations"] > 0
         for item in report["episodes"]
     )
+    assert all(
+        item["lighthouse_evidence"]["monitor_events_recorded"] > 0
+        for item in report["episodes"]
+    )
 
 
 def test_pipeline_is_reproducible_for_same_seed():
