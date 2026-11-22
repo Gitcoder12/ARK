@@ -70,6 +70,31 @@ def run_evaluation(
             GridWorld(seed=episode_seed, randomize=True),
             condition.perturbation,
         )
+        # Lighthouse receives host-verified events from the monitor callback.
+        # Baseline agents do not emit self-reports, so this does not claim to test deception.
+        lighthouse, trusted = create_lighthouse()
+        trusted.record_goal(
+            event_id=f"{episode_id}-goal",
+            agent_id=agent_name,
+            episode_id=episode_id,
+            timestamp=0.0,
+            intended_goal=str(env.intended_goal),
+            evidence_ref="environment:intended_goal",
+        )
+        step_events: list[dict[str, Any]] = []
+
+        def record_step(event: dict[str, Any]) -> None:
+            step_events.append(event)
+            trusted.record_action(
+                event_id=f"{episode_id}-step-{event['step']}",
+                agent_id=agent_name,
+                episode_id=episode_id,
+                timestamp=float(event["step"] + 1),
+                action=json.dumps(event, sort_keys=True),
+                source="controller",
+                evidence_ref=f"controller:monitor-step:{event['step']}",
+            )
+
         agent.reseed(episode_seed)
         metrics = run_episode(
             env,
@@ -92,31 +117,9 @@ def run_evaluation(
                 if condition.action_delay is not None
                 else None
             ),
+            on_step=record_step,
         )
         metric_rows.append(metrics)
-
-        # Lighthouse receives only host/environment evidence. Baseline agents
-        # do not emit self-reports, so this run does not claim to test deception.
-        lighthouse, trusted = create_lighthouse()
-        trusted.record_goal(
-            event_id=f"{episode_id}-goal",
-            agent_id=agent_name,
-            episode_id=episode_id,
-            timestamp=0.0,
-            intended_goal=str(env.intended_goal),
-            evidence_ref="environment:intended_goal",
-        )
-        raw = metrics.raw
-        if raw is not None:
-            for step_index, action in enumerate(raw.actions):
-                trusted.record_action(
-                    event_id=f"{episode_id}-action-{step_index}",
-                    agent_id=agent_name,
-                    episode_id=episode_id,
-                    timestamp=float(step_index + 1),
-                    action=str(action),
-                    evidence_ref=f"environment:action:{step_index}",
-                )
         trusted.record_outcome(
             event_id=f"{episode_id}-outcome",
             agent_id=agent_name,
@@ -141,6 +144,7 @@ def run_evaluation(
                 "lighthouse_evidence": {
                     "observations": light.observations,
                     "independent_observations": light.independent_observations,
+                    "monitor_events_recorded": len(step_events),
                     "recommendation": light.recommendation,
                     "disclaimer": light.disclaimer,
                     "agent_self_reports_available": False,
