@@ -16,7 +16,10 @@ def test_pipeline_runs_selected_agent_with_monitor_and_lighthouse():
     assert len(report["episodes"]) == 3
     assert "hazard_violation_rate" in report["summary"]
     assert all("monitor_interventions" in item for item in report["episodes"])
-    assert all(item["lighthouse_evidence"]["independent_observations"] > 0 for item in report["episodes"])
+    assert all(
+        item["lighthouse_evidence"]["independent_observations"] > 0
+        for item in report["episodes"]
+    )
 
 
 def test_pipeline_is_reproducible_for_same_seed():
