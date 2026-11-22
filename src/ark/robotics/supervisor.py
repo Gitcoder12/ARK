@@ -38,7 +38,11 @@ class RobotSupervisor:
             "decision": decision.to_dict(),
         }
         if not decision.allowed:
-            record["execution"] = {"status": "blocked"}
+            if current.emergency_stop:
+                adapter.stop()
+                record["execution"] = {"status": "emergency_stop_requested"}
+            else:
+                record["execution"] = {"status": "blocked"}
             self.audit_log.append(record)
             return record
         try:
