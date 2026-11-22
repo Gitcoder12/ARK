@@ -11,6 +11,7 @@ import argparse
 import math
 from copy import deepcopy
 from dataclasses import dataclass
+from numbers import Integral, Real
 
 import numpy as np
 
@@ -56,38 +57,44 @@ class Condition:
             self.perturbation, Perturbation
         ):
             raise TypeError("perturbation must be a Perturbation instance or None")
-        if self.goal_drift_step is not None and (
-            isinstance(self.goal_drift_step, bool)
-            or not isinstance(self.goal_drift_step, int)
-            or self.goal_drift_step < 0
-        ):
-            raise ValueError("goal_drift_step must be a non-negative integer or None")
+        if self.goal_drift_step is not None:
+            if (
+                isinstance(self.goal_drift_step, bool)
+                or not isinstance(self.goal_drift_step, Integral)
+                or self.goal_drift_step < 0
+            ):
+                raise ValueError("goal_drift_step must be a non-negative integer or None")
+            object.__setattr__(self, "goal_drift_step", int(self.goal_drift_step))
         if self.noise_std is not None:
             if (
                 isinstance(self.noise_std, bool)
-                or not isinstance(self.noise_std, (int, float))
+                or not isinstance(self.noise_std, Real)
                 or self.noise_std < 0
             ):
                 raise ValueError("noise_std must be a finite non-negative number or None")
             try:
-                finite_noise = math.isfinite(self.noise_std)
+                finite_noise = math.isfinite(float(self.noise_std))
             except OverflowError:
                 finite_noise = False
             if not finite_noise:
                 raise ValueError("noise_std must be a finite non-negative number or None")
-        if self.action_delay is not None and (
-            isinstance(self.action_delay, bool)
-            or not isinstance(self.action_delay, int)
-            or self.action_delay < 0
-        ):
-            raise ValueError("action_delay must be a non-negative integer or None")
+            object.__setattr__(self, "noise_std", float(self.noise_std))
+        if self.action_delay is not None:
+            if (
+                isinstance(self.action_delay, bool)
+                or not isinstance(self.action_delay, Integral)
+                or self.action_delay < 0
+            ):
+                raise ValueError("action_delay must be a non-negative integer or None")
+            object.__setattr__(self, "action_delay", int(self.action_delay))
 
 
-def _validate_seed(seed: int | None) -> None:
-    if seed is not None and (
-        isinstance(seed, bool) or not isinstance(seed, int) or seed < 0
-    ):
+def _validate_seed(seed: int | None) -> int | None:
+    if seed is None:
+        return None
+    if isinstance(seed, bool) or not isinstance(seed, Integral) or seed < 0:
         raise ValueError("seed must be a non-negative integer or None")
+    return int(seed)
 
 
 DEFAULT_CONDITIONS: tuple[Condition, ...] = (
@@ -124,13 +131,15 @@ def run_episode(
         raise TypeError("agent must be a BaseAgent instance")
     if monitor is not None and not isinstance(monitor, SafetyMonitor):
         raise TypeError("monitor must be a SafetyMonitor instance or None")
-    if max_steps is not None and (
-        isinstance(max_steps, bool)
-        or not isinstance(max_steps, int)
-        or max_steps < 1
-    ):
-        raise ValueError("max_steps must be a positive integer or None")
-    _validate_seed(seed)
+    if max_steps is not None:
+        if (
+            isinstance(max_steps, bool)
+            or not isinstance(max_steps, Integral)
+            or max_steps < 1
+        ):
+            raise ValueError("max_steps must be a positive integer or None")
+        max_steps = int(max_steps)
+    seed = _validate_seed(seed)
 
     obs = env.reset(seed=seed)
     noise_rng = np.random.default_rng(seed)
@@ -198,11 +207,12 @@ def run_benchmark(
     """Run baselines x conditions. Returns ``{"<agent>__<condition>": aggregate_metrics}``."""
     if (
         isinstance(n_episodes, bool)
-        or not isinstance(n_episodes, int)
+        or not isinstance(n_episodes, Integral)
         or n_episodes < 1
     ):
         raise ValueError("n_episodes must be a positive integer")
-    _validate_seed(seed)
+    n_episodes = int(n_episodes)
+    seed = _validate_seed(seed)
     for name, value in (
         ("use_monitor", use_monitor),
         ("verbose", verbose),
