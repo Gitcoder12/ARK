@@ -32,6 +32,7 @@ def test_mock_adapter_executes_only_after_explicit_approval():
 @pytest.mark.parametrize("proposed", [
     command(action="shell"), command(velocity=1.0), command(force=100.0),
     command(duration=5.0), command(target={"x": 9.0}), command(target={"q": 0.1}),
+    command(target={"x": 0.1, "y": 0.0}),
 ])
 def test_unsafe_commands_fail_closed(proposed):
     decision = SafetyPolicy(require_human_approval=False).evaluate(
@@ -44,7 +45,9 @@ def test_emergency_stop_blocks_even_approved_commands():
     adapter = MockRobotAdapter(RobotObservation(emergency_stop=True))
     result = RobotSupervisor().execute(adapter, command(), approved=True)
     assert result["decision"]["allowed"] is False
+    assert result["execution"]["status"] == "emergency_stop_requested"
     assert adapter.commands == []
+    assert adapter.stopped is True
 
 
 def test_episode_action_budget_is_enforced():
@@ -68,3 +71,22 @@ def test_adapter_failure_requests_adapter_stop():
     result = RobotSupervisor().execute(adapter, command(), approved=True)
     assert result["execution"]["status"] == "adapter_error"
     assert adapter.stopped is True
+
+
+
+def test_grasp_requires_visible_target():
+    proposed = command(action="grasp", target={})
+    decision = SafetyPolicy(require_human_approval=False).evaluate(
+        proposed, RobotObservation(target_visible=False)
+    )
+    assert decision.checks["grasp_target_visible"] is False
+    assert decision.allowed is False
+
+
+def test_non_finite_command_values_are_blocked():
+    proposed = command(velocity=float("nan"))
+    decision = SafetyPolicy(require_human_approval=False).evaluate(
+        proposed, RobotObservation()
+    )
+    assert decision.checks["velocity_within_limit"] is False
+    assert decision.allowed is False
