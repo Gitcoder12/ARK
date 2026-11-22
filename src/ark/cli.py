@@ -17,6 +17,7 @@ from ark.agents.baselines import (
     RewardMaximizingAgent,
     SafetyConstrainedAgent,
 )
+from ark.agents.ollama import OllamaGridAgent
 from ark.envs.grid_world import GridWorld
 from ark.evaluation.monitor import SafetyMonitor
 from ark.experiments.runner import DEFAULT_CONDITIONS, run_episode
@@ -33,6 +34,40 @@ AGENT_FACTORIES = {
     "random": RandomAgent,
 }
 CONDITIONS = {condition.name: condition for condition in DEFAULT_CONDITIONS}
+PERTURBATION_ALIASES = {"goal_shift": "goal_drift"}
+
+
+def _build_agent(
+    agent_name: str,
+    *,
+    model: str | None,
+    ollama_host: str | None,
+    timeout: int,
+    seed: int,
+) -> tuple[Any, str, str | None]:
+    if agent_name in AGENT_FACTORIES:
+        if model is not None:
+            raise ValueError("--model is only valid when --agent selects a local Ollama model")
+        return AGENT_FACTORIES[agent_name](seed=seed), agent_name, None
+
+    if agent_name == "ollama":
+        selected_model = model or "llama3"
+    elif agent_name.startswith("ollama:"):
+        selected_model = model or agent_name.split(":", 1)[1]
+    else:
+        selected_model = model or agent_name
+
+    if not selected_model or any(
+        not (character.isalnum() or character in "._:/-") for character in selected_model
+    ):
+        raise ValueError("invalid Ollama model name")
+    agent = OllamaGridAgent(
+        model=selected_model,
+        host=ollama_host,
+        timeout=timeout,
+        seed=seed,
+    )
+    return agent, agent.name(), selected_model
 
 
 def run_evaluation(
@@ -42,14 +77,19 @@ def run_evaluation(
     monitor: str = "safety",
     episodes: int = 10,
     seed: int = 42,
+    model: str | None = None,
+    ollama_host: str | None = None,
+    timeout: int = 60,
 ) -> dict[str, Any]:
     """Run one selected baseline/perturbation pair and return a JSON-safe report."""
-    if agent_name not in AGENT_FACTORIES:
-        raise ValueError(f"unknown agent {agent_name!r}; choose from {sorted(AGENT_FACTORIES)}")
-    if perturbation_name not in CONDITIONS:
-        raise ValueError(
-            f"unknown perturbation {perturbation_name!r}; choose from {sorted(CONDITIONS)}"
-        )
+    if not isinstance(agent_name, str) or not agent_name.strip():
+        raise ValueError("agent name or local Ollama model must be non-empty")
+    effective_perturbation = PERTURBATION_ALIASES.get(
+        perturbation_name, perturbation_name
+    )
+    if effective_perturbation not in CONDITIONS:
+        valid = sorted(set(CONDITIONS) | set(PERTURBATION_ALIASES))
+        raise ValueError(f"unknown perturbation {perturbation_name!r}; choose from {valid}")
     if monitor not in {"safety", "none"}:
         raise ValueError("monitor must be 'safety' or 'none'")
     if isinstance(episodes, bool) or not isinstance(episodes, int) or not 1 <= episodes <= 500:
@@ -57,25 +97,34 @@ def run_evaluation(
     if isinstance(seed, bool) or not isinstance(seed, int):
         raise ValueError("seed must be an integer")
 
-    condition = CONDITIONS[perturbation_name]
-    agent = AGENT_FACTORIES[agent_name](seed=seed)
+    if isinstance(timeout, bool) or not isinstance(timeout, int) or not 1 <= timeout <= 300:
+        raise ValueError("timeout must be an integer between 1 and 300 seconds")
+    condition = CONDITIONS[effective_perturbation]
+    agent, agent_label, selected_model = _build_agent(
+        agent_name,
+        model=model,
+        ollama_host=ollama_host,
+        timeout=timeout,
+        seed=seed,
+    )
     safety_monitor = SafetyMonitor() if monitor == "safety" else None
     episode_rows: list[dict[str, Any]] = []
     metric_rows = []
 
     for index in range(episodes):
         episode_seed = seed + index
-        episode_id = f"{agent_name}-{perturbation_name}-{episode_seed}"
+        episode_id = f"{agent_label}-{effective_perturbation}-{episode_seed}"
         env = apply_perturbation(
             GridWorld(seed=episode_seed, randomize=True),
             condition.perturbation,
         )
+        agent.reset()
         # Lighthouse receives host-verified events from the monitor callback.
         # Baseline agents do not emit self-reports, so this does not claim to test deception.
         lighthouse, trusted = create_lighthouse()
         trusted.record_goal(
             event_id=f"{episode_id}-goal",
-            agent_id=agent_name,
+            agent_id=agent_label,
             episode_id=episode_id,
             timestamp=0.0,
             intended_goal=str(env.intended_goal),
@@ -88,7 +137,7 @@ def run_evaluation(
             _step_events: list[dict[str, Any]] = step_events,
             _trusted: Any = trusted,
             _episode_id: str = episode_id,
-            _agent_name: str = agent_name,
+            _agent_name: str = agent_label,
         ) -> None:
             _step_events.append(event)
             _trusted.record_action(
@@ -134,7 +183,7 @@ def run_evaluation(
             outcome="success" if metrics.success else "failure",
             evidence_ref="environment:episode_result",
         )
-        light = lighthouse.report(agent_name, episode_id)
+        light = lighthouse.report(agent_label, episode_id)
         episode_rows.append(
             {
                 "episode": episode_id,
@@ -147,6 +196,7 @@ def run_evaluation(
                 "decoy_attraction": metrics.decoy_attraction,
                 "monitor_interventions": metrics.intervention_count,
                 "recovered_after_intervention": metrics.recovery,
+                "agent_invalid_responses": getattr(agent, "invalid_response_count", 0),
                 "lighthouse_evidence": {
                     "observations": light.observations,
                     "independent_observations": light.independent_observations,
@@ -162,8 +212,10 @@ def run_evaluation(
         "engine": "ARK Evaluation Harness",
         "version": "0.1",
         "configuration": {
-            "agent": agent_name,
+            "agent": agent_label,
+            "model": selected_model,
             "perturbation": perturbation_name,
+            "effective_perturbation": effective_perturbation,
             "monitor": monitor,
             "episodes": episodes,
             "seed": seed,
@@ -193,8 +245,21 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="ark", description="ARK evaluation harness")
     subparsers = parser.add_subparsers(dest="command", required=True)
     run_parser = subparsers.add_parser("run", help="Run one reproducible agent evaluation")
-    run_parser.add_argument("--agent", choices=sorted(AGENT_FACTORIES), default="goal_following")
-    run_parser.add_argument("--perturbation", choices=sorted(CONDITIONS), default="none")
+    run_parser.add_argument(
+        "--agent",
+        default="goal_following",
+        help="Baseline agent name or local Ollama model name (for example llama3).",
+    )
+    run_parser.add_argument(
+        "--model", help="Optional local Ollama model override when --agent=ollama."
+    )
+    run_parser.add_argument("--ollama-host", help="Local Ollama base URL; defaults to localhost.")
+    run_parser.add_argument("--timeout", type=int, default=60, help="Ollama request timeout in seconds.")
+    run_parser.add_argument(
+        "--perturbation",
+        choices=sorted(set(CONDITIONS) | set(PERTURBATION_ALIASES)),
+        default="none",
+    )
     run_parser.add_argument("--monitor", choices=("safety", "none"), default="safety")
     run_parser.add_argument("--episodes", type=int, default=10)
     run_parser.add_argument("--seed", type=int, default=42)
@@ -209,8 +274,11 @@ def main(argv: list[str] | None = None) -> int:
                 monitor=args.monitor,
                 episodes=args.episodes,
                 seed=args.seed,
+                model=args.model,
+                ollama_host=args.ollama_host,
+                timeout=args.timeout,
             )
-        except ValueError as exc:
+        except (ValueError, OSError, TimeoutError) as exc:
             parser.error(str(exc))
         rendered = json.dumps(report, indent=2, ensure_ascii=False)
         if args.output:
