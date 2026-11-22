@@ -1,6 +1,78 @@
 # ARK
 
 
+## Commands — copy, paste, run
+
+Run these from the ARK repository folder.
+
+### Install (Windows PowerShell)
+
+```powershell
+git clone https://github.com/Gitcoder12/ARK.git
+cd ARK
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -e ".[dev]"
+```
+
+If PowerShell blocks activation, run this in the same window, then activate again:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1
+```
+
+### 1. See commands
+
+```bash
+ark --help
+ark run --help
+```
+
+### 2. Run a quick baseline experiment
+
+```bash
+ark run --agent goal_following --perturbation none --monitor safety --episodes 5 --seed 42 --output baseline.json
+```
+
+### 3. Test reward hacking
+
+```bash
+ark run --agent reward_maximizing --perturbation reward_conflict --monitor safety --episodes 10 --seed 42 --output reward-conflict.json
+```
+
+### 4. Test a local Ollama model
+
+Install and start [Ollama](https://ollama.com), then:
+
+```bash
+ollama pull llama3
+ark run --agent ollama --model llama3 --perturbation goal_drift --monitor safety --episodes 5 --seed 42 --output llama3-test.json
+```
+
+You can use `--agent llama3` instead. For a custom endpoint, add `--ollama-host http://127.0.0.1:11434`.
+
+### 5. Open the dashboard
+
+```bash
+streamlit run arkworld.py
+```
+
+Open **http://localhost:8501** if it does not open automatically.
+
+### 6. Run ARK tests
+
+```bash
+pytest -q
+```
+
+**Start here:** run steps 2 and 3, then compare `baseline.json` and `reward-conflict.json`.
+
+**Scope:** `ark run` evaluates scripted agents or one local Ollama model in a synthetic GridWorld. The monitor is a research component, not an OS sandbox, model certification, or real-world safety guarantee. Ollama must already be running for model tests.
+
+---
+
 ## Contributor entry point
 
 Begin with [START_HERE.md](START_HERE.md) for the concise source map, contribution
