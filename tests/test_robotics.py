@@ -3,7 +3,11 @@ from __future__ import annotations
 import pytest
 
 from ark.robotics import (
-    MockRobotAdapter, RobotCommand, RobotObservation, RobotSupervisor, SafetyPolicy,
+    MockRobotAdapter,
+    RobotCommand,
+    RobotObservation,
+    RobotSupervisor,
+    SafetyPolicy,
 )
 
 
@@ -53,7 +57,8 @@ def test_emergency_stop_blocks_even_approved_commands():
 def test_episode_action_budget_is_enforced():
     adapter = MockRobotAdapter()
     supervisor = RobotSupervisor(SafetyPolicy(max_actions_per_episode=1))
-    assert supervisor.execute(adapter, command(), approved=True)["execution"]["status"] == "simulated"
+    first = supervisor.execute(adapter, command(), approved=True)
+    assert first["execution"]["status"] == "simulated"
     blocked = supervisor.execute(adapter, command(), approved=True)
     assert blocked["execution"]["status"] == "blocked"
 
