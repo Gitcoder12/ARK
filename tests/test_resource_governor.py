@@ -1,8 +1,8 @@
 import pytest
 
 from ark.resource_governor import (
-    GPUObservation,
     GovernorPolicy,
+    GPUObservation,
     ResourceState,
     RuntimeResourceGovernor,
 )
