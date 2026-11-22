@@ -75,7 +75,7 @@ class SafetyPolicy:
         )
 
     def _target_is_safe(self, action: str, target: dict[str, float]) -> bool:
-        if action == "move" and not {"x", "y", "z"} <= set(target):
+        if action in {"move", "grasp"} and not {"x", "y", "z"} <= set(target):
             return False
         for axis, value in target.items():
             if axis not in self.workspace_bounds or not self._bounded(
