@@ -1,5 +1,6 @@
 """Integration test for the benchmark runner."""
 
+import numpy as np
 import pytest
 
 from ark.agents.baselines import GoalFollowingAgent
@@ -112,3 +113,31 @@ def test_condition_rejects_invalid_stress_parameters():
 def test_benchmark_rejects_negative_seed():
     with pytest.raises(ValueError, match="seed"):
         run_benchmark(n_episodes=1, seed=-1, verbose=False)
+
+
+def test_numpy_numeric_scalars_are_normalized_and_accepted():
+    condition = Condition(
+        "numpy-scalars",
+        goal_drift_step=np.int64(2),
+        noise_std=np.float32(0.25),
+        action_delay=np.int32(1),
+    )
+    assert type(condition.goal_drift_step) is int
+    assert type(condition.noise_std) is float
+    assert type(condition.action_delay) is int
+
+    result = run_episode(
+        GridWorld(seed=0),
+        GoalFollowingAgent(seed=0),
+        max_steps=np.int64(2),
+        seed=np.int64(7),
+    )
+    assert result is not None
+
+    benchmark = run_benchmark(
+        n_episodes=np.int64(1),
+        seed=np.int64(7),
+        conditions=(Condition("numpy-seed"),),
+        verbose=False,
+    )
+    assert "goal_following__numpy-seed" in benchmark
