@@ -95,3 +95,12 @@ def test_non_finite_command_values_are_blocked():
     )
     assert decision.checks["velocity_within_limit"] is False
     assert decision.allowed is False
+
+
+def test_grasp_requires_a_bounded_target_position():
+    proposed = command(action="grasp", target={})
+    decision = SafetyPolicy(require_human_approval=False).evaluate(
+        proposed, RobotObservation(target_visible=True)
+    )
+    assert decision.checks["target_within_workspace"] is False
+    assert decision.allowed is False
