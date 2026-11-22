@@ -36,7 +36,7 @@ def test_pipeline_is_reproducible_for_same_seed():
 @pytest.mark.parametrize(
     "kwargs",
     [
-        {"agent_name": "unknown"},
+        {"agent_name": ""},
         {"perturbation_name": "unknown"},
         {"monitor": "maybe"},
         {"episodes": 0},
