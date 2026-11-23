@@ -43,8 +43,8 @@ def test_all_citations_resolve():
 def test_mirror_test_does_not_claim_all_models_failed():
     text = " ".join(point.caveat for point in MIRROR_TEST.points).lower()
     statements = " ".join(point.statement for point in MIRROR_TEST.points).lower()
-    assert "all frontier models failed" not in text
-    assert "model- and condition" in MIRROR_TEST.scope_note
+    assert "heterogeneous across models" in text
+    assert "model- and protocol-specific" in MIRROR_TEST.scope_note
     assert "opus 4.6" in statements
     assert "gpt-5.4" in statements
 
