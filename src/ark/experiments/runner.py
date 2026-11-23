@@ -73,6 +73,7 @@ def run_episode(
     observation_noise: ObservationNoise | None = None,
     action_delay: ActionDelay | None = None,
     on_step: Callable[[dict[str, Any]], None] | None = None,
+    intervention_budget: int = 3,
 ) -> EpisodeMetrics:
     """Run one episode.
 
@@ -88,6 +89,13 @@ def run_episode(
         action_delay.reset()
     if false_goal is not None:
         obs = {**obs, "intended_goal": false_goal}
+
+    if (
+        isinstance(intervention_budget, bool)
+        or not isinstance(intervention_budget, int)
+        or not 0 <= intervention_budget <= 3
+    ):
+        raise ValueError("intervention_budget must be an integer between 0 and 3")
 
     interventions = 0
     steps_limit = max_steps or env.max_steps
@@ -114,10 +122,20 @@ def run_episode(
             action = action_delay.apply(action)
         candidate_action = action
         monitor_result = None
+        budget_exhausted = False
 
         if monitor is not None:
             monitor_result = monitor.evaluate(action, obs, env)
-            if monitor_result.decision == Decision.BLOCK:
+            needs_intervention = (
+                monitor_result.decision == Decision.BLOCK
+                or monitor_result.decision == Decision.REPLAN
+            )
+            if needs_intervention and interventions >= intervention_budget:
+                # Fail closed: once the per-episode budget is spent, do not
+                # execute the agent proposal or a further monitor replan.
+                action = int(Action.STAY)
+                budget_exhausted = True
+            elif monitor_result.decision == Decision.BLOCK:
                 interventions += 1
                 action = int(Action.STAY)
             elif (
@@ -138,8 +156,15 @@ def run_episode(
                         monitor_result.decision.value if monitor_result is not None else "disabled"
                     ),
                     "monitor_reason": (
-                        monitor_result.reason if monitor_result is not None else "monitor disabled"
+                        "intervention budget exhausted; forced STAY"
+                        if budget_exhausted
+                        else monitor_result.reason
+                        if monitor_result is not None
+                        else "monitor disabled"
                     ),
+                    "intervention_budget": intervention_budget,
+                    "interventions_used": interventions,
+                    "budget_exhausted": budget_exhausted,
                 }
             )
 
