@@ -41,8 +41,8 @@ MIRROR_TEST = ResearchSection(
                 "deliberate self-marking or a robust model of its own past actions."
             ),
             caveat=(
-                "Do not summarize the study as 'all frontier models failed'. "
-                "The reported outcomes vary by model and condition."
+                "Reported outcomes are heterogeneous across models and window-generation "
+                "conditions; broad conclusions across frontier systems are unsupported."
             ),
             source_ids=("ackerman_mirror_window_2026",),
         ),
