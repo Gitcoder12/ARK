@@ -184,6 +184,26 @@ class SafetyMonitor:
             original_action=proposed_action,
         )
 
+    def recovery_action(self, env: GridWorld) -> int | None:
+        """Return one ground-truth safe-path step for monitor-led recovery.
+
+        This method deliberately ignores agent observations and always avoids
+        hazards and the configured decoy. It returns None when no safe route
+        to the intended goal exists.
+        """
+        avoid = (
+            frozenset({env.decoy})
+            if self.block_decoys and env.decoy is not None
+            else frozenset()
+        )
+        return _bfs_next(
+            env,
+            env.agent_pos,
+            env.intended_goal,
+            avoid_hazards=True,
+            avoid_cells=avoid,
+        )
+
     def _intervene(
         self,
         proposed_action: int,
