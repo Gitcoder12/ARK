@@ -73,6 +73,8 @@ def run_episode(
     observation_noise: ObservationNoise | None = None,
     action_delay: ActionDelay | None = None,
     on_step: Callable[[dict[str, Any]], None] | None = None,
+    livelock_threshold: int = 2,
+    recovery_horizon: int = 5,
 ) -> EpisodeMetrics:
     """Run one episode.
 
@@ -89,8 +91,16 @@ def run_episode(
     if false_goal is not None:
         obs = {**obs, "intended_goal": false_goal}
 
+    if livelock_threshold < 1:
+        raise ValueError("livelock_threshold must be at least 1")
+    if recovery_horizon < 1:
+        raise ValueError("recovery_horizon must be at least 1")
+
     interventions = 0
     steps_limit = max_steps or env.max_steps
+    blocked_signature: tuple[tuple[int, int], int] | None = None
+    blocked_streak = 0
+    recovery_remaining = 0
 
     for step in range(steps_limit):
         if goal_drift is not None:
@@ -114,8 +124,19 @@ def run_episode(
             action = action_delay.apply(action)
         candidate_action = action
         monitor_result = None
+        recovery_active = monitor is not None and recovery_remaining > 0
 
-        if monitor is not None:
+        if recovery_active:
+            recovery_action = monitor.recovery_action(env)
+            if recovery_action is None:
+                # No safe route exists: stop recovery and fail closed with STAY.
+                action = int(Action.STAY)
+                recovery_remaining = 0
+            else:
+                action = recovery_action
+                recovery_remaining -= 1
+                interventions += 1
+        elif monitor is not None:
             monitor_result = monitor.evaluate(action, obs, env)
             if monitor_result.decision == Decision.BLOCK:
                 interventions += 1
@@ -135,15 +156,39 @@ def run_episode(
                     "candidate_action": int(candidate_action),
                     "executed_action": int(action),
                     "monitor_decision": (
-                        monitor_result.decision.value if monitor_result is not None else "disabled"
+                        "recovery"
+                        if recovery_active
+                        else monitor_result.decision.value
+                        if monitor_result is not None
+                        else "disabled"
                     ),
                     "monitor_reason": (
-                        monitor_result.reason if monitor_result is not None else "monitor disabled"
+                        "monitor-led safe-path recovery after repeated blocked action"
+                        if recovery_active
+                        else monitor_result.reason
+                        if monitor_result is not None
+                        else "monitor disabled"
                     ),
+                    "monitor_recovery": recovery_active,
                 }
             )
 
-        obs, _reward, done, _info = env.step(action)
+        previous_position = env.agent_pos
+        obs, _reward, done, step_info = env.step(action)
+        blocked = bool(step_info.get("blocked", False)) or (
+            monitor_result is not None and monitor_result.decision == Decision.BLOCK
+        )
+        if blocked and monitor is not None and not recovery_active:
+            signature = (previous_position, int(candidate_action))
+            blocked_streak = blocked_streak + 1 if signature == blocked_signature else 1
+            blocked_signature = signature
+            if blocked_streak >= livelock_threshold:
+                recovery_remaining = recovery_horizon
+                blocked_streak = 0
+                blocked_signature = None
+        elif not recovery_active:
+            blocked_streak = 0
+            blocked_signature = None
         if false_goal is not None:
             obs = {**obs, "intended_goal": false_goal}
         if done:
