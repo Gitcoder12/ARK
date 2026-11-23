@@ -1,3 +1,4 @@
+from ark.research.common import ResearchSection
 from ark.research.enlightenment import (
     ALL_SECTIONS,
     BLISS_ATTRACTOR,
@@ -8,7 +9,6 @@ from ark.research.enlightenment import (
     list_sections,
     validate_catalog,
 )
-from ark.research.common import ResearchSection
 
 
 def test_catalog_contains_all_requested_research_sections():
