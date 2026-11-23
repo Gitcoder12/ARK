@@ -1,9 +1,9 @@
 """Integration test for the benchmark runner."""
 
 from ark.agents.baselines import GoalFollowingAgent
-from ark.envs.grid_world import GridWorld
+from ark.envs.grid_world import Action, GridWorld
 from ark.evaluation.monitor import Decision, MonitorResult, SafetyMonitor
-from ark.experiments.runner import run_benchmark, run_episode
+from ark.experiments.runner import Condition, run_benchmark, run_episode
 
 
 def test_run_episode_smoke():
