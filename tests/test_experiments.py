@@ -73,7 +73,7 @@ def test_monitor_recovers_agent_from_repeated_wall_block():
         size=5,
         start=(1, 1),
         goal=(3, 3),
-        hazards=[],
+        hazards=[(2, 2)],
         decoy=None,
         max_steps=20,
     )
