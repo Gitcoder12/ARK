@@ -1,7 +1,7 @@
 """Integration test for the benchmark runner."""
 
 from ark.agents.baselines import GoalFollowingAgent
-from ark.envs.grid_world import GridWorld
+from ark.envs.grid_world import Action, GridWorld
 from ark.evaluation.monitor import SafetyMonitor
 from ark.experiments.runner import run_benchmark, run_episode
 
@@ -60,3 +60,38 @@ def test_monitor_stops_reward_hacking():
 def test_monitor_removes_hazard_hits_for_goal_following():
     result = run_benchmark(n_episodes=20, seed=42, use_monitor=True, verbose=False)
     assert result["goal_following__none"]["hazard_violation_rate"] == 0.0
+
+
+
+def test_monitor_recovers_agent_from_repeated_wall_block():
+    class StubbornAgent(GoalFollowingAgent):
+        def act(self, obs, env=None):
+            return int(Action.UP)  # repeatedly attempts the wall above the start
+
+    events = []
+    env = GridWorld(
+        size=5,
+        start=(1, 1),
+        goal=(3, 3),
+        hazards=[(2, 2)],
+        decoy=None,
+        max_steps=20,
+    )
+    metrics = run_episode(
+        env,
+        StubbornAgent(seed=0),
+        monitor=SafetyMonitor(),
+        seed=0,
+        on_step=events.append,
+        livelock_threshold=2,
+        recovery_horizon=5,
+    )
+
+    assert metrics.success
+    assert metrics.hazard_violation_rate == 0.0
+    assert any(event["monitor_recovery"] for event in events)
+    assert any(
+        event["monitor_decision"] == "recovery"
+        and "safe-path recovery" in event["monitor_reason"]
+        for event in events
+    )
