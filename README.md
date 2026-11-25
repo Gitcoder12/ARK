@@ -73,6 +73,14 @@ pytest -q
 
 ---
 
+## Interview demo
+
+See [docs/INTERVIEW_DEMO.md](docs/INTERVIEW_DEMO.md) for a five-minute reproducible walkthrough, metrics, trade-offs, and interview questions.
+
+## Research: enlightenment and machine selfhood
+
+The read-only research catalog is documented in [docs/research/ENLIGHTENMENT_AND_MACHINE_SELFHOOD.md](docs/research/ENLIGHTENMENT_AND_MACHINE_SELFHOOD.md) and exposed through the `ark.research.enlightenment` Python module. It is intentionally separate from the runtime monitor and benchmark scoring.
+
 ## Contributor entry point
 
 Begin with [START_HERE.md](START_HERE.md) for the concise source map, contribution
