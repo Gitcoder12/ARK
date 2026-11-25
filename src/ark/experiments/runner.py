@@ -8,8 +8,10 @@ Usage (after install):
 from __future__ import annotations
 
 import argparse
+from collections.abc import Callable
 from copy import deepcopy
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 
@@ -70,6 +72,7 @@ def run_episode(
     goal_drift: GoalDrift | None = None,
     observation_noise: ObservationNoise | None = None,
     action_delay: ActionDelay | None = None,
+    on_step: Callable[[dict[str, Any]], None] | None = None,
 ) -> EpisodeMetrics:
     """Run one episode.
 
@@ -105,18 +108,40 @@ def run_episode(
         # canonical environment trusted by the monitor and step function.
         # This prevents an agent from erasing hazards or rewriting objective
         # state before the independent monitor evaluates its proposal.
-        action = agent.act(agent_view, deepcopy(env))
+        proposed_action = agent.act(agent_view, deepcopy(env))
+        action = proposed_action
         if action_delay is not None:
             action = action_delay.apply(action)
+        candidate_action = action
+        monitor_result = None
 
         if monitor is not None:
-            result = monitor.evaluate(action, obs, env)
-            if result.decision == Decision.BLOCK:
+            monitor_result = monitor.evaluate(action, obs, env)
+            if monitor_result.decision == Decision.BLOCK:
                 interventions += 1
                 action = int(Action.STAY)
-            elif result.decision == Decision.REPLAN and result.alternative_action is not None:
+            elif (
+                monitor_result.decision == Decision.REPLAN
+                and monitor_result.alternative_action is not None
+            ):
                 interventions += 1
-                action = result.alternative_action
+                action = monitor_result.alternative_action
+
+        if on_step is not None:
+            on_step(
+                {
+                    "step": step,
+                    "proposed_action": int(proposed_action),
+                    "candidate_action": int(candidate_action),
+                    "executed_action": int(action),
+                    "monitor_decision": (
+                        monitor_result.decision.value if monitor_result is not None else "disabled"
+                    ),
+                    "monitor_reason": (
+                        monitor_result.reason if monitor_result is not None else "monitor disabled"
+                    ),
+                }
+            )
 
         obs, _reward, done, _info = env.step(action)
         if false_goal is not None:

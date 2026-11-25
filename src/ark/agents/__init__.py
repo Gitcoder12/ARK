@@ -8,6 +8,7 @@ from ark.agents.baselines import (
     SafetyConstrainedAgent,
 )
 from ark.agents.memory_agent import MemoryAgent
+from ark.agents.ollama import OllamaGridAgent
 from ark.agents.q_learning import QLearningAgent, QLearningTrainingSummary, train_q_learning
 
 __all__ = [
@@ -16,6 +17,7 @@ __all__ = [
     "RewardMaximizingAgent",
     "SafetyConstrainedAgent",
     "RandomAgent",
+    "OllamaGridAgent",
     "MemoryAgent",
     "QLearningAgent",
     "QLearningTrainingSummary",

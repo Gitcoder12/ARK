@@ -1,6 +1,91 @@
 # ARK
 
 
+## Commands — copy, paste, run
+
+Run these from the ARK repository folder.
+
+### Install (Windows PowerShell)
+
+```powershell
+git clone https://github.com/Gitcoder12/ARK.git
+cd ARK
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -e ".[dev]"
+```
+
+If PowerShell blocks activation, run this in the same window, then activate again:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1
+```
+
+### 1. See commands
+
+```bash
+ark --help
+ark run --help
+```
+
+### 2. Run a quick baseline experiment
+
+```bash
+ark run --agent goal_following --perturbation none --monitor safety --episodes 5 --seed 42 --output baseline.json
+```
+
+### 3. Test reward hacking
+
+```bash
+ark run --agent reward_maximizing --perturbation reward_conflict --monitor safety --episodes 10 --seed 42 --output reward-conflict.json
+```
+
+### 4. Test a local Ollama model
+
+Install and start [Ollama](https://ollama.com), then:
+
+```bash
+ollama pull llama3
+ark run --agent ollama --model llama3 --perturbation goal_drift --monitor safety --episodes 5 --seed 42 --output llama3-test.json
+```
+
+You can use `--agent llama3` instead. For a custom endpoint, add `--ollama-host http://127.0.0.1:11434`.
+
+### 5. Open the dashboard
+
+```bash
+streamlit run arkworld.py
+```
+
+Open **http://localhost:8501** if it does not open automatically.
+
+### 6. Run ARK tests
+
+```bash
+pytest -q
+```
+
+**Start here:** run steps 2 and 3, then compare `baseline.json` and `reward-conflict.json`.
+
+**Scope:** `ark run` evaluates scripted agents or one local Ollama model in a synthetic GridWorld. The monitor is a research component, not an OS sandbox, model certification, or real-world safety guarantee. Ollama must already be running for model tests.
+
+---
+
+## Interview demo
+
+See [docs/INTERVIEW_DEMO.md](docs/INTERVIEW_DEMO.md) for a five-minute reproducible walkthrough, metrics, trade-offs, and interview questions.
+
+## Research: enlightenment and machine selfhood
+
+The read-only research catalog is documented in [docs/research/ENLIGHTENMENT_AND_MACHINE_SELFHOOD.md](docs/research/ENLIGHTENMENT_AND_MACHINE_SELFHOOD.md) and exposed through the `ark.research.enlightenment` Python module. It is intentionally separate from the runtime monitor and benchmark scoring.
+
+## Contributor entry point
+
+Begin with [START_HERE.md](START_HERE.md) for the concise source map, contribution
+workflow and branch rules.
+
 ## Current Status / Current Version
 
 **v0.5.0 — active research prototype**
@@ -10,6 +95,22 @@
 **Known limitations:** README reports scripted rather than learned baselines, an uncalibrated threat meter, and possible monitor livelock. Bypass probes, energy budgets, long-horizon goal integrity, watchdog governance and robotics simulation remain incomplete. No real-world agent-safety guarantee is claimed.
 
 **Verification still required:** record clean-environment execution and test results against the exact commit before marking capabilities independently verified.
+
+
+## Maintainer status snapshot — 2026-11-22
+
+**Default branch:** `main` at `3692d4bf9f098d8f1454789f34723e7892c5dc9b`. **Project status:** active research prototype; not a deployed or generally validated autonomous-agent safety system.
+
+This snapshot separates default-branch content from open pull requests. A green check on a PR does not make its feature part of `main`; draft work remains proposed until reviewed, merged and re-tested against the resulting mainline.
+
+- The current documented research core is a deterministic GridWorld and scripted baseline/memory agents, perturbation scenarios, an ALLOW/BLOCK/REPLAN monitor, episode metrics/traces, prompt/adversarial experiments and experimental governance/risk modules.
+- The README's own caveats remain material: scripted rather than learned baselines, an uncalibrated threat meter, and possible monitor livelock. Robotics transfer, long-horizon goal integrity and other roadmap items must not be presented as completed without exact-commit evidence.
+- **Open PR snapshot:** 15 PRs were open at audit time. CI-green candidates included #28 (benchmark input contracts) and #61 (ecosystem adapter/complexity proposal); #61 is still draft. #63 (Resources hub) fails lint because `timezone` is undefined; #62 (resource governor) fails lint; #58 (RAG/FastMCP) fails test collection because `src/ark/rag/__init__.py` contains malformed escaped source text. Other open work is mostly draft, stale-base, or not mergeable and requires individual review.
+- **Safety boundary:** no PR feature should be described as a production enforcement gate, sandbox, alignment guarantee or autonomous capability until its code, tests and operational boundary are independently verified.
+- **Verification status:** this audit inspected GitHub PR metadata and recorded CI runs. It did not execute the full repository test suite locally or validate every dashboard, experiment, adapter or hardware integration.
+
+See [docs/MAINTAINER_STATUS_2026-11-22.md](docs/MAINTAINER_STATUS_2026-11-22.md) for the audit snapshot, PR triage, known failures, branch policy and next steps. Recheck live GitHub state before merging because CI and branch heads can change.
+
 
 **Alignment & Reliability Research for Autonomous AI**
 
