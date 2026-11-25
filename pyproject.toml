@@ -27,7 +27,8 @@ dependencies = [
     "numpy>=1.26",
     "pydantic>=2.6",
     "streamlit>=1.36",
-    "pyyaml>=6.0"
+    "pyyaml>=6.0",
+    "psutil>=5.9.0"
 ]
 
 [project.optional-dependencies]
@@ -39,8 +40,12 @@ dev = [
 viz = [
     "matplotlib>=3.8",
 ]
+gpu = [
+    "GPUtil>=1.4",
+]
 
 [project.scripts]
+ark = "ark.cli:main"
 ark-run = "ark.experiments.runner:main"
 ark-arena = "ark.experiments.prompt_arena:main"
 ark-army = "ark.armies:main"
