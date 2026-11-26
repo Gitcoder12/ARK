@@ -59,7 +59,8 @@ SOURCES = {
         publisher="MIT Sloan",
         published="2026-06-03",
         url=(
-            "https://mitsloan.mit.edu/press/international-ai-experts-warn-potentially-catastrophic-risks-ai"
+            "https://mitsloan.mit.edu/press/"
+            "international-ai-experts-warn-potentially-catastrophic-risks-ai"
         ),
         kind="survey",
         notes=(
