@@ -1,6 +1,5 @@
 from ark.observatory import (
     MITIGATIONS,
-    RESEARCHERS,
     RISKS,
     SOURCES,
     get_researcher,
@@ -41,7 +40,11 @@ def test_risk_search_is_case_insensitive_and_handles_empty_query():
 
 def test_all_mitigation_sources_resolve():
     assert MITIGATIONS
-    assert all(source_id in SOURCES for item in MITIGATIONS.values() for source_id in item.source_ids)
+    assert all(
+        source_id in SOURCES
+        for item in MITIGATIONS.values()
+        for source_id in item.source_ids
+    )
 
 
 def test_primary_statements_are_not_experimental_results():
