@@ -187,9 +187,14 @@ RISKS = {
         status="documented_concern",
         documented_by=("geoffrey_hinton",),
         source_ids=("hinton_cnn_2026", "hinton_will_2026", "international_report_2026"),
-        existing_mitigations=("capability_evals", "sandboxing", "human_oversight", "safety_training"),
+        existing_mitigations=(
+            "capability_evals", "sandboxing", "human_oversight", "safety_training"
+        ),
         ark_coverage="partial",
-        ark_components=("ark.evaluation.monitor", "ark.evaluation.adversarial", "ark.limiters", "ark.corrigibility"),
+        ark_components=(
+            "ark.evaluation.monitor", "ark.evaluation.adversarial",
+            "ark.limiters", "ark.corrigibility"
+        ),
         evaluation_idea=(
             "In a bounded simulator, inject goal conflicts, reward loopholes, "
             "monitor-evasion attempts and shutdown requests; record violations, "
@@ -213,7 +218,10 @@ RISKS = {
         source_ids=("hinton_will_2026",),
         existing_mitigations=("capability_evals", "human_oversight", "safety_training"),
         ark_coverage="testable",
-        ark_components=("ark.evaluation.adversarial", "ark.evaluation.monitor", "ark.envs.grid_world"),
+        ark_components=(
+            "ark.evaluation.adversarial", "ark.evaluation.monitor",
+            "ark.envs.grid_world"
+        ),
         evaluation_idea=(
             "Create paired tasks where reward shortcuts conflict with the stated "
             "goal; measure exploit rate, goal completion and monitor detection."
