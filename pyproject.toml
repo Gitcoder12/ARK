@@ -54,6 +54,7 @@ ark-omelas = "ark.ethics.omelas:main"
 ark-harmony = "ark.harmony.core:main"
 ark-world = "ark.world.core:main"
 ark-robopia = "ark.robopia.core:main"
+ark-strategy = "ark.strategy.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
