@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: ark-research-feed
@@ -25,14 +26,62 @@ jobs:
           python-version: "3.12"
       - name: Fetch and merge research from arXiv, OpenAlex, and Crossref
         run: python scripts/update_research_feed.py
-      - name: Commit updated feed when changed
+      - name: Validate generated research feed
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/research_feed.json docs/research-feed.md
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: refresh ARK research feed"
-            git push
-          else
-            echo "Research feed is already up to date."
-          fi
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          data_path = Path("data/research_feed.json")
+          markdown_path = Path("docs/research-feed.md")
+          if not data_path.is_file() or not markdown_path.is_file():
+              raise SystemExit("Research feed outputs are missing")
+
+          payload = json.loads(data_path.read_text(encoding="utf-8"))
+          if not isinstance(payload, dict):
+              raise SystemExit("Research feed must be a JSON object")
+          papers = payload.get("papers")
+          if not isinstance(papers, list) or not papers:
+              raise SystemExit("Research feed must contain at least one paper")
+          if not isinstance(payload.get("generated_at"), str) or not payload["generated_at"].strip():
+              raise SystemExit("Research feed generated_at timestamp is missing")
+          if not isinstance(payload.get("sources"), list) or not payload["sources"]:
+              raise SystemExit("Research feed source list is missing")
+
+          seen = set()
+          required = ("id", "title", "url", "source", "ark_category")
+          for index, paper in enumerate(papers):
+              if not isinstance(paper, dict):
+                  raise SystemExit(f"Paper {index} is not an object")
+              missing = [field for field in required if not isinstance(paper.get(field), str) or not paper[field].strip()]
+              if missing:
+                  raise SystemExit(f"Paper {index} is missing required fields: {', '.join(missing)}")
+              if paper["id"] in seen:
+                  raise SystemExit(f"Duplicate paper id: {paper['id']}")
+              seen.add(paper["id"])
+              if not paper["url"].startswith("https://"):
+                  raise SystemExit(f"Paper {index} URL must use HTTPS")
+          if not markdown_path.read_text(encoding="utf-8").strip():
+              raise SystemExit("Research feed Markdown is empty")
+          print(f"Validated {len(papers)} unique research records")
+          PY
+      - name: Create or update research-feed pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: automation/research-feed
+          delete-branch: false
+          commit-message: "chore: refresh ARK research feed"
+          title: "chore: refresh ARK research feed"
+          body: |
+            Automated refresh of the ARK research feed.
+
+            - Sources: arXiv, OpenAlex, and Crossref
+            - Generated JSON and Markdown validated before opening/updating this PR
+            - Review the feed diff before merging
+          add-paths: |
+            data/research_feed.json
+            docs/research-feed.md
+          labels: |
+            automated
+            research
