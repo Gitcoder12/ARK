@@ -6,6 +6,7 @@ specific model runtime. It is an experimental detector, not a safety boundary.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import random
 
 import numpy as np
 from numpy.typing import NDArray
@@ -182,6 +183,17 @@ def make_synthetic_trajectories(
     """
     if samples < 20 or sequence_length < 3 or feature_size < 2:
         raise ValueError("Use >=20 samples, sequence_length >=3 and feature_size >=2.")
+    # Seed all supported RNGs so downstream extensions cannot inherit ambient randomness.
+    random.seed(seed)
+    try:
+        import torch
+    except ImportError:
+        torch = None
+    if torch is not None:
+        torch.manual_seed(seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(seed)
+
     rng = np.random.default_rng(seed)
     x = rng.normal(0.0, 0.35, (samples, sequence_length, feature_size))
     labels = rng.integers(0, 2, size=samples).astype(np.float64)
