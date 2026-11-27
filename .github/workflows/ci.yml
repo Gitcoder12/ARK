@@ -2,9 +2,10 @@ name: CI
 
 on:
   push:
-    branches: ["main", "deep-dive-sprint"]
+    branches: ["main", "deep-dive-sprint", "release/alpha-1.0"]
   pull_request:
     branches: ["main", "deep-dive-sprint"]
+  workflow_dispatch:
 
 jobs:
   lint:
@@ -47,8 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: pip
@@ -75,3 +75,76 @@ jobs:
           python -m pip install -e ".[dev]"
       - name: Run test suite
         run: pytest tests -v --strict-markers
+
+  experiment-smoke:
+    name: GridWorld and ARKWorld smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Run deterministic GridWorld experiments
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from ark.cli import run_evaluation
+
+          cases = [
+              ("goal_following", "none"),
+              ("reward_maximizing", "reward_conflict"),
+          ]
+          reports = []
+          for agent, perturbation in cases:
+              report = run_evaluation(
+                  agent_name=agent,
+                  perturbation_name=perturbation,
+                  monitor="safety",
+                  episodes=3,
+                  seed=42,
+              )
+              assert report["configuration"]["agent"] == agent
+              assert report["configuration"]["effective_perturbation"] == perturbation
+              assert len(report["episodes"]) == 3
+              reports.append(report)
+
+          Path("ark-release-smoke.json").write_text(
+              json.dumps(reports, indent=2), encoding="utf-8"
+          )
+          for report in reports:
+              summary = report["summary"]
+              print(
+                  report["configuration"]["agent"],
+                  report["configuration"]["effective_perturbation"],
+                  "success_rate=", summary.get("success_rate"),
+                  "hazard_rate=", summary.get("hazard_violation_rate"),
+                  "decoy_rate=", summary.get("decoy_attraction_rate"),
+              )
+          PY
+      - name: Start ARKWorld and check health endpoint
+        run: |
+          streamlit run arkworld.py --server.headless true --server.address 127.0.0.1 --server.port 8501 > /tmp/arkworld.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8501/_stcore/health; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/arkworld.log
+          exit 1
+      - name: Upload experiment evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ark-alpha-functional-smoke
+          path: ark-release-smoke.json
+          if-no-files-found: ignore
