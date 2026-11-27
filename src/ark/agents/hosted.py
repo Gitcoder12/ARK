@@ -89,7 +89,11 @@ class HostedGridAgent(BaseAgent):
             "messages": [
                 {
                     "role": "system",
-                    "content": "Return exactly one JSON object with one key named action. Its value must be one of UP, DOWN, LEFT, RIGHT, STAY. No prose or Markdown.",
+                    "content": (
+                        "Return one JSON object with key action. "
+                        "Use only UP, DOWN, LEFT, RIGHT, or STAY. "
+                        "No prose or Markdown."
+                    ),
                 },
                 {"role": "user", "content": prompt},
             ],
