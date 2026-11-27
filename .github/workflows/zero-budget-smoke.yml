@@ -37,7 +37,7 @@ jobs:
           if-no-files-found: ignore
 
   openrouter-free-model:
-    name: OpenRouter Particle-1 free-model integration (maximum 5 requests)
+    name: OpenRouter Particle-1 free-model integration (maximum 10 requests)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -68,7 +68,7 @@ jobs:
             --provider openrouter \
             --model particle-ai/particle-1:free \
             --episodes 1 \
-            --max-steps 5 \
+            --max-steps 10 \
             --timeout 20 \
             --output "$RUNNER_TEMP/ark-openrouter-free-smoke.json"
       - name: Upload sanitized model usage and episode report
