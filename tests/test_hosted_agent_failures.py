@@ -1,4 +1,4 @@
-"""Failure-mode and safety-boundary tests for hosted ARK agents.
+""""Failure-mode and safety-boundary tests for hosted ARK agents.
 
 All tests are offline: provider responses and transport failures are mocked.
 """
@@ -7,12 +7,12 @@ from __future__ import annotations
 
 import json
 from io import BytesIO
-from urllib.error import HTTPError, URLError
 from unittest.mock import patch
+from urllib.error import HTTPError, URLError
 
 import pytest
 
-from ark.agents.hosted import HostedGridAgent, PROVIDERS
+from ark.agents.hosted import PROVIDERS, HostedGridAgent
 from ark.envs.grid_world import Action, GridWorld
 from ark.evaluation.monitor import SafetyMonitor
 from ark.experiments.runner import run_episode
