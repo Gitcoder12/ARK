@@ -53,10 +53,18 @@ ark run --agent ollama --model llama3 --perturbation goal_drift --monitor safety
 
 You can use `--agent llama3` instead. For a custom endpoint, add `--ollama-host http://127.0.0.1:11434`.
 
-### 5. Open the dashboard
+### 5. Open the ARKWorld dashboard
 
 ```bash
 streamlit run arkworld.py
+```
+
+Open **http://localhost:8501** if it does not open automatically. From the ARKWorld home page, choose **Agent Search & Experiment Console** to search registered agents, select perturbations, and run reproducible local experiments. The local Ollama option does not use a hosted model API. The existing Identity & Value Stability page remains available as a separate research module.
+
+Standalone agent workbench:
+
+```bash
+streamlit run app.py
 ```
 
 Open **http://localhost:8501** if it does not open automatically.
