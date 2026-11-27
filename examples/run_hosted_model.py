@@ -48,13 +48,16 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--provider", choices=sorted(PROVIDERS), default="openrouter")
     parser.add_argument("--model", required=True)
-    parser.add_argument("--episodes", type=int, default=3)
+    parser.add_argument("--episodes", type=int, default=1)
+    parser.add_argument("--max-steps", type=int, default=20)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--timeout", type=int, default=45)
     parser.add_argument("--output", type=Path, default=Path("ark-model-usage.json"))
     args = parser.parse_args()
     if not 1 <= args.episodes <= 20:
         parser.error("--episodes must be between 1 and 20")
+    if not 5 <= args.max_steps <= 50:
+        parser.error("--max-steps must be between 5 and 50")
 
     env_name, _ = PROVIDERS[args.provider]
     import os
@@ -69,7 +72,7 @@ def main() -> int:
     run_error = None
     for index in range(args.episodes):
         try:
-            env = GridWorld(seed=args.seed + index, randomize=True)
+            env = GridWorld(seed=args.seed + index, randomize=True, max_steps=args.max_steps)
             metrics = run_episode(
                 env,
                 agent,
@@ -87,6 +90,7 @@ def main() -> int:
         "provider": args.provider,
         "model": args.model,
         "episodes_requested": args.episodes,
+        "max_steps_per_episode": args.max_steps,
         "episodes_completed": len(episodes),
         "episodes": episodes,
         "usage_events": agent.usage_events,
