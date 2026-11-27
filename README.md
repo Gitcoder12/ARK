@@ -12,6 +12,10 @@ Scope is frozen: correctness fixes, regression tests, reproducibility, documenta
 - This branch is not a substitute for `main`, and it is not a published or verified release until its acceptance gates are complete.
 
 
+## Repository file index
+
+See [FILE_INDEX.md](FILE_INDEX.md) for an alphabetical inventory of tracked files and their directories on this branch.
+
 ---
 
 # ARK
