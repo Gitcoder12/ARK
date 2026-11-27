@@ -16,7 +16,12 @@ on:
       episodes:
         description: "Episodes (1-20; each step makes a paid model request)"
         required: true
-        default: "3"
+        default: "1"
+        type: string
+      max_steps:
+        description: "Maximum model calls per episode (5-50)"
+        required: true
+        default: "20"
         type: string
 
 permissions:
@@ -47,6 +52,7 @@ jobs:
             --provider "${{ inputs.provider }}" \
             --model "${{ inputs.model }}" \
             --episodes "${{ inputs.episodes }}" \
+            --max-steps "${{ inputs.max_steps }}" \
             --output "$RUNNER_TEMP/ark-model-usage.json"
       - name: Upload per-model usage and quota report
         if: always()
