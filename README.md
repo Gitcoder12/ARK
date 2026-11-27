@@ -4,6 +4,14 @@ This branch is the dedicated stabilization track for **ARK Alpha 1.0**. It is no
 
 Scope is frozen: correctness fixes, regression tests, reproducibility, documentation, safe cleanup, and release packaging only. The project remains an experimental research framework; simulator results do not establish real-world AI safety or alignment.
 
+## Branch hierarchy
+
+- `main` is the default development branch and remains the canonical integration baseline.
+- `release/alpha-1.0` is the priority stabilization branch and secondary stable line for the ARK Alpha 1.0 milestone.
+- Changes intended for Alpha 1.0 should be reviewed against this branch, validated with the release checklist, and merged only after explicit maintainer approval.
+- This branch is not a substitute for `main`, and it is not a published or verified release until its acceptance gates are complete.
+
+
 ---
 
 # ARK
