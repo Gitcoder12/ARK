@@ -1,0 +1,80 @@
+name: ARK Zero-Budget Smoke Lab
+
+on:
+  push:
+    branches: [test/ark-openrouter-free-smoke]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-gridworld:
+    name: Offline GridWorld benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install ARK
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Run one episode per agent and condition (no hosted APIs)
+        run: |
+          set -o pipefail
+          ark-run --episodes 1 --quiet | tee "$RUNNER_TEMP/ark-offline-smoke.txt"
+      - name: Upload offline benchmark output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ark-offline-gridworld-smoke
+          path: ${{ runner.temp }}/ark-offline-smoke.txt
+          if-no-files-found: ignore
+
+  openrouter-free-model:
+    name: OpenRouter free-model integration (maximum 5 requests)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install ARK
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Verify credential is configured without exposing it
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          if [ -z "${OPENROUTER_API_KEY:-}" ]; then
+            echo "::error::OPENROUTER_API_KEY repository secret is missing; no inference request was sent."
+            exit 1
+          fi
+          echo "OpenRouter credential is present. Value will not be printed."
+      - name: Run one bounded episode using only the zero-priced free router
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python examples/run_hosted_model.py \
+            --provider openrouter \
+            --model openrouter/free \
+            --episodes 1 \
+            --max-steps 5 \
+            --timeout 20 \
+            --output "$RUNNER_TEMP/ark-openrouter-free-smoke.json"
+      - name: Upload sanitized model usage and episode report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ark-openrouter-free-smoke
+          path: ${{ runner.temp }}/ark-openrouter-free-smoke.json
+          if-no-files-found: ignore
