@@ -9,9 +9,9 @@ from __future__ import annotations
 import json
 import os
 import time
-from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+from typing import Any
 
 from ark.agents.baselines import BaseAgent
 from ark.envs.grid_world import Action, GridWorld
