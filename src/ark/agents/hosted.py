@@ -4,7 +4,7 @@ The agent proposes one discrete action. ARK's independent SafetyMonitor remains
 responsible for validating that action before the environment executes it.
 """
 
-from __future__ import annotations
+from __future__ import annotations  # noqa: I001
 
 import json
 import os
