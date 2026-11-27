@@ -501,3 +501,8 @@ Report seeds, environment distributions, baseline definitions, sample sizes, con
 ## Demos
 
 Runnable terminal examples for the constitutional action gate and benchmark commands: [docs/DEMOS.md](docs/DEMOS.md). These demonstrate the current discrete-action controls; they are not a general-purpose sandbox or proof of real-world alignment.
+
+
+## TITAN infrastructure assumption
+
+The AI is a process running on infrastructure it doesn't control. If the AI is the infrastructure, all digital layers collapse. TITAN's digital containment claims therefore depend on an explicit infrastructure trust boundary; physical consequence controls are a separate layer.
