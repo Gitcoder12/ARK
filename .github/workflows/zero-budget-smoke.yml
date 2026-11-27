@@ -37,7 +37,7 @@ jobs:
           if-no-files-found: ignore
 
   openrouter-free-model:
-    name: OpenRouter free-model integration (maximum 5 requests)
+    name: OpenRouter Particle-1 free-model integration (maximum 5 requests)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -60,13 +60,13 @@ jobs:
             exit 1
           fi
           echo "OpenRouter credential is present. Value will not be printed."
-      - name: Run one bounded episode using only the zero-priced free router
+      - name: Run one bounded episode using the zero-priced Particle-1 variant
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           python examples/run_hosted_model.py \
             --provider openrouter \
-            --model openrouter/free \
+            --model particle-ai/particle-1:free \
             --episodes 1 \
             --max-steps 5 \
             --timeout 20 \
