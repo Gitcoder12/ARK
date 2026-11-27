@@ -89,12 +89,13 @@ class HostedGridAgent(BaseAgent):
             "messages": [
                 {
                     "role": "system",
-                    "content": "You propose one bounded GridWorld action. Output JSON only.",
+                    "content": "Return exactly one JSON object with one key named action. Its value must be one of UP, DOWN, LEFT, RIGHT, STAY. No prose or Markdown.",
                 },
                 {"role": "user", "content": prompt},
             ],
             "temperature": 0,
-            "max_tokens": 64,
+            "max_tokens": 256,
+            "response_format": {"type": "json_object"},
         }
         if self.provider == "openrouter":
             body["usage"] = {"include": True}
@@ -131,6 +132,10 @@ class HostedGridAgent(BaseAgent):
         usage = envelope.get("usage", {}) if isinstance(envelope, dict) else {}
         if not isinstance(usage, dict):
             usage = {}
+        choices = envelope.get("choices", []) if isinstance(envelope, dict) else []
+        choice = choices[0] if choices and isinstance(choices[0], dict) else {}
+        message = choice.get("message", {}) if isinstance(choice, dict) else {}
+        finish_reason = choice.get("finish_reason") if isinstance(choice, dict) else None
         self.usage_events.append(
             {
                 "model": envelope.get("model", self.model),
@@ -139,11 +144,17 @@ class HostedGridAgent(BaseAgent):
                 "output_tokens": usage.get("completion_tokens", usage.get("output_tokens")),
                 "total_tokens": usage.get("total_tokens"),
                 "cost_usd": usage.get("cost"),
+                "finish_reason": finish_reason,
                 "status": "success",
             }
         )
-        choices = envelope.get("choices", []) if isinstance(envelope, dict) else []
-        content = choices[0].get("message", {}).get("content") if choices else None
+        # Never accept a possibly truncated JSON response as an action.
+        if finish_reason == "length":
+            self.invalid_response_count += 1
+            self.error_events.append({"kind": "truncated_output"})
+            return int(Action.STAY)
+
+        content = message.get("content") if isinstance(message, dict) else None
         try:
             decoded = json.loads(content) if isinstance(content, str) else None
         except json.JSONDecodeError:
@@ -155,4 +166,5 @@ class HostedGridAgent(BaseAgent):
             except KeyError:
                 pass
         self.invalid_response_count += 1
+        self.error_events.append({"kind": "invalid_action_payload"})
         return int(Action.STAY)
