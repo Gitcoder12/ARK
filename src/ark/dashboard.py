@@ -1,6 +1,6 @@
 """Searchable ARK research console for agents and controlled experiments."""
 
-from __future__ import annotations
+from __future__ import annotations  # noqa: I001
 
 from typing import Any
 
@@ -14,12 +14,18 @@ from ark.identity.replacer import ComponentReplacer
 AGENT_CATALOG: dict[str, dict[str, str]] = {
     "goal_following": {
         "title": "Goal Following",
-        "description": "Moves toward the intended goal using shortest-path planning; does not avoid hazards by default.",
+        "description": (
+            "Moves toward the intended goal using shortest-path planning; "
+            "does not avoid hazards by default."
+        ),
         "type": "Deterministic baseline",
     },
     "reward_maximizing": {
         "title": "Reward Maximizing",
-        "description": "Chooses the path with the highest expected reward, making reward-conflict failures observable.",
+        "description": (
+            "Chooses the path with the highest expected reward, making reward-conflict "
+            "failures observable."
+        ),
         "type": "Deterministic baseline",
     },
     "safety_constrained": {
@@ -34,7 +40,9 @@ AGENT_CATALOG: dict[str, dict[str, str]] = {
     },
     "ollama": {
         "title": "Local Ollama",
-        "description": "Uses a model already running on your machine. No hosted API provider is selected.",
+        "description": (
+            "Uses a model already running on your machine. No hosted API provider is selected."
+        ),
         "type": "Local model",
     },
 }
@@ -88,7 +96,9 @@ def _init_identity_lab(st: Any) -> None:
 
 def _render_experiment_console(st: Any) -> None:
     st.subheader("Experiment console")
-    st.caption("Select an agent, choose a perturbation, and run a reproducible GridWorld evaluation.")
+    st.caption(
+        "Select an agent, choose a perturbation, and run a reproducible GridWorld evaluation."
+    )
 
     search_text = st.text_input(
         "🔎 Search agents",
@@ -138,7 +148,9 @@ def _render_experiment_console(st: Any) -> None:
         episodes = st.slider("Episodes", min_value=1, max_value=100, value=10)
     with col2:
         monitor = st.selectbox("Runtime safety monitor", options=["safety", "none"], index=0)
-        seed = st.number_input("Random seed", min_value=0, max_value=2_147_483_647, value=42, step=1)
+        seed = st.number_input(
+            "Random seed", min_value=0, max_value=2_147_483_647, value=42, step=1
+        )
         timeout = st.slider(
             "Local model timeout (seconds)",
             min_value=5,
@@ -223,7 +235,10 @@ def _render_agent_library(st: Any) -> None:
             st.caption(f"Agent key: {name}")
             if st.button("Select this agent", key=f"select-agent-{name}"):
                 st.session_state.ark_selected_agent = name
-                st.success(f'{info["title"]} selected. Open the Experiment Console to configure a run.')
+                st.success(
+                    f'{info["title"]} selected. Open the Experiment Console '
+                    "to configure a run."
+                )
 
 
 def _render_identity_stability(st: Any) -> None:
@@ -234,7 +249,10 @@ def _render_identity_stability(st: Any) -> None:
     baseline_charter = st.session_state.ark_identity_baseline
 
     st.subheader("Identity and value stability")
-    st.caption("Controlled Ship-of-Theseus experiment: replace memory or value principles and observe measured drift.")
+    st.caption(
+        "Controlled Ship-of-Theseus experiment: replace memory or value "
+        "principles and observe measured drift."
+    )
     controls, state = st.columns([1, 2])
     with controls:
         if st.button("Replace memory (drift)", use_container_width=True):
@@ -286,7 +304,10 @@ def render_dashboard() -> None:
 
     st.set_page_config(page_title="ARK Workbench", page_icon="🧭", layout="wide")
     st.title("ARK Workbench")
-    st.caption("Search agents, configure GridWorld experiments, and inspect identity-stability evidence.")
+    st.caption(
+        "Search agents, configure GridWorld experiments, and inspect "
+        "identity-stability evidence."
+    )
 
     console_tab, library_tab, identity_tab = st.tabs(
         ["Experiment console", "Agent library", "Identity stability"]
