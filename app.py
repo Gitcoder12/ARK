@@ -3,8 +3,8 @@
 Run with: streamlit run app.py
 """
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 SRC = ROOT / "src"
