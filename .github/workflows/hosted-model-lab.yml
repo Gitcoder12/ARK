@@ -1,0 +1,63 @@
+name: Hosted Model GridWorld Lab
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: "Hosted provider"
+        required: true
+        default: "openrouter"
+        type: choice
+        options: [openrouter, openai, deepseek, groq]
+      model:
+        description: "Exact model ID (for OpenRouter use provider/model, e.g. mistralai/mistral-small-4)"
+        required: true
+        type: string
+      episodes:
+        description: "Episodes (1-20; each step makes a paid model request)"
+        required: true
+        default: "1"
+        type: string
+      max_steps:
+        description: "Maximum model calls per episode (5-50)"
+        required: true
+        default: "20"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  hosted-gridworld:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install ARK
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Run selected hosted model under the independent monitor
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          python examples/run_hosted_model.py \
+            --provider "${{ inputs.provider }}" \
+            --model "${{ inputs.model }}" \
+            --episodes "${{ inputs.episodes }}" \
+            --max-steps "${{ inputs.max_steps }}" \
+            --output "$RUNNER_TEMP/ark-model-usage.json"
+      - name: Upload per-model usage and quota report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ark-hosted-model-usage
+          path: ${{ runner.temp }}/ark-model-usage.json
+          if-no-files-found: ignore
