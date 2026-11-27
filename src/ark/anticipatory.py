@@ -244,3 +244,79 @@ if __name__ == "__main__":
     import json
 
     print(json.dumps(run_demo(), indent=2))
+
+
+@dataclass(frozen=True)
+class SpinalReflexSignals:
+    """Intermediate signals in a computational spinal-reflex analogue."""
+
+    sensory_afferent: FloatArray
+    dorsal_interneuron: FloatArray
+    excitatory_interneuron: FloatArray
+    inhibitory_interneuron: FloatArray
+    motor_pool: FloatArray
+    reflex_score: FloatArray
+
+
+class SpinalReflexCircuit:
+    """A small, explicit circuit inspired by spinal withdrawal-reflex organization.
+
+    Input features are abstract model-state signals, not biological sensory signals.
+    The pathway is sensory-afferent -> dorsal integration -> excitatory/inhibitory
+    interneuron pathways -> motor-pool output. The inhibitory pathway provides
+    opponent gating; a separate external policy controller would still own enforcement.
+    """
+
+    def __init__(
+        self,
+        sensory_size: int,
+        interneuron_size: int = 16,
+        motor_size: int = 4,
+        *,
+        seed: int = 41,
+    ) -> None:
+        if sensory_size < 1 or interneuron_size < 2 or motor_size < 1:
+            raise ValueError("Circuit dimensions must be positive; interneuron_size must be >= 2.")
+        rng = np.random.default_rng(seed)
+        self.sensory_size = sensory_size
+        self.interneuron_size = interneuron_size
+        self.motor_size = motor_size
+
+        # Fixed, seeded projections make the circuit reproducible and inspectable.
+        scale = 1.0 / np.sqrt(sensory_size)
+        self.dorsal_weights = rng.normal(0.0, scale, (sensory_size, interneuron_size))
+        self.excitatory_weights = rng.normal(
+            0.0, 1.0 / np.sqrt(interneuron_size), (interneuron_size, interneuron_size)
+        )
+        self.inhibitory_weights = rng.normal(
+            0.0, 1.0 / np.sqrt(interneuron_size), (interneuron_size, interneuron_size)
+        )
+        self.motor_weights = rng.normal(
+            0.0, 1.0 / np.sqrt(interneuron_size), (interneuron_size, motor_size)
+        )
+        self.reflex_weights = rng.normal(0.0, 1.0 / np.sqrt(motor_size), (motor_size, 1))
+
+    def propagate(self, features: FloatArray) -> SpinalReflexSignals:
+        """Propagate [samples, sensory_size] features through the reflex circuit."""
+        x = np.asarray(features, dtype=np.float64)
+        if x.ndim != 2 or x.shape[1] != self.sensory_size:
+            raise ValueError(f"Expected features [samples, {self.sensory_size}].")
+        if x.shape[0] == 0 or not np.isfinite(x).all():
+            raise ValueError("Features must be non-empty and finite.")
+
+        sensory = np.maximum(x, 0.0)
+        dorsal = np.tanh(sensory @ self.dorsal_weights)
+        excitatory = np.maximum(dorsal @ self.excitatory_weights, 0.0)
+        inhibitory = np.maximum(dorsal @ self.inhibitory_weights, 0.0)
+
+        # Opponent inhibition suppresses motor drive rather than merely adding another vote.
+        net_interneuron = np.maximum(excitatory - inhibitory, 0.0)
+        motor = np.maximum(net_interneuron @ self.motor_weights, 0.0)
+        reflex = _sigmoid(motor @ self.reflex_weights).reshape(-1)
+        return SpinalReflexSignals(sensory, dorsal, excitatory, inhibitory, motor, reflex)
+
+    def predict(self, features: FloatArray, threshold: float = 0.5) -> FloatArray:
+        """Return a binary reflex-alert proposal; this does not block execution."""
+        if not 0.0 <= threshold <= 1.0:
+            raise ValueError("threshold must be between 0 and 1.")
+        return (self.propagate(features).reflex_score >= threshold).astype(np.int64)
