@@ -6,7 +6,6 @@ specific model runtime. It is an experimental detector, not a safety boundary.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable
 
 import numpy as np
 from numpy.typing import NDArray
