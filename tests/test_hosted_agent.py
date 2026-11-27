@@ -13,7 +13,7 @@ def test_hosted_agent_parses_action_and_records_usage(monkeypatch):
     monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
     response = {
         "model": "mistralai/mistral-small-4",
-        "choices": [{"message": {"content": '{"action":"RIGHT"}'}}],
+        "choices": [{"finish_reason": "stop", "message": {"content": '{"action":"RIGHT"}'}}],
         "usage": {"prompt_tokens": 12, "completion_tokens": 4, "total_tokens": 16, "cost": 0.0001},
     }
 
