@@ -54,6 +54,17 @@ with left:
         "negotiate allocations, and leave an auditable event trace."
     )
 
+    st.page_link(
+        "pages/0_Agent_Experiment_Console.py",
+        label="Agent Search & Experiment Console",
+        icon="🤖",
+        help="Search the registered ARK agents, configure GridWorld stress tests, and inspect evidence.",
+    )
+    st.markdown(
+        "Browse baseline and local Ollama agents, choose perturbations, and run "
+        "reproducible experiments without opening a terminal."
+    )
+
     st.subheader("Agent competition & red-team labs")
     st.markdown("**Prompt Arena — Painter · Hallucinator · Rogue**")
     st.write(
