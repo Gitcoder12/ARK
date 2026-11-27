@@ -9,7 +9,8 @@ Open **Actions → Hosted Model GridWorld Lab → Run workflow** on the `main` b
 Inputs:
 - `provider`: `openrouter`, `openai`, `deepseek`, or `groq`
 - `model`: exact provider model ID; for OpenRouter use the provider/model ID, e.g. `mistralai/mistral-small-4`
-- `episodes`: 1–20. Every environment step makes one model request, so start with 1.
+- `episodes`: 1–20; defaults to 1.
+- `max_steps`: 5–50; defaults to 20, limiting each episode to at most 20 paid model calls.
 
 Required repository secrets:
 - `OPENROUTER_API_KEY`
