@@ -74,3 +74,20 @@ output-only monitoring, on held-out scenarios, at an acceptable false-positive r
 The next milestone is a benchmark with temporally aligned trajectories, pre-event labels,
 output-only baselines, held-out scenario families, and measured lead time. Do not claim
 anticipation until the detector beats the output-only baseline before the action boundary.
+
+
+## Spinal-reflex geometry experiment
+
+A second, explicitly structured baseline models a simplified withdrawal-reflex pathway:
+
+1. **Sensory afferent stage:** accepts abstract internal-state feature signals.
+2. **Dorsal integration stage:** combines incoming features into an interneuron representation.
+3. **Excitatory interneuron pathway:** propagates evidence that can increase motor-pool drive.
+4. **Inhibitory interneuron pathway:** provides opponent suppression of that drive.
+5. **Motor-pool stage:** converts the net interneuron signal into a reflex score.
+
+This is a computational analogy to spinal reflex organization, not a simulation of spinal tissue, synapses, neurotransmitters, or biological timing. The model uses fixed seeded projections so the pathway is deterministic and inspectable; it is not trained and its score is not calibrated.
+
+The next controlled comparison should evaluate this circuit against the existing state/temporal/transition MLP baseline using identical held-out trajectories and parameter/latency reporting. Include ablations that remove the inhibitory path, remove the excitatory path, and vary the interneuron connectivity. A meaningful claim requires an empirically demonstrated improvement in pre-action lead time at an acceptable false-positive rate.
+
+The reflex score is only a monitor proposal. It must not directly execute tools or own the enforcement boundary. A separately implemented policy controller must decide whether to pause, reject, or quarantine an action.
