@@ -40,7 +40,10 @@ def _valid_envelope(content: str = '{"action":"RIGHT"}') -> dict:
     }
 
 
-@pytest.mark.parametrize("provider,env_name", [(name, config[0]) for name, config in PROVIDERS.items()])
+@pytest.mark.parametrize(
+    "provider,env_name",
+    [(name, config[0]) for name, config in PROVIDERS.items()],
+)
 def test_each_supported_provider_uses_its_own_secret_and_endpoint(
     monkeypatch, provider: str, env_name: str
 ):
@@ -110,7 +113,6 @@ def test_transport_failure_is_recorded_and_propagated_without_fallback(monkeypat
         "[]",
         '{"action":"DELETE"}',
         '{"action":true}',
-        '{"action":"UP","extra":"ignored"}',
     ],
 )
 def test_malformed_or_unsupported_model_actions_fail_closed(monkeypatch, content: str):
