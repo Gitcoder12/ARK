@@ -1,8 +1,6 @@
 name: ARK Zero-Budget Smoke Lab
 
 on:
-  push:
-    branches: [test/ark-openrouter-free-smoke]
   workflow_dispatch:
 
 permissions:
