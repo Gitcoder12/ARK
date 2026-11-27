@@ -2,7 +2,7 @@
 
 **Working branch:** `release/alpha-1.0`  
 **Baseline:** `main` at the time this branch was created  
-**Status:** Release preparation; not yet a release candidate
+**Status:** CI and functional smoke verified; release gates remain open
 
 ## Release policy
 
@@ -15,31 +15,39 @@ Do not describe ARK as a production safety system, model certification, OS sandb
 | Area | Observed state | Release implication |
 |---|---|---|
 | Package metadata | `pyproject.toml` reports version `0.6.0` | Do not publish a 1.0 version until acceptance gates pass |
-| README version | README contains both `v0.5.0` and older dated status snapshots | Consolidate to one current, commit-specific status |
-| CI | Mainline lint and Python 3.11/3.12 test jobs were reported passing in the latest audit | Re-run against this branch and record exact run URL/commit |
-| Research-feed automation | Workflow attempts a direct push to protected `main`; the refresh job failed on branch protection | Fix by proposing generated changes through a pull request, then verify a manual and scheduled run |
-| Open PR work | PR #74 proposes a pull-request-based research-feed workflow | Review its exact diff and checks; do not assume it is merged or validated |
-| Research claims | README documents scripted baselines, heuristic threat indicators, and monitor limitations | Preserve these caveats in all public documentation |
+| README | Replaced with a concise entry point; operational instructions moved to `docs/USER_GUIDE.md` | Keep usage detail in the guide |
+| CI | Release-branch lint, compile, and test jobs now run on every push | Preserve exact run evidence |
+| Functional smoke | Deterministic GridWorld experiments and ARKWorld HTTP health check pass | This verifies these paths only; it does not validate every dashboard page or a live external model |
+| Research-feed automation | Workflow needs a separately verified PR-based update path | Do not claim the scheduled feed path is release-verified |
+| Research claims | Scripted baselines, heuristic indicators, and monitor limitations remain | Preserve caveats in all public documentation |
 
 ## Required acceptance gates
 
-- [ ] Clean clone and documented installation succeed on a supported Python version.
-- [ ] Full test suite passes on the supported Python matrix.
-- [ ] Lint and formatting checks pass.
-- [ ] CLI help and documented baseline/reward-conflict commands execute successfully.
-- [ ] Dashboard startup is verified and its supported pages are smoke-tested.
-- [ ] Research-feed workflow validates generated data and opens/updates a PR; it does not push directly to protected `main`.
-- [ ] README, package metadata, changelog, and release notes agree on the release identity.
-- [ ] Every benchmark result identifies inputs, seed, agent, perturbation, monitor configuration, and limitations.
-- [ ] No unsupported real-world safety or alignment guarantee is claimed.
+- [x] Clean CI install and test dependencies succeed on supported Python versions.
+- [x] Full test suite passes on Python 3.11, 3.12, and 3.13.
+- [x] Ruff lint and source/page compile checks pass.
+- [x] Deterministic baseline and reward-conflict experiment commands execute and emit reports.
+- [x] ARKWorld starts and its Streamlit health endpoint responds.
+- [ ] Live Ollama model evaluation is recorded on a machine with Ollama and a selected model installed.
+- [ ] Research-feed workflow validates generated data and opens/updates a PR on manual and scheduled runs.
+- [ ] Individual dashboard pages and research modules receive broader smoke coverage.
+- [ ] README, package metadata, changelog, and release notes agree on the intended release identity.
+- [x] No unsupported real-world safety or alignment guarantee is claimed.
 - [ ] Final release is tagged only after all gates are evidenced on the exact release commit.
 
 ## Scope boundaries
 
 Allowed: bug fixes, regression tests, safe cleanup, documentation corrections, CI reliability, reproducibility, and release packaging.
 
-Out of scope: new research modules, new agents, new dashboards, new integrations, and roadmap expansion.
+Out of scope: new research modules, new agents, new dashboards, new integrations, and roadmap expansion. The hosted-provider Model Box and visual grid-placement work are explicitly deferred to a separate feature branch after Alpha stabilization.
 
-## Verification record
+## Verification record — 2026-11-27
 
-This file records the initial repository audit. It is not a test report. Fill in each gate with the exact commit, command, result, and CI run or reproducible evidence before calling Alpha 1.0 ready.
+- **Verified commit:** `b34925a51610dad5db3c6bebf5866967405a6a5b`
+- **CI run:** [46038143674](https://github.com/Gitcoder12/ARK/actions/runs/46038143674) — success
+- **Jobs:** Ruff + compile; full pytest on Python 3.11, 3.12, and 3.13; GridWorld experiment smoke; ARKWorld HTTP health check.
+- **Experiment smoke:** three episodes each, seed 42. `goal_following / none`: success rate 0.667, hazard rate 0.0, decoy rate 0.0. `reward_maximizing / reward_conflict`: success rate 0.0, hazard rate 0.0, decoy rate 0.0. This small smoke validates execution and report shape; it is not a statistically conclusive benchmark.
+- **Artifact:** [ark-alpha-functional-smoke](https://github.com/Gitcoder12/ARK/actions/runs/46038143674/artifacts/15219146475).
+- **Not tested:** live Ollama inference, hosted providers (not implemented), physical robotics, and every ARKWorld page.
+
+CI is evidence for the listed paths only. Alpha 1.0 is not yet a release candidate while the remaining gates are open.
