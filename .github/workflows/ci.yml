@@ -21,9 +21,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
       - name: Lint source, tests, and Streamlit pages
-        run: ruff check src tests pages
+        run: ruff check src tests pages app.py arkworld.py
       - name: Compile source and Streamlit pages
-        run: python -m compileall -q src pages
+        run: python -m compileall -q src pages app.py arkworld.py
 
   test:
     name: test
