@@ -27,7 +27,9 @@ Each profile can record:
 
 A known factual field requires its own evidence entry. Unknown values remain explicitly unknown. "Downloadable weights" does not automatically mean "open-source": the license is a separate fact. A model may have multiple developers or locations, so origin should not be reduced to a single country without evidence.
 
-The registry is local. It is not an automated web scraper and does not verify whether a model card or license is accurate. Users must review source quality and refresh stale facts.
+The registry is local. It is not an automated web scraper and does not verify whether a model card or license is accurate. Users must review source quality and refresh stale facts. The same model tag from different providers is stored as separate identity records.
+
+The Lab can compare two saved identity passports field by field. Each field is marked as the same, different, or unknown. These differences describe sourced provenance and declared properties; they do not imply relative capability, quality, or safety.
 
 ## Matched behavior comparison
 
