@@ -6,6 +6,7 @@ from ark.model_registry import (
     build_audit_record,
     classify_audit_record,
     latest_audits,
+    load_registry,
     parse_ollama_tags,
     save_audit_record,
     search_audits,
@@ -152,7 +153,7 @@ def test_registry_persistence_latest_model_search_and_verdict_filter(tmp_path):
     }
     save_audit_record(older, path)
     save_audit_record(newer, path)
-    latest = latest_audits(__import__("ark.model_registry", fromlist=["load_registry"]).load_registry(path))
+    latest = latest_audits(load_registry(path))
     assert len(latest) == 1
     assert latest[0]["performance_score"] == 80.0
     assert search_audits([older, newer], "reward") == [newer]
