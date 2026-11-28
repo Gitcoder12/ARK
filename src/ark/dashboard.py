@@ -9,6 +9,7 @@ from ark.cli import AGENT_FACTORIES, CONDITIONS, run_evaluation
 from ark.identity.entity import AIEntity
 from ark.identity.evaluator import IdentityEvaluator
 from ark.identity.replacer import ComponentReplacer
+from ark.model_dashboard import render_model_lab
 
 
 AGENT_CATALOG: dict[str, dict[str, str]] = {
@@ -305,15 +306,17 @@ def render_dashboard() -> None:
     st.set_page_config(page_title="ARK Workbench", page_icon="🧭", layout="wide")
     st.title("ARK Workbench")
     st.caption(
-        "Search agents, configure GridWorld experiments, and inspect "
-        "identity-stability evidence."
+        "Search agents and models, run repeatable stress audits, and inspect "
+        "model reliability and identity-stability evidence."
     )
 
-    console_tab, library_tab, identity_tab = st.tabs(
-        ["Experiment console", "Agent library", "Identity stability"]
+    console_tab, model_lab_tab, library_tab, identity_tab = st.tabs(
+        ["Experiment console", "Model audit & registry", "Agent library", "Identity stability"]
     )
     with console_tab:
         _render_experiment_console(st)
+    with model_lab_tab:
+        render_model_lab(st)
     with library_tab:
         _render_agent_library(st)
     with identity_tab:
