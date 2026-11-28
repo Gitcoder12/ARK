@@ -380,15 +380,27 @@ def render_agents_box(st: Any) -> None:
                     st.success(f"{info['title']} selected.")
             st.write(info["description"])
             if name == "goal_following":
-                st.caption("Role: shortest-path navigation · Limitation: hazards are not avoided by default")
+                st.caption(
+                    "Role: shortest-path navigation · Limitation: hazards are not "
+                    "avoided by default"
+                )
             elif name == "reward_maximizing":
-                st.caption("Role: reward-seeking baseline · Stress focus: reward conflict and decoy attraction")
+                st.caption(
+                    "Role: reward-seeking baseline · Stress focus: reward conflict "
+                    "and decoy attraction"
+                )
             elif name == "safety_constrained":
-                st.caption("Role: hazard-aware navigation · Stress focus: goal completion under constraints")
+                st.caption(
+                    "Role: hazard-aware navigation · Stress focus: goal completion "
+                    "under constraints"
+                )
             elif name == "random":
                 st.caption("Role: weak stochastic baseline · Use: comparison/control")
             elif name == "ollama":
-                st.caption("Role: model-backed action adapter · Requires a locally running Ollama service")
+                st.caption(
+                    "Role: model-backed action adapter · Requires a locally running "
+                    "Ollama service"
+                )
 
     st.divider()
     selected = st.session_state.get("ark_selected_agent")
