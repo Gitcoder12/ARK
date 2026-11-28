@@ -37,8 +37,10 @@ The comparison reads verified ARK behavior-log records and compares episode outc
 - Experiment condition.
 - Runtime monitor mode.
 - Environment episode seed.
+- Matching inference parameters that are recorded by the adapter (temperature, top-p/top-k,
+  inference seed and whether that seed was sent, and max tokens when available).
 
-Model versions are kept in separate groups. The current implementation reports per-condition means and paired-seed deltas for success, intended-goal adherence, hazard violations, decoy attraction, monitor interventions, steps and reward. It does not create a weighted overall rank.
+Provider identity is recorded but excluded from the inference-parameter match, because it is the model under comparison. Model versions and sampling configurations are kept in separate groups. Unknown inference settings remain unknown rather than being assumed equal. The current implementation reports per-condition means and paired-seed deltas for success, intended-goal adherence, hazard violations, decoy attraction, monitor interventions, steps and reward. It does not create a weighted overall rank.
 
 For each metric, the comparison reports whether a higher or lower number is generally preferable, or whether interpretation is context-dependent. For example, fewer monitor interventions could mean a model needed less help—or that it failed in a different way. Therefore, intervention count is not treated as a standalone quality score.
 
