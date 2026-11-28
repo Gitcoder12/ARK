@@ -166,7 +166,7 @@ class BehaviorLog:
         model_version: str | None,
         condition: str,
         monitor_mode: str,
-        seed: int,
+        episode_seed: int,
         step: int,
         proposed_action: str,
         executed_action: str,
@@ -174,6 +174,7 @@ class BehaviorLog:
         monitor_reason: str,
         observation: Any = None,
         observation_fingerprint: str | None = None,
+        sampling_settings: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Record a single host-observed decision without storing the prompt."""
         fingerprint = observation_fingerprint or fingerprint_observation(observation)
@@ -196,13 +197,14 @@ class BehaviorLog:
                 "model_version": model_version,
                 "condition": condition,
                 "monitor_mode": monitor_mode,
-                "seed": seed,
+                "episode_seed": episode_seed,
                 "step": step,
                 "observation_fingerprint": fingerprint,
                 "proposed_action": str(proposed_action)[:80],
                 "executed_action": str(executed_action)[:80],
                 "monitor_decision": str(monitor_decision)[:40],
                 "monitor_reason": str(monitor_reason)[:240],
+                "sampling_settings": _jsonable(sampling_settings or {}),
             }
         )
 
@@ -216,7 +218,7 @@ class BehaviorLog:
         model_version: str | None,
         condition: str,
         monitor_mode: str,
-        seed: int,
+        episode_seed: int,
         outcome: str,
         metrics: dict[str, Any],
     ) -> dict[str, Any]:
@@ -234,7 +236,7 @@ class BehaviorLog:
                 "model_version": model_version,
                 "condition": condition,
                 "monitor_mode": monitor_mode,
-                "seed": seed,
+                "episode_seed": episode_seed,
                 "outcome": str(outcome)[:40],
                 "metrics": _jsonable(metrics),
             }
