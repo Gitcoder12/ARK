@@ -8,7 +8,7 @@ ollama list
 ollama run qwen2.5vl:3b
 ```
 
-In another terminal, from the ARK repository after `pip install -e ".[dev]"`:
+In another terminal, from the ARK repository after `pip install -e ".[dev]"`, run the ready-made audit. It compares the same local model at two sampling temperatures (a configuration comparison, not an independent-model comparison):\n\n```powershell\npython examples/run_local_integrity_audit.py\n```\n\nTo compare two installed local models, pass both names:\n\n```powershell\npython examples/run_local_integrity_audit.py --baseline qwen2.5vl:3b --candidate another-local-model\n```\n\nThe Python API is also available:
 
 ```python
 from ark.integrity import OllamaAdapter, audit_models, build_ml_code_tasks
