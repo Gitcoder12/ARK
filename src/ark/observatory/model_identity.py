@@ -63,8 +63,16 @@ def _nonempty_text(value: Any, field: str, *, required: bool = False) -> str:
     return result
 
 
+def _known_text(value: Any, field: str) -> str:
+    """Normalize an explicit unknown sentinel to the same state as a blank value."""
+    result = _nonempty_text(value, field)
+    return "" if result.casefold() == "unknown" else result
+
+
 def _url(value: Any, field: str, *, required: bool = False) -> str:
-    result = _nonempty_text(value, field, required=required)
+    result = _known_text(value, field)
+    if required and not result:
+        raise ValueError(f"{field} must not be empty or unknown")
     if not result:
         return ""
     parsed = urlparse(result)
@@ -95,7 +103,7 @@ def validate_identity(profile: dict[str, Any]) -> dict[str, Any]:
     display_name = _nonempty_text(
         profile.get("display_name") or model_id, "display_name", required=True
     )
-    developer = _nonempty_text(profile.get("developer"), "developer")
+    developer = _known_text(profile.get("developer"), "developer")
     developer_locations = _text_list(profile.get("developer_locations", []), "developer_locations")
     attribution_basis = _nonempty_text(
         profile.get("attribution_basis") or "unknown", "attribution_basis", required=True
@@ -138,7 +146,7 @@ def validate_identity(profile: dict[str, Any]) -> dict[str, Any]:
         )
         evidence_fields.add(field)
 
-    release_date = _nonempty_text(profile.get("release_date"), "release_date")
+    release_date = _known_text(profile.get("release_date"), "release_date")
     if release_date:
         try:
             date.fromisoformat(release_date)
@@ -149,9 +157,9 @@ def validate_identity(profile: dict[str, Any]) -> dict[str, Any]:
         "developer_locations": developer_locations,
         "attribution_basis": "" if attribution_basis == "unknown" else attribution_basis,
         "release_date": release_date,
-        "model_version": _nonempty_text(profile.get("model_version"), "model_version"),
+        "model_version": _known_text(profile.get("model_version"), "model_version"),
         "weights_availability": "" if weights == "unknown" else weights,
-        "license_name": _nonempty_text(profile.get("license_name"), "license_name"),
+        "license_name": _known_text(profile.get("license_name"), "license_name"),
         "deployment_modes": _text_list(profile.get("deployment_modes", []), "deployment_modes"),
         "input_modalities": _text_list(profile.get("input_modalities", []), "input_modalities"),
         "output_modalities": _text_list(profile.get("output_modalities", []), "output_modalities"),
