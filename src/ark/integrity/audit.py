@@ -12,8 +12,9 @@ import json
 import math
 import statistics
 import time
+from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
-from typing import Callable, Protocol
+from typing import Protocol
 
 
 class ModelAdapter(Protocol):
