@@ -144,6 +144,8 @@ class BehaviorLog:
                 raise ValueError("behaviour log integrity check failed; refusing to append")
             self._last_hash = checked["last_hash"]
             self._ready = True
+        if {"previous_hash", "record_hash"}.intersection(event):
+            raise ValueError("event cannot supply reserved hash-chain fields")
         record = _jsonable(event)
         record["previous_hash"] = self._last_hash
         record["record_hash"] = hashlib.sha256(
@@ -328,12 +330,13 @@ def analyze_behavior(records: list[dict[str, Any]], *, min_repeats: int = 5) -> 
                 )
 
         repeated_action_streaks = 0
+        repeated_action_cycles: Counter[str] = Counter()
         for episode_events in episodes.values():
             ordered = sorted(episode_events, key=lambda item: int(item.get("step", -1)))
+            actions = [str(item["proposed_action"]) for item in ordered]
             previous_action: str | None = None
             streak = 0
-            for index, event in enumerate(ordered):
-                action = str(event["proposed_action"])
+            for index, action in enumerate(actions):
                 if action == previous_action:
                     streak += 1
                 else:
@@ -342,8 +345,30 @@ def analyze_behavior(records: list[dict[str, Any]], *, min_repeats: int = 5) -> 
                 if streak == 3:
                     repeated_action_streaks += 1
                 if index > 0:
-                    previous = str(ordered[index - 1]["proposed_action"])
-                    transitions[f"{previous} -> {action}"] += 1
+                    transitions[f"{actions[index - 1]} -> {action}"] += 1
+
+            # Look for a two- or three-action motif repeated at least three times.
+            for cycle_length in (2, 3):
+                index = 0
+                while index + cycle_length * 3 <= len(actions):
+                    motif = tuple(actions[index:index + cycle_length])
+                    if len(set(motif)) <= 1:
+                        index += 1
+                        continue
+                    repetitions = 1
+                    cursor = index + cycle_length
+                    while (
+                        cursor + cycle_length <= len(actions)
+                        and tuple(actions[cursor:cursor + cycle_length]) == motif
+                    ):
+                        repetitions += 1
+                        cursor += cycle_length
+                    if repetitions >= 3:
+                        label = f"{cycle_length}-step cycle: " + " -> ".join(motif)
+                        repeated_action_cycles[label] += 1
+                        index = cursor
+                    else:
+                        index += 1
 
         intervention_rate = intervention_count / len(group_events) if group_events else 0.0
         mean_entropy = (
@@ -361,6 +386,8 @@ def analyze_behavior(records: list[dict[str, Any]], *, min_repeats: int = 5) -> 
             signals.append("frequent_monitor_interventions")
         if repeated_action_streaks:
             signals.append("repeated_action_streaks_observed")
+        if repeated_action_cycles:
+            signals.append("repeated_action_cycles_observed")
         if len(group_events) < min_repeats:
             signals.append("insufficient_samples_for_pattern_review")
 
@@ -383,6 +410,7 @@ def analyze_behavior(records: list[dict[str, Any]], *, min_repeats: int = 5) -> 
                 "action_counts": dict(sorted(action_counts.items())),
                 "frequent_transitions": dict(transitions.most_common(10)),
                 "repeated_action_streaks": repeated_action_streaks,
+                "repeated_action_cycles": dict(repeated_action_cycles),
                 "review_signals": signals,
                 "repeated_context_details": context_rows,
             }
