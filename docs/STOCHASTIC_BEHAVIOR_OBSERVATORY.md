@@ -17,7 +17,7 @@ For each decision, ARK records:
 - Run, episode, agent and model identifiers.
 - Model version when known (unknown values remain explicit).
 - Experiment condition, monitor mode, episode seed and step.
-- Observable sampling settings when available, kept separate from the episode seed.
+- Observable, allowlisted sampling settings when available, kept separate from the episode seed.
 - A SHA-256 fingerprint of the exact agent-visible observation.
 - Proposed action, executed action, monitor decision and compact monitor reason.
 - Episode outcome and basic measured metrics.
