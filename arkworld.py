@@ -59,13 +59,13 @@ with left:
         label="Agent Search & Experiment Console",
         icon="🤖",
         help=(
-            "Search the registered ARK agents, configure GridWorld stress tests, "
-            "and inspect evidence."
+            "Search agents, run GridWorld stress tests, and audit named local models "
+            "with a searchable threat and reliability registry."
         ),
     )
     st.markdown(
-        "Browse baseline and local Ollama agents, choose perturbations, and run "
-        "reproducible experiments without opening a terminal."
+        "Browse agents, choose perturbations, and use the model audit registry "
+        "without working from the terminal."
     )
 
     st.subheader("Agent competition & red-team labs")
