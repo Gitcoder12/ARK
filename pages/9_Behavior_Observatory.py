@@ -12,7 +12,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from ark.observatory.behavior import (  # noqa: E402
+from ark.observatory.behavior import (  # noqa: E402, I001
     DEFAULT_LOG_PATH,
     BehaviorLog,
     analyze_behavior,
