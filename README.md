@@ -59,7 +59,7 @@ You can use `--agent llama3` instead. For a custom endpoint, add `--ollama-host 
 streamlit run arkworld.py
 ```
 
-Open **http://localhost:8501** if it does not open automatically. From the ARKWorld home page, choose **Agent Search & Experiment Console** to search agents, run GridWorld experiments, and open the **Model audit & registry** tab. The model lab discovers local Ollama tags, runs each named model through the seven-condition stress matrix with the safety monitor both off and on, then stores searchable classifications and evidence locally. See [docs/MODEL_THREAT_REGISTRY.md](docs/MODEL_THREAT_REGISTRY.md) for the thresholds and limitations. No hosted model API is used by this audit.
+Open **http://localhost:8501** if it does not open automatically. ARKWorld now has two dedicated workspaces: **ARK Models Box** discovers installed local Ollama models, runs the seven-condition/two-monitor audit matrix, and searches the local threat/reliability registry; **ARK Agents Box** searches ARK's selectable agent implementations, shows their roles and limitations, and sets the selection for the experiment console. The older **Agent Search & Experiment Console** remains available for configuring and running experiments. See [docs/MODEL_THREAT_REGISTRY.md](docs/MODEL_THREAT_REGISTRY.md) for classification thresholds and limitations. Model audits are local-only and do not call hosted providers.
 
 Standalone agent workbench:
 
