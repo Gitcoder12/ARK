@@ -279,10 +279,8 @@ else:
                     )
                     st.caption(
                         f'Matched seeds: {row["matched_seed_count"]} · '
-                        (
-                            f'episodes A/B: {row["model_a_episode_count"]}/'
-                            f'{row["model_b_episode_count"]} · '
-                        )
+                        f'episodes A/B: {row["model_a_episode_count"]}/'
+                        f'{row["model_b_episode_count"]} · '
                         f'versions A/B: {row["model_a_version"]}/'
                         f'{row["model_b_version"]}'
                     )
