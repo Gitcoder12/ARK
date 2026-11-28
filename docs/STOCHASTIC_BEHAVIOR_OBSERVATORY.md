@@ -67,7 +67,8 @@ For each agent, model, known model version, condition and monitor mode, the anal
 1. Groups decisions by exact agent-visible observation fingerprint.
 2. Computes action counts and normalized Shannon entropy for repeated contexts.
 3. Reports agreement rate, context repetition and action variability.
-4. Counts action transitions and repeated-action streaks inside episodes.
+4. Counts action transitions, repeated-action streaks, and recurring two- or
+   three-action cycles inside episodes.
 5. Reports monitor interventions as descriptive signals.
 
 A normalized entropy near zero means one action dominated the observed repeats.
