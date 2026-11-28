@@ -237,28 +237,38 @@ class PromptProfile:
     def report(self) -> dict[str, object]:
         if not self.assessments:
             return {
-                "prompts_reviewed": 0, "skill_score": None,
-                "style_variety": 0, "style_distribution": {},
+                "prompts_reviewed": 0,
+                "skill_score": None,
+                "style_variety": 0,
+                "style_distribution": {},
+                "improvement_delta": None,
                 "message": "Submit prompts to establish a baseline.",
             }
         recent = self.assessments[-20:]
         distribution = Counter(item.style for item in recent)
         quality = sum(item.score for item in recent) / len(recent)
-        breadth = min(100.0, len(distribution) / 4 * 100)
-        skill = round(quality * 0.85 + breadth * 0.15, 1)
+        improvement_delta = None
+        if len(self.assessments) >= 6:
+            previous = self.assessments[-10:-5]
+            latest = self.assessments[-5:]
+            previous_avg = sum(item.score for item in previous) / len(previous)
+            latest_avg = sum(item.score for item in latest) / len(latest)
+            improvement_delta = round(latest_avg - previous_avg, 1)
         return {
             "prompts_reviewed": len(self.assessments),
-            "skill_score": skill,
+            # Skill score measures prompt quality only. Variety is reported separately
+            # so users are not rewarded for choosing an unsuitable style.
+            "skill_score": round(quality, 1),
             "average_prompt_quality": round(quality, 1),
             "style_variety": len(distribution),
             "style_distribution": dict(distribution),
+            "improvement_delta": improvement_delta,
             "recent_prompt_quality": [item.score for item in recent],
             "message": (
-                "Use a style that fits the task; variety is not rewarded when "
-                "it makes the instruction less effective."
+                "Choose the style that fits the task. Style variety is a separate "
+                "learning signal, not a substitute for prompt quality."
             ),
         }
-
 
 class PromptAuditor:
     """Small facade suitable for ARK and RepoForge integrations."""
