@@ -36,7 +36,10 @@ def _jsonable(value: Any) -> Any:
             raise ValueError("observation contains a non-finite number")
         return value
     if isinstance(value, dict):
-        return {str(key): _jsonable(item) for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))}
+        return {
+            str(key): _jsonable(item)
+            for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
+        }
     if isinstance(value, (list, tuple)):
         return [_jsonable(item) for item in value]
     raise TypeError(f"unsupported observation value: {type(value).__name__}")
@@ -113,7 +116,8 @@ class BehaviorLog:
                 continue
             unsigned = {key: value for key, value in record.items() if key != "record_hash"}
             try:
-                expected_hash = hashlib.sha256(_canonical_json(unsigned).encode("utf-8")).hexdigest()
+                canonical = _canonical_json(unsigned).encode("utf-8")
+                expected_hash = hashlib.sha256(canonical).hexdigest()
             except (TypeError, ValueError):
                 errors.append(f"line {line_number}: record is not canonical JSON")
                 continue
