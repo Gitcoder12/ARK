@@ -31,21 +31,21 @@ ECOSYSTEM_CONTEXT = [
     },
     {
         "region": "China",
-        "focus": "Large-scale industrial adoption, research output, domestic infrastructure and a growing open-weight ecosystem.",
-        "evidence": "Stanford HAI reports Chinese strength in AI publications, citations and patent output. China's 2026 agent guidelines emphasize safety, controllability, standards and industrial application.",
-        "url": "https://english.www.gov.cn/english.www.gov.cn/news/202605/08/content_WS69fde8e2c6d00ca5f9a0ad49.html",
-        "date": "Government agent guidelines, May 8, 2026",
+        "focus": "Research output, industrial adoption, domestic infrastructure and official open-source ecosystem goals.",
+        "evidence": "Stanford HAI reports Chinese strength in AI publications, citations and patent output. China's 2026 agent guidelines emphasize safety, controllability, standards and industrial application; a separate 2026 government action plan names open-source ecosystem development as a goal.",
+        "url": "https://english.www.gov.cn/news/202601/08/content_WS695f1b55c6d00ca5f9a087b9.html",
+        "date": "Government AI action plan, January 8, 2026",
     },
     {
         "region": "Europe",
-        "focus": "Shared supercomputing infrastructure, industrial and multilingual applications, and trustworthy-AI governance.",
+        "focus": "Shared supercomputing infrastructure, startup access, sectoral adoption and coordinated AI governance.",
         "evidence": "The European Commission reports 19 AI Factories and 13 Antennas being set up through EuroHPC to connect compute, data and talent with researchers and businesses.",
         "url": "https://digital-strategy.ec.europa.eu/en/policies/ai-factories",
         "date": "European Commission AI Factories page, accessed November 28, 2026",
     },
     {
         "region": "Japan",
-        "focus": "AI safety evaluation, industrial robotics and real-world deployment in Japanese-language and sector-specific contexts.",
+        "focus": "AI safety evaluation, including expanded evaluation perspectives for agent systems.",
         "evidence": "Japan's AI Safety Institute updated its evaluation-perspectives guide to version 1.20 in July 2026, explicitly expanding evaluation examples for AI-agent systems.",
         "url": "https://aisi.go.jp/output/output_framework/guide_to_evaluation_perspective_on_ai_safety/",
         "date": "Japan AISI guide v1.20, July 2026",
@@ -256,6 +256,7 @@ else:
                         [
                             {
                                 "Metric": metric,
+                                "Direction": values["direction"],
                                 "Model A mean": values["model_a_mean"],
                                 "Model B mean": values["model_b_mean"],
                                 "Delta B − A": values["delta_b_minus_a"],
