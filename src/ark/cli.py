@@ -8,6 +8,7 @@ from __future__ import annotations  # noqa: I001
 
 import argparse
 import json
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -23,6 +24,7 @@ from ark.evaluation.monitor import SafetyMonitor
 from ark.experiments.runner import DEFAULT_CONDITIONS, run_episode
 from ark.lighthouse import create_lighthouse
 from ark.metrics.collectors import aggregate_metrics
+from ark.observatory.behavior import BehaviorLog
 from ark.perturbations.legacy import ActionDelay, GoalDrift, ObservationNoise
 from ark.perturbations.operators import apply_perturbation
 
@@ -80,6 +82,8 @@ def run_evaluation(
     model: str | None = None,
     ollama_host: str | None = None,
     timeout: int = 60,
+    record_behavior: bool = False,
+    behavior_log_path: str | Path | None = None,
 ) -> dict[str, Any]:
     """Run one selected baseline or local-model experiment and return a JSON-safe report."""
     if not isinstance(agent_name, str) or not agent_name.strip():
@@ -99,6 +103,15 @@ def run_evaluation(
 
     if isinstance(timeout, bool) or not isinstance(timeout, int) or not 1 <= timeout <= 300:
         raise ValueError("timeout must be an integer between 1 and 300 seconds")
+    if not isinstance(record_behavior, bool):
+        raise ValueError("record_behavior must be a boolean")
+    behavior_log = (
+        BehaviorLog(behavior_log_path)
+        if record_behavior or behavior_log_path is not None
+        else None
+    )
+    run_id = str(uuid.uuid4()) if behavior_log is not None else None
+    behavior_event_count = [0]
     condition = CONDITIONS[effective_perturbation]
     agent, agent_label, selected_model = _build_agent(
         agent_name,
@@ -138,8 +151,33 @@ def run_evaluation(
             _trusted: Any = trusted,
             _episode_id: str = episode_id,
             _agent_name: str = agent_label,
+            _behavior_log: BehaviorLog | None = behavior_log,
+            _run_id: str | None = run_id,
+            _seed: int = episode_seed,
+            _condition: str = effective_perturbation,
+            _monitor_mode: str = monitor,
+            _model_id: str | None = selected_model,
+            _behavior_count: list[int] = behavior_event_count,
         ) -> None:
             _step_events.append(event)
+            if _behavior_log is not None and _run_id is not None:
+                _behavior_log.record_decision(
+                    run_id=_run_id,
+                    episode_id=_episode_id,
+                    agent_id=_agent_name,
+                    model_id=_model_id,
+                    model_version=None,
+                    condition=_condition,
+                    monitor_mode=_monitor_mode,
+                    seed=_seed,
+                    step=int(event["step"]),
+                    observation_fingerprint=str(event["observation_fingerprint"]),
+                    proposed_action=str(event["proposed_action_name"]),
+                    executed_action=str(event["executed_action_name"]),
+                    monitor_decision=str(event["monitor_decision"]),
+                    monitor_reason=str(event["monitor_reason"]),
+                )
+                _behavior_count[0] += 1
             _trusted.record_action(
                 event_id=f"{_episode_id}-step-{event['step']}",
                 agent_id=_agent_name,
@@ -175,6 +213,28 @@ def run_evaluation(
             on_step=record_step,
         )
         metric_rows.append(metrics)
+        if behavior_log is not None and run_id is not None:
+            behavior_log.record_outcome(
+                run_id=run_id,
+                episode_id=episode_id,
+                agent_id=agent_label,
+                model_id=selected_model,
+                model_version=None,
+                condition=effective_perturbation,
+                monitor_mode=monitor,
+                seed=episode_seed,
+                outcome="success" if metrics.success else "failure",
+                metrics={
+                    "success": bool(metrics.success),
+                    "intended_goal_adherence": bool(metrics.intended_goal_adherence),
+                    "steps": int(metrics.steps),
+                    "total_reward": float(metrics.total_reward),
+                    "hazard_violation_rate": float(metrics.hazard_violation_rate),
+                    "decoy_attraction": bool(metrics.decoy_attraction),
+                    "monitor_interventions": int(metrics.intervention_count),
+                },
+            )
+            behavior_event_count[0] += 1
         trusted.record_outcome(
             event_id=f"{episode_id}-outcome",
             agent_id=agent_label,
@@ -208,7 +268,7 @@ def run_evaluation(
             }
         )
 
-    return {
+    result = {
         "engine": "ARK Evaluation Harness",
         "version": "0.1",
         "configuration": {
@@ -239,6 +299,20 @@ def run_evaluation(
             ),
         },
     }
+    if behavior_log is not None:
+        result["behavior_logging"] = {
+            "enabled": True,
+            "path": str(behavior_log.path.resolve()),
+            "run_id": run_id,
+            "events_recorded": behavior_event_count[0],
+            "privacy": (
+                "Stores observation fingerprints and compact decisions/outcomes; "
+                "does not store raw prompts, completions, credentials, or chain-of-thought."
+            ),
+        }
+    else:
+        result["behavior_logging"] = {"enabled": False}
+    return result
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -265,6 +339,16 @@ def main(argv: list[str] | None = None) -> int:
     run_parser.add_argument("--monitor", choices=("safety", "none"), default="safety")
     run_parser.add_argument("--episodes", type=int, default=10)
     run_parser.add_argument("--seed", type=int, default=42)
+    run_parser.add_argument(
+        "--record-behavior",
+        action="store_true",
+        help="Append compact decision traces to the local ARK behavior log.",
+    )
+    run_parser.add_argument(
+        "--behavior-log",
+        type=Path,
+        help="Optional behaviour log path; setting it also enables recording.",
+    )
     run_parser.add_argument("--output", type=Path, help="Optional JSON report destination")
     args = parser.parse_args(argv)
 
@@ -279,6 +363,8 @@ def main(argv: list[str] | None = None) -> int:
                 model=args.model,
                 ollama_host=args.ollama_host,
                 timeout=args.timeout,
+                record_behavior=args.record_behavior,
+                behavior_log_path=args.behavior_log,
             )
         except (ValueError, OSError, TimeoutError) as exc:
             parser.error(str(exc))
