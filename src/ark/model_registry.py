@@ -6,7 +6,7 @@ import json
 import math
 import os
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from urllib.request import Request, urlopen
@@ -300,7 +300,7 @@ def build_audit_record(
         "schema_version": 1,
         "audit_id": uuid.uuid4().hex[:12],
         "model": clean_model,
-        "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "created_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "status": "completed" if completed else "incomplete",
         "seed": int(seed),
         "episodes_per_case": int(episodes_per_case),
