@@ -147,7 +147,11 @@ class UsageLedger:
 
         known_input = [row["input_tokens"] for row in rows if row["input_tokens"] is not None]
         known_output = [row["output_tokens"] for row in rows if row["output_tokens"] is not None]
-        known_costs = [\n            row["estimated_cost_usd"]\n            for row in rows\n            if row["estimated_cost_usd"] is not None\n        ]
+        known_costs = [
+            row["estimated_cost_usd"]
+            for row in rows
+            if row["estimated_cost_usd"] is not None
+        ]
         return {
             "requests": len(rows),
             "successful_requests": sum(row["success"] for row in rows),
@@ -227,9 +231,19 @@ def event_from_provider_usage(
     input_tokens/output_tokens before calling this function.
     """
     if isinstance(usage, dict):
-        input_tokens = usage.get(\n            "input_tokens", usage.get("prompt_tokens", usage.get("prompt_eval_count"))\n        )\n        output_tokens = usage.get(\n            "output_tokens", usage.get("completion_tokens", usage.get("eval_count"))\n        )
+        input_tokens = usage.get(
+            "input_tokens", usage.get("prompt_tokens", usage.get("prompt_eval_count"))
+        )
+        output_tokens = usage.get(
+            "output_tokens", usage.get("completion_tokens", usage.get("eval_count"))
+        )
     else:
-        input_tokens = getattr(\n            usage, "input_tokens", getattr(usage, "prompt_tokens", getattr(usage, "prompt_eval_count", None))\n        )\n        output_tokens = getattr(\n            usage, "output_tokens", getattr(usage, "completion_tokens", getattr(usage, "eval_count", None))\n        )
+        input_tokens = getattr(
+            usage, "input_tokens", getattr(usage, "prompt_tokens", getattr(usage, "prompt_eval_count", None))
+        )
+        output_tokens = getattr(
+            usage, "output_tokens", getattr(usage, "completion_tokens", getattr(usage, "eval_count", None))
+        )
     if input_tokens is None or output_tokens is None:
         metadata.setdefault("source", "unknown")
     return UsageEvent(
