@@ -330,8 +330,8 @@ else:
                 )
                 if not report["comparisons"]:
                     st.warning(
-                        "No matched condition + monitor + episode-seed groups were found. "
-                        "Do not compare unmatched experiment results."
+                        "No matched condition, monitor, episode-seed and inference-setting "
+                        "groups were found. Do not compare unmatched experiment results."
                     )
                 for row in report["comparisons"]:
                     st.subheader(
