@@ -101,6 +101,8 @@ def _validated_sampling_settings(settings: dict[str, Any] | None) -> dict[str, A
                 or value < 0
             ):
                 raise ValueError(f"{field} must be a finite non-negative number")
+            if field == "top_p" and value > 1:
+                raise ValueError("top_p must be between 0 and 1")
             cleaned[field] = float(value)
 
     for field in ("top_k", "max_tokens"):
@@ -332,6 +334,28 @@ class BehaviorLog:
             raise ValueError(
                 "unsupported behavior metrics: " + ", ".join(sorted(unexpected_metrics))
             )
+        boolean_metrics = {
+            "success",
+            "intended_goal_adherence",
+            "decoy_attraction",
+        }
+        integer_metrics = {"steps", "monitor_interventions"}
+        for field, value in metrics.items():
+            if field in boolean_metrics and not isinstance(value, bool):
+                raise ValueError(f"{field} must be boolean")
+            if field in integer_metrics and (
+                isinstance(value, bool) or not isinstance(value, int) or value < 0
+            ):
+                raise ValueError(f"{field} must be a non-negative integer")
+            if field in {"total_reward", "hazard_violation_rate"}:
+                if (
+                    isinstance(value, bool)
+                    or not isinstance(value, (int, float))
+                    or not math.isfinite(value)
+                ):
+                    raise ValueError(f"{field} must be a finite number")
+                if field == "hazard_violation_rate" and not 0 <= value <= 1:
+                    raise ValueError("hazard_violation_rate must be between 0 and 1")
         return self.append(
             {
                 "schema_version": 1,
