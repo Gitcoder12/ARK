@@ -88,8 +88,8 @@ def _text_list(value: Any, field: str) -> list[str]:
         raise ValueError(f"{field} must be a list of strings")
     cleaned: list[str] = []
     for item in value:
-        text = _nonempty_text(item, field, required=True)
-        if text not in cleaned:
+        text = _known_text(item, field)
+        if text and text not in cleaned:
             cleaned.append(text)
     return cleaned
 
