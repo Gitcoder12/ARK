@@ -13,7 +13,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from ark.observatory.behavior import BehaviorLog, DEFAULT_LOG_PATH  # noqa: E402
+from ark.observatory.behavior import DEFAULT_LOG_PATH, BehaviorLog  # noqa: E402
 from ark.observatory.model_identity import (  # noqa: E402, I001
     DEFAULT_IDENTITY_PATH,
     compare_model_outcomes,
@@ -24,29 +24,59 @@ from ark.observatory.model_identity import (  # noqa: E402, I001
 ECOSYSTEM_CONTEXT = [
     {
         "region": "United States",
-        "focus": "Frontier model production, private investment, large-scale compute and commercial platforms.",
-        "evidence": "Stanford HAI's 2026 AI Index reports US leadership in notable-model production and private investment; it also says the US-China model performance gap had narrowed to 2.7% on its March 2026 snapshot.",
+        "focus": (
+            "Frontier model production, private investment, large-scale compute "
+            "and commercial platforms."
+        ),
+        "evidence": (
+            "Stanford HAI's 2026 AI Index reports US leadership in notable-model "
+            "production and private investment; it also says the US-China model "
+            "performance gap had narrowed to 2.7% on its March 2026 snapshot."
+        ),
         "url": "https://hai.stanford.edu/ai-index/2026-ai-index-report",
         "date": "2026 AI Index; technical snapshot March 2026",
     },
     {
         "region": "China",
-        "focus": "Research output, industrial adoption, domestic infrastructure and official open-source ecosystem goals.",
-        "evidence": "Stanford HAI reports Chinese strength in AI publications, citations and patent output. China's 2026 agent guidelines emphasize safety, controllability, standards and industrial application; a separate 2026 government action plan names open-source ecosystem development as a goal.",
+        "focus": (
+            "Research output, industrial adoption, domestic infrastructure and "
+            "official open-source ecosystem goals."
+        ),
+        "evidence": (
+            "Stanford HAI reports Chinese strength in AI publications, citations "
+            "and patent output. China's 2026 agent guidelines emphasize safety, "
+            "controllability, standards and industrial application; a separate "
+            "2026 government action plan names open-source ecosystem development "
+            "as a goal."
+        ),
         "url": "https://english.www.gov.cn/news/202601/08/content_WS695f1b55c6d00ca5f9a087b9.html",
         "date": "Government AI action plan, January 8, 2026",
     },
     {
         "region": "Europe",
-        "focus": "Shared supercomputing infrastructure, startup access, sectoral adoption and coordinated AI governance.",
-        "evidence": "The European Commission reports 19 AI Factories and 13 Antennas being set up through EuroHPC to connect compute, data and talent with researchers and businesses.",
+        "focus": (
+            "Shared supercomputing infrastructure, startup access, sectoral "
+            "adoption and coordinated AI governance."
+        ),
+        "evidence": (
+            "The European Commission reports 19 AI Factories and 13 Antennas "
+            "being set up through EuroHPC to connect compute, data and talent "
+            "with researchers and businesses."
+        ),
         "url": "https://digital-strategy.ec.europa.eu/en/policies/ai-factories",
         "date": "European Commission AI Factories page, accessed November 28, 2026",
     },
     {
         "region": "Japan",
-        "focus": "AI safety evaluation, including expanded evaluation perspectives for agent systems.",
-        "evidence": "Japan's AI Safety Institute updated its evaluation-perspectives guide to version 1.20 in July 2026, explicitly expanding evaluation examples for AI-agent systems.",
+        "focus": (
+            "AI safety evaluation, including expanded evaluation perspectives "
+            "for agent systems."
+        ),
+        "evidence": (
+            "Japan's AI Safety Institute updated its evaluation-perspectives "
+            "guide to version 1.20 in July 2026, explicitly expanding evaluation "
+            "examples for AI-agent systems."
+        ),
         "url": "https://aisi.go.jp/output/output_framework/guide_to_evaluation_perspective_on_ai_safety/",
         "date": "Japan AISI guide v1.20, July 2026",
     },
@@ -249,8 +279,12 @@ else:
                     )
                     st.caption(
                         f'Matched seeds: {row["matched_seed_count"]} · '
-                        f'episodes A/B: {row["model_a_episode_count"]}/{row["model_b_episode_count"]} · '
-                        f'versions A/B: {row["model_a_version"]}/{row["model_b_version"]}'
+                        (
+                            f'episodes A/B: {row["model_a_episode_count"]}/'
+                            f'{row["model_b_episode_count"]} · '
+                        )
+                        f'versions A/B: {row["model_a_version"]}/'
+                        f'{row["model_b_version"]}'
                     )
                     st.dataframe(
                         [
