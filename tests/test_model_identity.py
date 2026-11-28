@@ -5,11 +5,11 @@ import json
 import pytest
 
 from ark.observatory.model_identity import (
+    compare_identity_profiles,
     compare_model_outcomes,
     load_identity_registry,
     save_identity,
     validate_identity,
-    compare_identity_profiles,
 )
 
 
