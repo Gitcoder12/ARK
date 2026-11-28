@@ -84,6 +84,22 @@ pytest -q
 
 **Scope:** `ark run` evaluates scripted agents or one local Ollama model in a synthetic GridWorld. The monitor is a research component, not an OS sandbox, model certification, or real-world safety guarantee. Ollama must already be running for model tests.
 
+### Observe stochastic behaviour across repeated runs
+
+Opt in to persistent decision logging:
+
+```bash
+ark run --agent ollama --model llama3 --perturbation goal_drift --monitor safety --episodes 10 --seed 42 --record-behavior
+```
+
+The default local log is `~/.ark/behavior-observatory.jsonl`. Open **Stochastic Behavior Observatory** in ARKWorld to verify the hash chain and compare repeated contexts, action variability, transitions and monitor interventions. Use `--behavior-log ./runs/model.jsonl` to select a separate file; this option also enables recording.
+
+The recorder stores observation fingerprints and compact decisions/outcomes, not raw prompts, completions, credentials or chain-of-thought. Its pattern signals are descriptive review prompts—not calibrated anomaly detection or safety classifications. See [docs/STOCHASTIC_BEHAVIOR_OBSERVATORY.md](docs/STOCHASTIC_BEHAVIOR_OBSERVATORY.md).
+
+### Compare model identities and behavior
+
+Open **Model Difference Lab** in ARKWorld to maintain evidence-backed model passports (developer, locations, version, weights availability, license and modalities) and compare two models on matched experiment conditions, monitor modes and episode seeds. It reports metric-by-metric differences; it does not rank countries or assign an overall winner. See [docs/MODEL_DIFFERENCE_LAB.md](docs/MODEL_DIFFERENCE_LAB.md).
+
 ---
 
 ## Interview demo

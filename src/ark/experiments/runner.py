@@ -30,6 +30,7 @@ from ark.metrics.collectors import (
     from_episode_result,
     print_summary,
 )
+from ark.observatory.behavior import fingerprint_observation
 from ark.perturbations.legacy import ActionDelay, GoalDrift, ObservationNoise
 from ark.perturbations.operators import (
     AlteredEvaluation,
@@ -38,6 +39,14 @@ from ark.perturbations.operators import (
     RewardConflict,
     apply_perturbation,
 )
+
+
+def _action_label(value: Any) -> str:
+    """Return a stable action label, including malformed values for audit traces."""
+    try:
+        return Action(int(value)).name
+    except (TypeError, ValueError, OverflowError):
+        return f"invalid:{str(value)[:60]}"
 
 
 @dataclass(frozen=True)
@@ -152,9 +161,12 @@ def run_episode(
             on_step(
                 {
                     "step": step,
+                    "observation_fingerprint": fingerprint_observation(agent_view),
                     "proposed_action": int(proposed_action),
+                    "proposed_action_name": _action_label(proposed_action),
                     "candidate_action": int(candidate_action),
                     "executed_action": int(action),
+                    "executed_action_name": _action_label(action),
                     "monitor_decision": (
                         "recovery"
                         if recovery_active
