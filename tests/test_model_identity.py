@@ -35,6 +35,7 @@ def _profile(**overrides):
             for field in [
                 "developer",
                 "developer_locations",
+                "attribution_basis",
                 "release_date",
                 "model_version",
                 "weights_availability",
