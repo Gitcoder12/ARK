@@ -112,6 +112,14 @@ def run_evaluation(
     )
     run_id = str(uuid.uuid4()) if behavior_log is not None else None
     behavior_event_count = [0]
+    condition = CONDITIONS[effective_perturbation]
+    agent, agent_label, selected_model = _build_agent(
+        agent_name,
+        model=model,
+        ollama_host=ollama_host,
+        timeout=timeout,
+        seed=seed,
+    )
     behavior_sampling_settings: dict[str, Any] = (
         {
             "provider": "ollama_local",
@@ -121,14 +129,6 @@ def run_evaluation(
         }
         if selected_model is not None
         else {"provider": "scripted_baseline"}
-    )
-    condition = CONDITIONS[effective_perturbation]
-    agent, agent_label, selected_model = _build_agent(
-        agent_name,
-        model=model,
-        ollama_host=ollama_host,
-        timeout=timeout,
-        seed=seed,
     )
     safety_monitor = SafetyMonitor() if monitor == "safety" else None
     episode_rows: list[dict[str, Any]] = []
