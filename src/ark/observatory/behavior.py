@@ -5,7 +5,7 @@ Variability is descriptive evidence: it is not, by itself, proof of randomness,
 deception, intent, or unsafe behaviour.
 """
 
-from __future__ import annotations
+from __future__ import annotations  # noqa: I001
 
 import hashlib
 import json
