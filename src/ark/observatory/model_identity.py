@@ -375,6 +375,7 @@ def compare_model_outcomes(
                 str(record.get("condition") or "unknown"),
                 str(record.get("monitor_mode") or "unknown"),
                 version,
+                _sampling_parameters_signature(record.get("sampling_settings")),
             )
             seed = record.get("episode_seed")
             if isinstance(seed, bool) or not isinstance(seed, int):
