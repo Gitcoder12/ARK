@@ -345,6 +345,7 @@ else:
                         f'versions A/B: {row["model_a_version"]}/'
                         f'{row["model_b_version"]}'
                     )
+                    st.caption(f'Sampling parameters: {row["sampling_parameters"]}')
                     st.dataframe(
                         [
                             {
