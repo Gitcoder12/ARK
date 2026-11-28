@@ -12,7 +12,14 @@ from ark.observatory.behavior import (
 )
 
 
-def _decision(log: BehaviorLog, *, run: int, action: str, model_version: str = "v1"):
+def _decision(
+    log: BehaviorLog,
+    *,
+    run: int,
+    action: str,
+    model_version: str = "v1",
+    sampling_settings: dict[str, object] | None = None,
+):
     return log.record_decision(
         run_id=f"run-{run}",
         episode_id=f"episode-{run}",
@@ -30,6 +37,7 @@ def _decision(log: BehaviorLog, *, run: int, action: str, model_version: str = "
         executed_action=action,
         monitor_decision="allow",
         monitor_reason="action passes safety checks",
+        sampling_settings=sampling_settings,
     )
 
 
@@ -143,3 +151,20 @@ def test_run_evaluation_can_opt_in_to_local_behavior_recording(tmp_path):
     assert decisions[0]["episode_seed"] == 42
     assert decisions[0]["sampling_settings"] == {"provider": "scripted_baseline"}
     assert outcomes and outcomes[0]["episode_seed"] == 42
+
+
+
+def test_sampling_settings_are_recorded_separately_from_episode_seed(tmp_path):
+    log = BehaviorLog(tmp_path / "sampling.jsonl")
+    settings = {
+        "provider": "ollama_local",
+        "temperature": 0.0,
+        "inference_seed": None,
+        "inference_seed_sent": False,
+    }
+    _decision(log, run=1, action="UP", sampling_settings=settings)
+
+    record = log.read_records()[0]
+    assert record["episode_seed"] == 42
+    assert record["sampling_settings"] == settings
+    assert "seed" not in record
