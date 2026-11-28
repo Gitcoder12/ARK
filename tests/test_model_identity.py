@@ -165,7 +165,14 @@ def test_identity_comparison_reports_field_differences_and_unknowns():
         {
             "model_id": "provider/model-a",
             "provider": "provider-a",
+            "developer": "unknown",
+            "developer_locations": ["unknown"],
+            "release_date": "unknown",
+            "model_version": "unknown",
             "weights_availability": "unknown",
+            "license_name": "unknown",
+            "model_card_url": "unknown",
+            "system_card_url": "unknown",
         }
     )
     profile_b = validate_identity(
@@ -188,3 +195,22 @@ def test_identity_comparison_reports_field_differences_and_unknowns():
     assert fields["provider"]["status"] == "different"
     assert fields["weights_availability"]["status"] == "unknown"
     assert "quality" in report["interpretation"]
+
+
+
+def test_identity_rejects_invalid_known_release_date():
+    with pytest.raises(ValueError, match="release_date must use YYYY-MM-DD"):
+        validate_identity(
+            {
+                "model_id": "provider/model",
+                "provider": "provider",
+                "release_date": "November 2026",
+                "evidence": [
+                    {
+                        "field": "release_date",
+                        "url": "https://example.org/release",
+                        "checked_on": "2026-11-28",
+                    }
+                ],
+            }
+        )
