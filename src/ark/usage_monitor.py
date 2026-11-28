@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from pathlib import Path
 from threading import RLock
@@ -147,7 +147,7 @@ class UsageLedger:
 
         known_input = [row["input_tokens"] for row in rows if row["input_tokens"] is not None]
         known_output = [row["output_tokens"] for row in rows if row["output_tokens"] is not None]
-        known_costs = [row["estimated_cost_usd"] for row in rows if row["estimated_cost_usd"] is not None]
+        known_costs = [\n            row["estimated_cost_usd"]\n            for row in rows\n            if row["estimated_cost_usd"] is not None\n        ]
         return {
             "requests": len(rows),
             "successful_requests": sum(row["success"] for row in rows),
