@@ -22,6 +22,16 @@ from ark.observatory.model_identity import (  # noqa: E402, I001
     save_identity,
 )
 
+
+
+def _identity_option(profile: dict[str, Any]) -> str:
+    """Return a distinct label for provider-specific passport versions."""
+    return (
+        f'{profile["provider"]} · {profile["model_version"]} · '
+        f'{profile["developer"]}'
+    )
+
+
 ECOSYSTEM_CONTEXT = [
     {
         "region": "United States",
@@ -269,24 +279,24 @@ else:
                 with passport_left:
                     selected_version_a = st.selectbox(
                         "Model A passport version",
-                        options=[item["model_version"] for item in profiles_a],
+                        options=[_identity_option(item) for item in profiles_a],
                         index=len(profiles_a) - 1,
                         key="model_identity_version_a",
                     )
                 with passport_right:
                     selected_version_b = st.selectbox(
                         "Model B passport version",
-                        options=[item["model_version"] for item in profiles_b],
+                        options=[_identity_option(item) for item in profiles_b],
                         index=len(profiles_b) - 1,
                         key="model_identity_version_b",
                     )
                 profile_a = next(
                     item for item in profiles_a
-                    if item["model_version"] == selected_version_a
+                    if _identity_option(item) == selected_version_a
                 )
                 profile_b = next(
                     item for item in profiles_b
-                    if item["model_version"] == selected_version_b
+                    if _identity_option(item) == selected_version_b
                 )
                 identity_report = compare_identity_profiles(profile_a, profile_b)
                 st.dataframe(
