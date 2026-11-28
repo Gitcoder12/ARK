@@ -164,12 +164,12 @@ class BehaviorLog:
         monitor_mode: str,
         seed: int,
         step: int,
-        observation: Any = None,
-        observation_fingerprint: str | None = None,
         proposed_action: str,
         executed_action: str,
         monitor_decision: str,
         monitor_reason: str,
+        observation: Any = None,
+        observation_fingerprint: str | None = None,
     ) -> dict[str, Any]:
         """Record a single host-observed decision without storing the prompt."""
         fingerprint = observation_fingerprint or fingerprint_observation(observation)
