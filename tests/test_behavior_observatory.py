@@ -82,7 +82,7 @@ def test_hash_chain_detects_tampering_and_refuses_append(tmp_path):
 
 def test_repeated_context_variability_is_reported_without_rogue_label(tmp_path):
     log = BehaviorLog(tmp_path / "behavior.jsonl")
-    for run, action in enumerate(["UP", "UP", "LEFT", "LEFT", "RIGHT"]):
+    for run, action in enumerate(["UP", "UP", "LEFT", "LEFT", "RIGHT", "RIGHT"]):
         _decision(log, run=run, action=action)
 
     report = analyze_behavior(log.read_records(), min_repeats=5)
