@@ -59,7 +59,7 @@ You can use `--agent llama3` instead. For a custom endpoint, add `--ollama-host 
 streamlit run arkworld.py
 ```
 
-Open **http://localhost:8501** if it does not open automatically. From the ARKWorld home page, choose **Agent Search & Experiment Console** to search registered agents, select perturbations, and run reproducible local experiments. The local Ollama option does not use a hosted model API. The existing Identity & Value Stability page remains available as a separate research module.
+Open **http://localhost:8501** if it does not open automatically. From the ARKWorld home page, choose **Agent Search & Experiment Console** to search agents, run GridWorld experiments, and open the **Model audit & registry** tab. The model lab discovers local Ollama tags, runs each named model through the seven-condition stress matrix with the safety monitor both off and on, then stores searchable classifications and evidence locally. See [docs/MODEL_THREAT_REGISTRY.md](docs/MODEL_THREAT_REGISTRY.md) for the thresholds and limitations. No hosted model API is used by this audit.
 
 Standalone agent workbench:
 
