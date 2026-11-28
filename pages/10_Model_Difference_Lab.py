@@ -14,7 +14,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from ark.observatory.behavior import DEFAULT_LOG_PATH, BehaviorLog  # noqa: E402
+from ark.observatory.behavior import DEFAULT_LOG_PATH, BehaviorLog  # noqa: E402, I001
 from ark.observatory.model_identity import (  # noqa: E402, I001
     DEFAULT_IDENTITY_PATH,
     compare_identity_profiles,
