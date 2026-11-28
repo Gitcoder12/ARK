@@ -18,6 +18,36 @@ st.markdown(
     "ARKWorld is the **umbrella hub**. Each world keeps its own rules, evidence, "
     "metrics, and safety boundaries while sharing a common home."
 )
+st.page_link(
+    "pages/8_Why_We_Build.py",
+    label="Why We Build ARK",
+    icon="🌌",
+    help=(
+        "Read the mission connecting trustworthy AI, shared abundance, "
+        "science, and space exploration."
+    ),
+)
+
+st.divider()
+st.header("Model & agent workspaces")
+
+models_col, agents_col = st.columns(2)
+with models_col:
+    st.page_link(
+        "pages/6_Models_Box.py",
+        label="ARK Models Box",
+        icon="🧠",
+        help="Discover local models, run stress audits, and search evidence-backed rankings.",
+    )
+    st.caption("Installed model inventory · Full stress audits · Reliability registry")
+with agents_col:
+    st.page_link(
+        "pages/7_Agents_Box.py",
+        label="ARK Agents Box",
+        icon="🤖",
+        help="Search ARK's built-in agents, inspect their roles, and select one for experiments.",
+    )
+    st.caption("Agent catalogue · Roles and capabilities · Experiment selection")
 
 st.divider()
 st.header("Simulation worlds")
@@ -52,6 +82,20 @@ with left:
     st.markdown(
         "The seven-zone digital city: scripted agents collaborate, share resources, "
         "negotiate allocations, and leave an auditable event trace."
+    )
+
+    st.page_link(
+        "pages/0_Agent_Experiment_Console.py",
+        label="Agent Search & Experiment Console",
+        icon="🤖",
+        help=(
+            "Search agents, run GridWorld stress tests, and audit named local models "
+            "with a searchable threat and reliability registry."
+        ),
+    )
+    st.markdown(
+        "Browse agents, choose perturbations, and use the model audit registry "
+        "without working from the terminal."
     )
 
     st.subheader("Agent competition & red-team labs")
