@@ -20,6 +20,27 @@ st.markdown(
 )
 
 st.divider()
+st.header("Model & agent workspaces")
+
+models_col, agents_col = st.columns(2)
+with models_col:
+    st.page_link(
+        "pages/6_Models_Box.py",
+        label="ARK Models Box",
+        icon="🧠",
+        help="Discover local models, run stress audits, and search evidence-backed rankings.",
+    )
+    st.caption("Installed model inventory · Full stress audits · Reliability registry")
+with agents_col:
+    st.page_link(
+        "pages/7_Agents_Box.py",
+        label="ARK Agents Box",
+        icon="🤖",
+        help="Search ARK's built-in agents, inspect their roles, and select one for experiments.",
+    )
+    st.caption("Agent catalogue · Roles and capabilities · Experiment selection")
+
+st.divider()
 st.header("Simulation worlds")
 
 left, right = st.columns(2)
