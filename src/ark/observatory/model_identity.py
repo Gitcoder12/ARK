@@ -246,6 +246,55 @@ def save_identity(
     return updated
 
 
+def compare_identity_profiles(
+    profile_a: dict[str, Any],
+    profile_b: dict[str, Any],
+) -> dict[str, Any]:
+    """Compare sourced identity fields without turning differences into quality scores."""
+    left = validate_identity(profile_a)
+    right = validate_identity(profile_b)
+    fields = (
+        "provider",
+        "developer",
+        "developer_locations",
+        "attribution_basis",
+        "release_date",
+        "model_version",
+        "weights_availability",
+        "license_name",
+        "deployment_modes",
+        "input_modalities",
+        "output_modalities",
+        "languages",
+        "model_card_url",
+        "system_card_url",
+    )
+    comparisons: list[dict[str, Any]] = []
+    for field in fields:
+        value_a, value_b = left[field], right[field]
+        unknown_a = value_a in ("", "unknown", None, [])
+        unknown_b = value_b in ("", "unknown", None, [])
+        status = (
+            "unknown"
+            if unknown_a or unknown_b
+            else "same"
+            if value_a == value_b
+            else "different"
+        )
+        comparisons.append(
+            {"field": field, "model_a": value_a, "model_b": value_b, "status": status}
+        )
+    return {
+        "model_a": left["model_id"],
+        "model_b": right["model_id"],
+        "field_comparisons": comparisons,
+        "interpretation": (
+            "Identity differences describe sourced provenance and declared model "
+            "properties. They do not indicate relative capability, quality, or safety."
+        ),
+    }
+
+
 def _mean(values: list[float]) -> float | None:
     return sum(values) / len(values) if values else None
 
