@@ -98,6 +98,8 @@ if st.button("Verify and analyze log", type="primary"):
                 st.json(item["frequent_transitions"])
                 st.write("**Repeated action streaks**")
                 st.write(item["repeated_action_streaks"])
+                st.write("**Repeated action cycles**")
+                st.json(item["repeated_action_cycles"])
                 st.write("**Repeated-context details**")
                 st.dataframe(
                     item["repeated_context_details"],
