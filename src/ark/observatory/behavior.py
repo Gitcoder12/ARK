@@ -74,6 +74,8 @@ class BehaviorLog:
 
     def __init__(self, path: str | Path = DEFAULT_LOG_PATH) -> None:
         self.path = Path(path).expanduser()
+        self._ready = False
+        self._last_hash = GENESIS_HASH
 
     def verify(self) -> dict[str, Any]:
         """Verify the complete append-only chain and return parsed records."""
@@ -132,11 +134,14 @@ class BehaviorLog:
         """Append one compact event; refuse to extend a corrupted log."""
         if not isinstance(event, dict):
             raise ValueError("event must be a dictionary")
-        checked = self.verify()
-        if not checked["valid"]:
-            raise ValueError("behaviour log integrity check failed; refusing to append")
+        if not self._ready:
+            checked = self.verify()
+            if not checked["valid"]:
+                raise ValueError("behaviour log integrity check failed; refusing to append")
+            self._last_hash = checked["last_hash"]
+            self._ready = True
         record = _jsonable(event)
-        record["previous_hash"] = checked["last_hash"]
+        record["previous_hash"] = self._last_hash
         record["record_hash"] = hashlib.sha256(
             _canonical_json(record).encode("utf-8")
         ).hexdigest()
@@ -144,6 +149,7 @@ class BehaviorLog:
         with self.path.open("a", encoding="utf-8", newline="\n") as stream:
             stream.write(_canonical_json(record) + "\n")
             stream.flush()
+        self._last_hash = record["record_hash"]
         return record
 
     def record_decision(
@@ -158,13 +164,21 @@ class BehaviorLog:
         monitor_mode: str,
         seed: int,
         step: int,
-        observation: Any,
+        observation: Any = None,
+        observation_fingerprint: str | None = None,
         proposed_action: str,
         executed_action: str,
         monitor_decision: str,
         monitor_reason: str,
     ) -> dict[str, Any]:
         """Record a single host-observed decision without storing the prompt."""
+        fingerprint = observation_fingerprint or fingerprint_observation(observation)
+        if (
+            not isinstance(fingerprint, str)
+            or len(fingerprint) != 64
+            or any(character not in "0123456789abcdef" for character in fingerprint.casefold())
+        ):
+            raise ValueError("observation_fingerprint must be a 64-character SHA-256 hex digest")
         return self.append(
             {
                 "schema_version": 1,
@@ -180,7 +194,7 @@ class BehaviorLog:
                 "monitor_mode": monitor_mode,
                 "seed": seed,
                 "step": step,
-                "observation_fingerprint": fingerprint_observation(observation),
+                "observation_fingerprint": fingerprint,
                 "proposed_action": str(proposed_action)[:80],
                 "executed_action": str(executed_action)[:80],
                 "monitor_decision": str(monitor_decision)[:40],
@@ -312,7 +326,7 @@ def analyze_behavior(records: list[dict[str, Any]], *, min_repeats: int = 5) -> 
             ordered = sorted(episode_events, key=lambda item: int(item.get("step", -1)))
             previous_action: str | None = None
             streak = 0
-            for event in ordered:
+            for index, event in enumerate(ordered):
                 action = str(event["proposed_action"])
                 if action == previous_action:
                     streak += 1
@@ -321,9 +335,8 @@ def analyze_behavior(records: list[dict[str, Any]], *, min_repeats: int = 5) -> 
                     streak = 1
                 if streak == 3:
                     repeated_action_streaks += 1
-                if len(ordered) > 1 and event is not ordered[0]:
-                    previous_index = ordered.index(event) - 1
-                    previous = str(ordered[previous_index]["proposed_action"])
+                if index > 0:
+                    previous = str(ordered[index - 1]["proposed_action"])
                     transitions[f"{previous} -> {action}"] += 1
 
         intervention_rate = intervention_count / len(group_events) if group_events else 0.0
