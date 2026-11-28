@@ -98,6 +98,11 @@ and flags configured performance anomalies without claiming to prove intent.
 See [docs/MODEL_INTEGRITY_TRANSPARENCY.md](docs/MODEL_INTEGRITY_TRANSPARENCY.md).
 This is a research instrument, not a forensic detector or provider certification.
 
+### Local model integrity quickstart
+
+Run the paired audit against locally installed Ollama models with no hosted API
+calls: [docs/LOCAL_MODEL_INTEGRITY_QUICKSTART.md](docs/LOCAL_MODEL_INTEGRITY_QUICKSTART.md).
+
 ## Research: enlightenment and machine selfhood
 
 The read-only research catalog is documented in [docs/research/ENLIGHTENMENT_AND_MACHINE_SELFHOOD.md](docs/research/ENLIGHTENMENT_AND_MACHINE_SELFHOOD.md) and exposed through the `ark.research.enlightenment` Python module. It is intentionally separate from the runtime monitor and benchmark scoring.
