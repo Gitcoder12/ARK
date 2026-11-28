@@ -87,8 +87,13 @@ def _validated_sampling_settings(settings: dict[str, Any] | None) -> dict[str, A
     cleaned: dict[str, Any] = {}
     provider = settings.get("provider")
     if provider is not None:
-        if not isinstance(provider, str) or not provider.strip() or len(provider) > 80:
-            raise ValueError("sampling provider must be a non-empty short string")
+        if (
+            not isinstance(provider, str)
+            or not provider.strip()
+            or len(provider) > 80
+            or any(not (character.isalnum() or character in "_.-") for character in provider)
+        ):
+            raise ValueError("sampling provider must be a short identifier")
         cleaned["provider"] = provider.strip()
 
     for field in ("temperature", "top_p"):
@@ -318,6 +323,8 @@ class BehaviorLog:
     ) -> dict[str, Any]:
         """Record a compact episode outcome and its measured metrics."""
         safe_sampling_settings = _validated_sampling_settings(sampling_settings)
+        if outcome not in {"success", "failure"}:
+            raise ValueError("outcome must be 'success' or 'failure'")
         allowed_metrics = {
             "success",
             "intended_goal_adherence",
