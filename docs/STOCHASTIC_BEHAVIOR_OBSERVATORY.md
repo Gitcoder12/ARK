@@ -46,6 +46,10 @@ Record an experiment:
 ark run --agent goal_following --perturbation none --monitor safety --episodes 10 --seed 42 --record-behavior
 ```
 
+The **ARK Models Box** full-audit workflow also has a checkbox for appending its
+local Ollama decision traces to this same observatory log. It is enabled by
+default and can be switched off before starting the audit.
+
 Choose a log file explicitly:
 
 ```bash
