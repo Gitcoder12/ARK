@@ -58,4 +58,19 @@ def test_negative_token_counts_rejected_but_unknown_allowed(tokens):
     else:
         with pytest.raises(ValueError):
             UsageEvent(provider="p", model="m", input_tokens=tokens, output_tokens=0)
-\n\ndef test_ollama_usage_fields_are_supported(tmp_path):\n    ledger = UsageLedger(tmp_path / "usage.sqlite3")\n    event = event_from_provider_usage(\n        provider="ollama", model="qwen2.5:3b",\n        usage={"prompt_eval_count": 42, "eval_count": 18},\n        is_local=True,\n    )\n    ledger.record(event)\n    summary = ledger.summary()\n    assert summary["input_tokens"] == 42\n    assert summary["output_tokens"] == 18\n    assert summary["total_tokens"] == 60\n    assert summary["estimated_cost_usd"] == 0.0\n
+
+
+
+def test_ollama_usage_fields_are_supported(tmp_path):
+    ledger = UsageLedger(tmp_path / "usage.sqlite3")
+    event = event_from_provider_usage(
+        provider="ollama", model="qwen2.5:3b",
+        usage={"prompt_eval_count": 42, "eval_count": 18},
+        is_local=True,
+    )
+    ledger.record(event)
+    summary = ledger.summary()
+    assert summary["input_tokens"] == 42
+    assert summary["output_tokens"] == 18
+    assert summary["total_tokens"] == 60
+    assert summary["estimated_cost_usd"] == 0.0
