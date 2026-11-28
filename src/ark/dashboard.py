@@ -326,3 +326,82 @@ def render_dashboard() -> None:
 def main() -> None:
     """Entry point for Streamlit launchers."""
     render_dashboard()
+
+
+
+def render_agents_box(st: Any) -> None:
+    """Render ARK's searchable, honest catalogue of selectable agent implementations."""
+    st.set_page_config(page_title="ARK Agents Box", page_icon="🤖", layout="wide")
+    st.title("ARK Agents Box")
+    st.caption(
+        "Browse the agent implementations ARK can currently run, inspect their roles, "
+        "and send a selection to the experiment console."
+    )
+
+    query_col, type_col = st.columns([2, 1])
+    with query_col:
+        query = st.text_input(
+            "Search agents",
+            placeholder="Search goal, reward, safety, random, Ollama…",
+            key="ark_agents_box_search",
+        )
+    with type_col:
+        kinds = ["All types", *sorted({item["type"] for item in AGENT_CATALOG.values()})]
+        selected_type = st.selectbox("Agent type", kinds, key="ark_agents_box_type")
+
+    matches = filter_agents(query)
+    if selected_type != "All types":
+        matches = [name for name in matches if AGENT_CATALOG[name]["type"] == selected_type]
+
+    baseline_count = sum(
+        item["type"] == "Deterministic baseline" for item in AGENT_CATALOG.values()
+    )
+    model_count = sum(item["type"] == "Local model" for item in AGENT_CATALOG.values())
+    metric_cols = st.columns(3)
+    metric_cols[0].metric("Selectable entries", len(AGENT_CATALOG))
+    metric_cols[1].metric("Scripted baselines", baseline_count)
+    metric_cols[2].metric("Local model adapters", model_count)
+
+    if not matches:
+        st.info("No agents match this search. Try a broader term.")
+        return
+
+    for name in matches:
+        info = AGENT_CATALOG[name]
+        with st.container(border=True):
+            title_col, action_col = st.columns([4, 1])
+            with title_col:
+                st.subheader(info["title"])
+                st.caption(f"{info['type']} · `{name}`")
+            with action_col:
+                if st.button("Select", key=f"agents-box-select-{name}", use_container_width=True):
+                    st.session_state.ark_selected_agent = name
+                    st.session_state.ark_agents_box_selected = name
+                    st.success(f"{info['title']} selected.")
+            st.write(info["description"])
+            if name == "goal_following":
+                st.caption("Role: shortest-path navigation · Limitation: hazards are not avoided by default")
+            elif name == "reward_maximizing":
+                st.caption("Role: reward-seeking baseline · Stress focus: reward conflict and decoy attraction")
+            elif name == "safety_constrained":
+                st.caption("Role: hazard-aware navigation · Stress focus: goal completion under constraints")
+            elif name == "random":
+                st.caption("Role: weak stochastic baseline · Use: comparison/control")
+            elif name == "ollama":
+                st.caption("Role: model-backed action adapter · Requires a locally running Ollama service")
+
+    st.divider()
+    selected = st.session_state.get("ark_selected_agent")
+    if selected in AGENT_CATALOG:
+        info = AGENT_CATALOG[selected]
+        st.write(f"**Current selection:** {info['title']} (`{selected}`)")
+    st.page_link(
+        "pages/0_Agent_Experiment_Console.py",
+        label="Open experiment console",
+        icon="🧪",
+        help="Configure stress conditions and run the selected agent.",
+    )
+    st.caption(
+        "This box lists selectable implementations in the current GridWorld harness. "
+        "The separate Prompt Arena personas are experiments, not interchangeable model entries."
+    )
