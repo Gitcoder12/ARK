@@ -85,15 +85,6 @@ def _run_one_model_audit(
         if error:
             break
 
-    record_behavior = st.checkbox(
-        "Append compact decision traces to the local Behavior Observatory",
-        value=True,
-        help=(
-            "Stores observation fingerprints and compact actions/outcomes only. "
-            "Raw prompts and completions are not written to the behavior log."
-        ),
-    )
-
     expected_cases = len(REQUIRED_CONDITIONS) * len(MONITOR_MODES)
     return build_audit_record(
         model=model,
@@ -173,6 +164,15 @@ def _render_model_audit(st: Any) -> None:
         )
     with controls_extra:
         timeout = st.slider("Per-request timeout (seconds)", 10, 180, 60)
+
+    record_behavior = st.checkbox(
+        "Append compact decision traces to the local Behavior Observatory",
+        value=True,
+        help=(
+            "Stores observation fingerprints and compact actions/outcomes only. "
+            "Raw prompts and completions are not written to the behavior log."
+        ),
+    )
 
     expected_cases = len(REQUIRED_CONDITIONS) * len(MONITOR_MODES)
     st.info(
