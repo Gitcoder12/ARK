@@ -73,6 +73,7 @@ def test_behavior_log_verifies_chain_and_records_compact_events(tmp_path):
     assert verification["records"][0]["sampling_settings"] == {}
     assert verification["records"][1]["event_type"] == "episode_outcome"
     assert verification["records"][1]["episode_seed"] == 42
+    assert verification["records"][1]["sampling_settings"] == {}
     rendered = path.read_text(encoding="utf-8")
     assert "raw_prompt" not in rendered
     assert "chain_of_thought" not in rendered
@@ -151,6 +152,7 @@ def test_run_evaluation_can_opt_in_to_local_behavior_recording(tmp_path):
     assert decisions[0]["episode_seed"] == 42
     assert decisions[0]["sampling_settings"] == {"provider": "scripted_baseline"}
     assert outcomes and outcomes[0]["episode_seed"] == 42
+    assert outcomes[0]["sampling_settings"] == {"provider": "scripted_baseline"}
 
 
 
@@ -201,3 +203,56 @@ def test_repeated_alternating_actions_are_reported_as_a_cycle(tmp_path):
     group = analyze_behavior(log.read_records())["groups"][0]
     assert group["repeated_action_cycles"] == {"2-step cycle: UP -> RIGHT": 1}
     assert "repeated_action_cycles_observed" in group["review_signals"]
+
+
+
+def test_sampling_settings_reject_credential_like_unapproved_fields(tmp_path):
+    log = BehaviorLog(tmp_path / "sampling-reject.jsonl")
+    with pytest.raises(ValueError, match="unsupported sampling settings"):
+        _decision(
+            log,
+            run=1,
+            action="UP",
+            sampling_settings={"provider": "ollama", "api_key": "secret"},
+        )
+
+
+def test_outcome_metrics_reject_arbitrary_payload_fields(tmp_path):
+    log = BehaviorLog(tmp_path / "metrics-reject.jsonl")
+    with pytest.raises(ValueError, match="unsupported behavior metrics"):
+        log.record_outcome(
+            run_id="run",
+            episode_id="episode",
+            agent_id="agent",
+            model_id="model",
+            model_version="v1",
+            condition="none",
+            monitor_mode="safety",
+            episode_seed=1,
+            outcome="success",
+            metrics={"success": True, "raw_prompt": "should not enter this log"},
+        )
+
+
+def test_outcome_preserves_allowlisted_inference_settings(tmp_path):
+    log = BehaviorLog(tmp_path / "outcome-sampling.jsonl")
+    settings = {
+        "provider": "ollama_local",
+        "temperature": 0.0,
+        "inference_seed": None,
+        "inference_seed_sent": False,
+    }
+    log.record_outcome(
+        run_id="run",
+        episode_id="episode",
+        agent_id="agent",
+        model_id="model",
+        model_version=None,
+        condition="none",
+        monitor_mode="safety",
+        episode_seed=1,
+        outcome="success",
+        metrics={"success": True},
+        sampling_settings=settings,
+    )
+    assert log.read_records()[0]["sampling_settings"] == settings
