@@ -18,6 +18,12 @@ st.markdown(
     "ARKWorld is the **umbrella hub**. Each world keeps its own rules, evidence, "
     "metrics, and safety boundaries while sharing a common home."
 )
+st.page_link(
+    "pages/8_Why_We_Build.py",
+    label="Why We Build ARK",
+    icon="🌌",
+    help="Read the mission connecting trustworthy AI, shared abundance, science, and space exploration.",
+)
 
 st.divider()
 st.header("Model & agent workspaces")
