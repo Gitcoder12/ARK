@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import ast
 import re
+import textwrap
 
 from ark.integrity.audit import TaskCase
 
@@ -19,7 +20,7 @@ def _extract_python(text: str) -> str:
 
 def _code_score(required: tuple[str, ...]):
     def evaluate(output: str) -> float:
-        code = _extract_python(output)
+        code = textwrap.dedent(_extract_python(output))
         try:
             tree = ast.parse(code)
         except SyntaxError:
