@@ -96,6 +96,10 @@ The default local log is `~/.ark/behavior-observatory.jsonl`. Open **Stochastic 
 
 The recorder stores observation fingerprints and compact decisions/outcomes, not raw prompts, completions, credentials or chain-of-thought. Its pattern signals are descriptive review prompts—not calibrated anomaly detection or safety classifications. See [docs/STOCHASTIC_BEHAVIOR_OBSERVATORY.md](docs/STOCHASTIC_BEHAVIOR_OBSERVATORY.md).
 
+### Compare model identities and behavior
+
+Open **Model Difference Lab** in ARKWorld to maintain evidence-backed model passports (developer, locations, version, weights availability, license and modalities) and compare two models on matched experiment conditions, monitor modes and episode seeds. It reports metric-by-metric differences; it does not rank countries or assign an overall winner. See [docs/MODEL_DIFFERENCE_LAB.md](docs/MODEL_DIFFERENCE_LAB.md).
+
 ---
 
 ## Interview demo
