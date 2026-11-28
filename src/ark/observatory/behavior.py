@@ -20,6 +20,23 @@ from typing import Any
 GENESIS_HASH = "0" * 64
 DEFAULT_LOG_PATH = Path.home() / ".ark" / "behavior-observatory.jsonl"
 INTERVENTION_DECISIONS = {"block", "replan", "recovery"}
+ALLOWED_SAMPLING_SETTING_FIELDS = {
+    "provider",
+    "temperature",
+    "top_p",
+    "top_k",
+    "inference_seed",
+    "inference_seed_sent",
+    "max_tokens",
+}
+COMPARISON_SAMPLING_FIELDS = {
+    "temperature",
+    "top_p",
+    "top_k",
+    "inference_seed",
+    "inference_seed_sent",
+    "max_tokens",
+}
 
 
 def _jsonable(value: Any) -> Any:
@@ -55,6 +72,77 @@ def fingerprint_observation(observation: Any) -> str:
         allow_nan=False,
     ).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def _validated_sampling_settings(settings: dict[str, Any] | None) -> dict[str, Any]:
+    """Keep a small allowlist of generation metadata, never arbitrary caller payloads."""
+    if settings is None:
+        return {}
+    if not isinstance(settings, dict):
+        raise ValueError("sampling_settings must be an object")
+    unknown = set(settings) - ALLOWED_SAMPLING_SETTING_FIELDS
+    if unknown:
+        raise ValueError("unsupported sampling settings: " + ", ".join(sorted(unknown)))
+
+    cleaned: dict[str, Any] = {}
+    provider = settings.get("provider")
+    if provider is not None:
+        if not isinstance(provider, str) or not provider.strip() or len(provider) > 80:
+            raise ValueError("sampling provider must be a non-empty short string")
+        cleaned["provider"] = provider.strip()
+
+    for field in ("temperature", "top_p"):
+        value = settings.get(field)
+        if value is not None:
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(value)
+                or value < 0
+            ):
+                raise ValueError(f"{field} must be a finite non-negative number")
+            cleaned[field] = float(value)
+
+    for field in ("top_k", "max_tokens"):
+        value = settings.get(field)
+        if value is not None:
+            if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+                raise ValueError(f"{field} must be a positive integer")
+            cleaned[field] = value
+
+    if "inference_seed" in settings:
+        value = settings["inference_seed"]
+        if value is not None and (
+            isinstance(value, bool) or not isinstance(value, int)
+        ):
+            raise ValueError("inference_seed must be an integer or null")
+        cleaned["inference_seed"] = value
+
+    if "inference_seed_sent" in settings:
+        value = settings["inference_seed_sent"]
+        if not isinstance(value, bool):
+            raise ValueError("inference_seed_sent must be boolean")
+        cleaned["inference_seed_sent"] = value
+
+    return cleaned
+
+
+def _sampling_signature(settings: Any) -> str:
+    """Canonicalize only inference-affecting settings, excluding provider identity."""
+    if not isinstance(settings, dict):
+        settings = {}
+    parameters = {
+        key: settings[key]
+        for key in sorted(COMPARISON_SAMPLING_FIELDS)
+        if key in settings
+    }
+    return json.dumps(
+        parameters,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+        allow_nan=False,
+    )
 
 
 def _canonical_json(payload: dict[str, Any]) -> str:
@@ -186,6 +274,7 @@ class BehaviorLog:
             or any(character not in "0123456789abcdef" for character in fingerprint.casefold())
         ):
             raise ValueError("observation_fingerprint must be a 64-character SHA-256 hex digest")
+        safe_sampling_settings = _validated_sampling_settings(sampling_settings)
         return self.append(
             {
                 "schema_version": 1,
@@ -206,7 +295,7 @@ class BehaviorLog:
                 "executed_action": str(executed_action)[:80],
                 "monitor_decision": str(monitor_decision)[:40],
                 "monitor_reason": str(monitor_reason)[:240],
-                "sampling_settings": _jsonable(sampling_settings or {}),
+                "sampling_settings": safe_sampling_settings,
             }
         )
 
@@ -223,8 +312,26 @@ class BehaviorLog:
         episode_seed: int,
         outcome: str,
         metrics: dict[str, Any],
+        sampling_settings: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Record a compact episode outcome and its measured metrics."""
+        safe_sampling_settings = _validated_sampling_settings(sampling_settings)
+        allowed_metrics = {
+            "success",
+            "intended_goal_adherence",
+            "steps",
+            "total_reward",
+            "hazard_violation_rate",
+            "decoy_attraction",
+            "monitor_interventions",
+        }
+        if not isinstance(metrics, dict):
+            raise ValueError("metrics must be an object")
+        unexpected_metrics = set(metrics) - allowed_metrics
+        if unexpected_metrics:
+            raise ValueError(
+                "unsupported behavior metrics: " + ", ".join(sorted(unexpected_metrics))
+            )
         return self.append(
             {
                 "schema_version": 1,
@@ -240,6 +347,7 @@ class BehaviorLog:
                 "monitor_mode": monitor_mode,
                 "episode_seed": episode_seed,
                 "outcome": str(outcome)[:40],
+                "sampling_settings": safe_sampling_settings,
                 "metrics": _jsonable(metrics),
             }
         )
