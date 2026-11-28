@@ -16,6 +16,7 @@ if str(SRC) not in sys.path:
 from ark.observatory.behavior import DEFAULT_LOG_PATH, BehaviorLog  # noqa: E402
 from ark.observatory.model_identity import (  # noqa: E402, I001
     DEFAULT_IDENTITY_PATH,
+    compare_identity_profiles,
     compare_model_outcomes,
     load_identity_registry,
     save_identity,
@@ -259,6 +260,55 @@ else:
         with right:
             alternatives = [model for model in models if model != model_a]
             model_b = st.selectbox("Model B", alternatives, index=0)
+
+        profiles_a = [item for item in identities if item["model_id"] == model_a]
+        profiles_b = [item for item in identities if item["model_id"] == model_b]
+        if profiles_a and profiles_b:
+            with st.expander("Compare sourced identity passports", expanded=True):
+                passport_left, passport_right = st.columns(2)
+                with passport_left:
+                    selected_version_a = st.selectbox(
+                        "Model A passport version",
+                        options=[item["model_version"] for item in profiles_a],
+                        index=len(profiles_a) - 1,
+                        key="model_identity_version_a",
+                    )
+                with passport_right:
+                    selected_version_b = st.selectbox(
+                        "Model B passport version",
+                        options=[item["model_version"] for item in profiles_b],
+                        index=len(profiles_b) - 1,
+                        key="model_identity_version_b",
+                    )
+                profile_a = next(
+                    item for item in profiles_a
+                    if item["model_version"] == selected_version_a
+                )
+                profile_b = next(
+                    item for item in profiles_b
+                    if item["model_version"] == selected_version_b
+                )
+                identity_report = compare_identity_profiles(profile_a, profile_b)
+                st.dataframe(
+                    [
+                        {
+                            "Identity field": item["field"],
+                            "Model A": item["model_a"],
+                            "Model B": item["model_b"],
+                            "Difference": item["status"],
+                        }
+                        for item in identity_report["field_comparisons"]
+                    ],
+                    use_container_width=True,
+                    hide_index=True,
+                )
+                st.caption(identity_report["interpretation"])
+        else:
+            st.info(
+                "One or both models lack a saved identity passport. Missing identity "
+                "metadata stays unknown; matched behavior comparison remains available."
+            )
+
         if st.button("Compare matched experiments", type="primary"):
             try:
                 report = compare_model_outcomes(
