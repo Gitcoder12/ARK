@@ -98,6 +98,17 @@ with left:
         "without working from the terminal."
     )
 
+    st.page_link(
+        "pages/9_Behavior_Observatory.py",
+        label="Stochastic Behavior Observatory",
+        icon="📈",
+        help="Persist decision traces, compare repeated contexts, and inspect behaviour patterns.",
+    )
+    st.markdown(
+        "Collect compact decision logs and analyze action variability, trajectories, "
+        "and monitor interventions across repeated runs."
+    )
+
     st.subheader("Agent competition & red-team labs")
     st.markdown("**Prompt Arena — Painter · Hallucinator · Rogue**")
     st.write(
