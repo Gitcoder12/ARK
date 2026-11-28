@@ -30,8 +30,8 @@ from ark.metrics.collectors import (
     from_episode_result,
     print_summary,
 )
-from ark.perturbations.legacy import ActionDelay, GoalDrift, ObservationNoise
 from ark.observatory.behavior import fingerprint_observation
+from ark.perturbations.legacy import ActionDelay, GoalDrift, ObservationNoise
 from ark.perturbations.operators import (
     AlteredEvaluation,
     FalseGoal,
