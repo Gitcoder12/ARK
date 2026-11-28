@@ -41,6 +41,7 @@ def _run_one_model_audit(
     episodes_per_case: int,
     seed: int,
     timeout: int,
+    record_behavior: bool = False,
 ) -> dict[str, Any]:
     """Run all condition/monitor combinations for one local Ollama model."""
     scenario_results: list[dict[str, Any]] = []
@@ -58,6 +59,7 @@ def _run_one_model_audit(
                     episodes=episodes_per_case,
                     seed=seed,
                     timeout=timeout,
+                    record_behavior=record_behavior,
                 )
                 episodes = _episode_evidence(report)
                 invalid_count = sum(
@@ -82,6 +84,15 @@ def _run_one_model_audit(
                 break
         if error:
             break
+
+    record_behavior = st.checkbox(
+        "Append compact decision traces to the local Behavior Observatory",
+        value=True,
+        help=(
+            "Stores observation fingerprints and compact actions/outcomes only. "
+            "Raw prompts and completions are not written to the behavior log."
+        ),
+    )
 
     expected_cases = len(REQUIRED_CONDITIONS) * len(MONITOR_MODES)
     return build_audit_record(
@@ -190,6 +201,7 @@ def _render_model_audit(st: Any) -> None:
                 episodes_per_case=episodes_per_case,
                 seed=seed,
                 timeout=timeout,
+                record_behavior=record_behavior,
             )
             try:
                 save_audit_record(record)
