@@ -214,3 +214,14 @@ def test_identity_rejects_invalid_known_release_date():
                 ],
             }
         )
+
+
+
+def test_identity_upsert_keeps_same_model_tag_from_different_providers(tmp_path):
+    path = tmp_path / "identity.json"
+    first = save_identity(_profile(provider="provider-a"), path)
+    second = save_identity(_profile(provider="provider-b"), path)
+
+    assert len(first) == 1
+    assert len(second) == 2
+    assert {item["provider"] for item in second} == {"provider-a", "provider-b"}
