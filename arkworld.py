@@ -109,6 +109,17 @@ with left:
         "and monitor interventions across repeated runs."
     )
 
+    st.page_link(
+        "pages/10_Model_Difference_Lab.py",
+        label="Model Difference Lab",
+        icon="🧬",
+        help="Record evidence-backed model identities and compare matched behavior experiments.",
+    )
+    st.markdown(
+        "Compare model metadata and measured behavior without treating country or provider "
+        "as a safety label."
+    )
+
     st.subheader("Agent competition & red-team labs")
     st.markdown("**Prompt Arena — Painter · Hallucinator · Rogue**")
     st.write(
