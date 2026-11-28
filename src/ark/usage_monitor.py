@@ -227,11 +227,9 @@ def event_from_provider_usage(
     input_tokens/output_tokens before calling this function.
     """
     if isinstance(usage, dict):
-        input_tokens = usage.get("input_tokens", usage.get("prompt_tokens"))
-        output_tokens = usage.get("output_tokens", usage.get("completion_tokens"))
+        input_tokens = usage.get(\n            "input_tokens", usage.get("prompt_tokens", usage.get("prompt_eval_count"))\n        )\n        output_tokens = usage.get(\n            "output_tokens", usage.get("completion_tokens", usage.get("eval_count"))\n        )
     else:
-        input_tokens = getattr(usage, "input_tokens", getattr(usage, "prompt_tokens", None))
-        output_tokens = getattr(usage, "output_tokens", getattr(usage, "completion_tokens", None))
+        input_tokens = getattr(\n            usage, "input_tokens", getattr(usage, "prompt_tokens", getattr(usage, "prompt_eval_count", None))\n        )\n        output_tokens = getattr(\n            usage, "output_tokens", getattr(usage, "completion_tokens", getattr(usage, "eval_count", None))\n        )
     if input_tokens is None or output_tokens is None:
         metadata.setdefault("source", "unknown")
     return UsageEvent(
