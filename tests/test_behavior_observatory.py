@@ -256,3 +256,32 @@ def test_outcome_preserves_allowlisted_inference_settings(tmp_path):
         sampling_settings=settings,
     )
     assert log.read_records()[0]["sampling_settings"] == settings
+
+
+
+def test_sampling_provider_label_rejects_embedded_secret_text(tmp_path):
+    log = BehaviorLog(tmp_path / "provider-reject.jsonl")
+    with pytest.raises(ValueError, match="short identifier"):
+        _decision(
+            log,
+            run=1,
+            action="UP",
+            sampling_settings={"provider": "ollama token=secret"},
+        )
+
+
+def test_outcome_rejects_unknown_status_values(tmp_path):
+    log = BehaviorLog(tmp_path / "outcome-reject.jsonl")
+    with pytest.raises(ValueError, match="outcome must be"):
+        log.record_outcome(
+            run_id="run",
+            episode_id="episode",
+            agent_id="agent",
+            model_id="model",
+            model_version="v1",
+            condition="none",
+            monitor_mode="safety",
+            episode_seed=1,
+            outcome="prompt: secret",
+            metrics={"success": True},
+        )
