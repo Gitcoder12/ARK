@@ -1,5 +1,10 @@
 # ARK
 
+## Why we build
+
+ARK exists to make increasingly capable autonomous AI more reliable, inspectable, bounded, and accountable to human goals and rights. Its long-range north star is a world where technology expands shared abundance, basic dignity is not gated by income, and humanity has more room for science, creativity, and space exploration.
+
+Read the full [Why We Build ARK mission](docs/WHY_WE_BUILD.md), also available in ARKWorld.
 
 ## Commands — copy, paste, run
 
