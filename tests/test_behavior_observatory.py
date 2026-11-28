@@ -21,7 +21,7 @@ def _decision(log: BehaviorLog, *, run: int, action: str, model_version: str = "
         model_version=model_version,
         condition="none",
         monitor_mode="safety",
-        seed=42,
+        episode_seed=42,
         step=0,
         observation_fingerprint=fingerprint_observation(
             {"position": (1, 1), "step": 0, "grid": [[0, 1], [2, 3]]}
@@ -52,7 +52,7 @@ def test_behavior_log_verifies_chain_and_records_compact_events(tmp_path):
         model_version="v1",
         condition="none",
         monitor_mode="safety",
-        seed=42,
+        episode_seed=42,
         outcome="success",
         metrics={"success": True, "steps": 3},
     )
@@ -61,7 +61,10 @@ def test_behavior_log_verifies_chain_and_records_compact_events(tmp_path):
     assert verification["valid"] is True
     assert len(verification["records"]) == 2
     assert verification["records"][0]["event_type"] == "decision"
+    assert verification["records"][0]["episode_seed"] == 42
+    assert verification["records"][0]["sampling_settings"] == {}
     assert verification["records"][1]["event_type"] == "episode_outcome"
+    assert verification["records"][1]["episode_seed"] == 42
     rendered = path.read_text(encoding="utf-8")
     assert "raw_prompt" not in rendered
     assert "chain_of_thought" not in rendered
@@ -130,4 +133,13 @@ def test_run_evaluation_can_opt_in_to_local_behavior_recording(tmp_path):
     assert report["behavior_logging"]["events_recorded"] > 0
     verification = BehaviorLog(path).verify()
     assert verification["valid"] is True
-    assert any(item["event_type"] == "episode_outcome" for item in verification["records"])
+    decisions = [
+        item for item in verification["records"] if item["event_type"] == "decision"
+    ]
+    outcomes = [
+        item for item in verification["records"] if item["event_type"] == "episode_outcome"
+    ]
+    assert decisions
+    assert decisions[0]["episode_seed"] == 42
+    assert decisions[0]["sampling_settings"] == {"provider": "scripted_baseline"}
+    assert outcomes and outcomes[0]["episode_seed"] == 42
