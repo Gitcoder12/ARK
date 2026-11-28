@@ -7,14 +7,15 @@ deception, intent, or unsafe behaviour.
 
 from __future__ import annotations
 
-import hashlib
-import json
-import math
-import uuid
 from collections import Counter, defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+
+import hashlib
+import json
+import math
+import uuid
 
 
 GENESIS_HASH = "0" * 64
