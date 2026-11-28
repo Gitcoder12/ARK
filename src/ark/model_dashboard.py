@@ -52,6 +52,7 @@ def _run_one_model_audit(
                 report = run_evaluation(
                     agent_name="ollama",
                     model=model,
+                    ollama_host="http://127.0.0.1:11434",
                     perturbation_name=condition,
                     monitor=monitor,
                     episodes=episodes_per_case,
