@@ -10,6 +10,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from ark.model_dashboard import render_models_box  # noqa: E402
+import streamlit as st
+from ark.model_dashboard import render_models_box
 
-render_models_box(__import__("streamlit"))
+render_models_box(st)
