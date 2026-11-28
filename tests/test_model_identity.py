@@ -9,6 +9,7 @@ from ark.observatory.model_identity import (
     load_identity_registry,
     save_identity,
     validate_identity,
+    compare_identity_profiles,
 )
 
 
@@ -156,3 +157,34 @@ def test_model_comparison_marks_small_matched_sample_as_insufficient():
 def test_model_comparison_rejects_self_comparison():
     with pytest.raises(ValueError, match="different"):
         compare_model_outcomes([], "same", "same")
+
+
+
+def test_identity_comparison_reports_field_differences_and_unknowns():
+    profile_a = validate_identity(
+        {
+            "model_id": "provider/model-a",
+            "provider": "provider-a",
+            "weights_availability": "unknown",
+        }
+    )
+    profile_b = validate_identity(
+        {
+            "model_id": "provider/model-b",
+            "provider": "provider-b",
+            "weights_availability": "api_only",
+            "evidence": [
+                {
+                    "field": "weights_availability",
+                    "url": "https://example.org/weights",
+                    "checked_on": "2026-11-28",
+                }
+            ],
+        }
+    )
+
+    report = compare_identity_profiles(profile_a, profile_b)
+    fields = {item["field"]: item for item in report["field_comparisons"]}
+    assert fields["provider"]["status"] == "different"
+    assert fields["weights_availability"]["status"] == "unknown"
+    assert "quality" in report["interpretation"]
