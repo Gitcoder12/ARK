@@ -55,7 +55,8 @@ def test_profile_tracks_quality_and_style_variety():
     report = profile.report()
     assert report["prompts_reviewed"] == 2
     assert report["style_variety"] >= 2
-    assert 0 <= report["skill_score"] <= 100
+    assert report["skill_score"] == report["average_prompt_quality"]
+    assert report["improvement_delta"] is None
 
 
 def test_sensitive_action_triggers_safety_warning():
