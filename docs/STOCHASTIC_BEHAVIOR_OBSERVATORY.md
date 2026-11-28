@@ -16,7 +16,8 @@ does not automatically mean dangerous behaviour, deception, or a meaningful anom
 For each decision, ARK records:
 - Run, episode, agent and model identifiers.
 - Model version when known (unknown values remain explicit).
-- Experiment condition, monitor mode, seed and step.
+- Experiment condition, monitor mode, episode seed and step.
+- Observable sampling settings when available, kept separate from the episode seed.
 - A SHA-256 fingerprint of the exact agent-visible observation.
 - Proposed action, executed action, monitor decision and compact monitor reason.
 - Episode outcome and basic measured metrics.
@@ -87,11 +88,17 @@ against an attacker who can rewrite the entire file and recompute the chain. The
 initial implementation assumes one writer per log file. Do not have multiple ARK
 processes append concurrently to the same file.
 
-Reproducibility also requires context beyond the seed: model identifier/version,
+Reproducibility requires context beyond the episode seed: model identifier/version,
 sampling settings, provider routing, environment version, dependencies and runtime
-hardware may all affect behavior. The current GridWorld integration records the
-model identifier but cannot reliably observe a provider-side model build or all
-serving details. Unknown fields must remain unknown rather than being inferred.
+hardware may all affect behavior. The episode seed controls ARK's experiment and
+environment; it is not necessarily the model's inference RNG seed.
+
+The current local Ollama adapter sends `temperature=0` but does not send an
+inference seed. The log records this as `inference_seed=null` and
+`inference_seed_sent=false`; do not treat a fixed episode seed or temperature
+zero as proof of deterministic model generation. The adapter also does not yet
+expose a provider-side model build/version, so `model_version` remains unknown.
+Unknown fields must remain unknown rather than being inferred.
 
 ## Research motivation
 
