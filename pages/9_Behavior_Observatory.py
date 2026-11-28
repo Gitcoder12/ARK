@@ -2,9 +2,21 @@
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
 import streamlit as st
 
-from ark.observatory.behavior import DEFAULT_LOG_PATH, BehaviorLog, analyze_behavior
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from ark.observatory.behavior import (  # noqa: E402
+    DEFAULT_LOG_PATH,
+    BehaviorLog,
+    analyze_behavior,
+)
 
 
 st.set_page_config(
