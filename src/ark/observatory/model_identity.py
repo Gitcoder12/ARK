@@ -324,6 +324,22 @@ def _metric_value(metrics: dict[str, Any], name: str) -> float | None:
     return None
 
 
+def _sampling_parameters_signature(settings: Any) -> str:
+    """Compare only inference-affecting parameters, not the provider name."""
+    if not isinstance(settings, dict):
+        settings = {}
+    fields = (
+        "temperature",
+        "top_p",
+        "top_k",
+        "inference_seed",
+        "inference_seed_sent",
+        "max_tokens",
+    )
+    parameters = {field: settings[field] for field in fields if field in settings}
+    return json.dumps(parameters, sort_keys=True, separators=(",", ":"), allow_nan=False)
+
+
 def compare_model_outcomes(
     records: list[dict[str, Any]],
     model_a: str,
@@ -345,8 +361,10 @@ def compare_model_outcomes(
     ):
         raise ValueError("min_matched_seeds must be an integer of at least 2")
 
-    def collect(model_id: str) -> dict[tuple[str, str, str], dict[int, list[dict[str, Any]]]]:
-        groups: dict[tuple[str, str, str], dict[int, list[dict[str, Any]]]] = defaultdict(
+    def collect(
+        model_id: str,
+    ) -> dict[tuple[str, str, str, str], dict[int, list[dict[str, Any]]]]:
+        groups: dict[tuple[str, str, str, str], dict[int, list[dict[str, Any]]]] = defaultdict(
             lambda: defaultdict(list)
         )
         for record in records:
@@ -370,9 +388,22 @@ def compare_model_outcomes(
     groups_b = collect(model_b)
     comparisons: list[dict[str, Any]] = []
 
-    for (condition_a, monitor_a, version_a), seeds_a in sorted(groups_a.items()):
-        for (condition_b, monitor_b, version_b), seeds_b in sorted(groups_b.items()):
-            if (condition_a, monitor_a) != (condition_b, monitor_b):
+    for (
+        condition_a,
+        monitor_a,
+        version_a,
+        sampling_signature_a,
+    ), seeds_a in sorted(groups_a.items()):
+        for (
+            condition_b,
+            monitor_b,
+            version_b,
+            sampling_signature_b,
+        ), seeds_b in sorted(groups_b.items()):
+            if (
+                (condition_a, monitor_a) != (condition_b, monitor_b)
+                or sampling_signature_a != sampling_signature_b
+            ):
                 continue
             common_seeds = sorted(set(seeds_a) & set(seeds_b))
             if not common_seeds:
@@ -421,6 +452,7 @@ def compare_model_outcomes(
                     "monitor_mode": monitor_a,
                     "model_a_version": version_a,
                     "model_b_version": version_b,
+                    "sampling_parameters": json.loads(sampling_signature_a),
                     "matched_seeds": common_seeds,
                     "matched_seed_count": len(common_seeds),
                     "model_a_episode_count": len(paired_a),
