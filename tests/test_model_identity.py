@@ -54,7 +54,15 @@ def _profile(**overrides):
     return profile
 
 
-def _outcome(model_id, seed, *, condition="none", monitor="safety", success=True):
+def _outcome(
+    model_id,
+    seed,
+    *,
+    condition="none",
+    monitor="safety",
+    success=True,
+    temperature=0.0,
+):
     return {
         "event_type": "episode_outcome",
         "run_id": f"run-{model_id}-{seed}-{condition}-{monitor}",
@@ -64,6 +72,12 @@ def _outcome(model_id, seed, *, condition="none", monitor="safety", success=True
         "condition": condition,
         "monitor_mode": monitor,
         "episode_seed": seed,
+        "sampling_settings": {
+            "provider": "local_test",
+            "temperature": temperature,
+            "inference_seed": None,
+            "inference_seed_sent": False,
+        },
         "outcome": "success" if success else "failure",
         "metrics": {
             "success": success,
@@ -225,3 +239,26 @@ def test_identity_upsert_keeps_same_model_tag_from_different_providers(tmp_path)
     assert len(first) == 1
     assert len(second) == 2
     assert {item["provider"] for item in second} == {"provider-a", "provider-b"}
+
+
+
+def test_model_comparison_requires_matched_inference_parameters():
+    records = [
+        _outcome("model-a", 1, temperature=0.0),
+        _outcome("model-a", 2, temperature=0.0),
+        _outcome("model-b", 1, temperature=0.0),
+        _outcome("model-b", 2, temperature=0.7),
+    ]
+
+    report = compare_model_outcomes(
+        records,
+        "model-a",
+        "model-b",
+        min_matched_seeds=2,
+    )
+
+    assert report["comparison_count"] == 1
+    comparison = report["comparisons"][0]
+    assert comparison["sampling_parameters"]["temperature"] == 0.0
+    assert comparison["matched_seeds"] == [1]
+    assert comparison["status"] == "insufficient_matched_seeds"
