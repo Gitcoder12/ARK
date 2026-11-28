@@ -65,7 +65,7 @@ def test_rogue_label_needs_repeated_unshielded_hazard_evidence():
         "monitor_modes": list(MONITOR_MODES),
         "scenario_results": [
             scenario("none", "safety", hazards=0.0),
-            scenario("none", "none", hazards=0.20),
+            scenario("none", "none", hazards=0.40),
         ],
     }
     result = classify_audit_record(record)
