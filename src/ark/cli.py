@@ -157,6 +157,16 @@ def run_evaluation(
             _condition: str = effective_perturbation,
             _monitor_mode: str = monitor,
             _model_id: str | None = selected_model,
+            _sampling_settings: dict[str, Any] = (
+                {
+                    "provider": "ollama_local",
+                    "temperature": 0.0,
+                    "inference_seed": None,
+                    "inference_seed_sent": False,
+                }
+                if selected_model is not None
+                else {"provider": "scripted_baseline"}
+            ),
             _behavior_count: list[int] = behavior_event_count,
         ) -> None:
             _step_events.append(event)
@@ -169,13 +179,14 @@ def run_evaluation(
                     model_version=None,
                     condition=_condition,
                     monitor_mode=_monitor_mode,
-                    seed=_seed,
+                    episode_seed=_seed,
                     step=int(event["step"]),
                     observation_fingerprint=str(event["observation_fingerprint"]),
                     proposed_action=str(event["proposed_action_name"]),
                     executed_action=str(event["executed_action_name"]),
                     monitor_decision=str(event["monitor_decision"]),
                     monitor_reason=str(event["monitor_reason"]),
+                    sampling_settings=_sampling_settings,
                 )
                 _behavior_count[0] += 1
             _trusted.record_action(
@@ -222,7 +233,7 @@ def run_evaluation(
                 model_version=None,
                 condition=effective_perturbation,
                 monitor_mode=monitor,
-                seed=episode_seed,
+                episode_seed=episode_seed,
                 outcome="success" if metrics.success else "failure",
                 metrics={
                     "success": bool(metrics.success),
