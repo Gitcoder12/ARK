@@ -168,3 +168,36 @@ def test_sampling_settings_are_recorded_separately_from_episode_seed(tmp_path):
     assert record["episode_seed"] == 42
     assert record["sampling_settings"] == settings
     assert "seed" not in record
+
+
+
+def test_behavior_log_rejects_caller_supplied_hash_chain_fields(tmp_path):
+    log = BehaviorLog(tmp_path / "reserved.jsonl")
+    with pytest.raises(ValueError, match="reserved hash-chain"):
+        log.append({"event_type": "decision", "record_hash": "forged"})
+
+
+def test_repeated_alternating_actions_are_reported_as_a_cycle(tmp_path):
+    log = BehaviorLog(tmp_path / "cycles.jsonl")
+    fingerprint = fingerprint_observation({"position": [1, 1], "step": 0})
+    for step, action in enumerate(["UP", "RIGHT", "UP", "RIGHT", "UP", "RIGHT"]):
+        log.record_decision(
+            run_id="cycle-run",
+            episode_id="cycle-episode",
+            agent_id="local-agent",
+            model_id="cycle-model",
+            model_version="v1",
+            condition="none",
+            monitor_mode="safety",
+            episode_seed=7,
+            step=step,
+            observation_fingerprint=fingerprint,
+            proposed_action=action,
+            executed_action=action,
+            monitor_decision="allow",
+            monitor_reason="action passes checks",
+        )
+
+    group = analyze_behavior(log.read_records())["groups"][0]
+    assert group["repeated_action_cycles"] == {"2-step cycle: UP -> RIGHT": 1}
+    assert "repeated_action_cycles_observed" in group["review_signals"]
