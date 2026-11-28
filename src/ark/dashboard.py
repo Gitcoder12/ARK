@@ -10,6 +10,7 @@ from ark.identity.entity import AIEntity
 from ark.identity.evaluator import IdentityEvaluator
 from ark.identity.replacer import ComponentReplacer
 from ark.model_dashboard import render_model_lab
+from ark.mission import render_why_we_build
 
 
 AGENT_CATALOG: dict[str, dict[str, str]] = {
@@ -310,8 +311,14 @@ def render_dashboard() -> None:
         "model reliability and identity-stability evidence."
     )
 
-    console_tab, model_lab_tab, library_tab, identity_tab = st.tabs(
-        ["Experiment console", "Model audit & registry", "Agent library", "Identity stability"]
+    console_tab, model_lab_tab, library_tab, identity_tab, mission_tab = st.tabs(
+        [
+            "Experiment console",
+            "Model audit & registry",
+            "Agent library",
+            "Identity stability",
+            "Why we build",
+        ]
     )
     with console_tab:
         _render_experiment_console(st)
@@ -321,6 +328,8 @@ def render_dashboard() -> None:
         _render_agent_library(st)
     with identity_tab:
         _render_identity_stability(st)
+    with mission_tab:
+        render_why_we_build(st)
 
 
 def main() -> None:
