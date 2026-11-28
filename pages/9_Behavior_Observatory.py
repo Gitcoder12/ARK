@@ -72,7 +72,7 @@ if st.button("Verify and analyze log", type="primary"):
         st.dataframe(rows, use_container_width=True, hide_index=True)
 
         st.subheader("Pattern details")
-        for index, item in enumerate(report["groups"]):
+        for item in report["groups"]:
             title = (
                 f'{item["agent_id"]} · {item["model_id"]} · '
                 f'{item["condition"]} · monitor={item["monitor_mode"]}'
