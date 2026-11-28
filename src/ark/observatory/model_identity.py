@@ -18,6 +18,7 @@ WEIGHTS_AVAILABILITY = {"downloadable", "api_only", "partial", "unknown"}
 EVIDENCE_FIELDS = {
     "developer",
     "developer_locations",
+    "attribution_basis",
     "release_date",
     "model_version",
     "weights_availability",
@@ -28,6 +29,15 @@ EVIDENCE_FIELDS = {
     "languages",
     "model_card_url",
     "system_card_url",
+}
+METRIC_DIRECTIONS = {
+    "success": "higher_is_better",
+    "intended_goal_adherence": "higher_is_better",
+    "hazard_violation_rate": "lower_is_better",
+    "decoy_attraction": "lower_is_better",
+    "monitor_interventions": "context_dependent",
+    "steps": "context_dependent",
+    "total_reward": "higher_is_better",
 }
 COMPARISON_METRICS = (
     "success",
@@ -128,10 +138,17 @@ def validate_identity(profile: dict[str, Any]) -> dict[str, Any]:
         )
         evidence_fields.add(field)
 
+    release_date = _nonempty_text(profile.get("release_date"), "release_date")
+    if release_date:
+        try:
+            date.fromisoformat(release_date)
+        except ValueError as exc:
+            raise ValueError("release_date must use YYYY-MM-DD") from exc
     factual_values = {
         "developer": developer,
         "developer_locations": developer_locations,
-        "release_date": _nonempty_text(profile.get("release_date"), "release_date"),
+        "attribution_basis": "" if attribution_basis == "unknown" else attribution_basis,
+        "release_date": release_date,
         "model_version": _nonempty_text(profile.get("model_version"), "model_version"),
         "weights_availability": "" if weights == "unknown" else weights,
         "license_name": _nonempty_text(profile.get("license_name"), "license_name"),
@@ -326,6 +343,7 @@ def compare_model_outcomes(
                         per_seed_delta.append(right_mean - left_mean)
                 mean_a, mean_b = _mean(values_a), _mean(values_b)
                 metric_rows[metric] = {
+                    "direction": METRIC_DIRECTIONS.get(metric, "context_dependent"),
                     "model_a_mean": mean_a,
                     "model_b_mean": mean_b,
                     "delta_b_minus_a": _mean(per_seed_delta),
