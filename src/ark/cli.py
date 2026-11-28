@@ -112,6 +112,16 @@ def run_evaluation(
     )
     run_id = str(uuid.uuid4()) if behavior_log is not None else None
     behavior_event_count = [0]
+    behavior_sampling_settings: dict[str, Any] = (
+        {
+            "provider": "ollama_local",
+            "temperature": 0.0,
+            "inference_seed": None,
+            "inference_seed_sent": False,
+        }
+        if selected_model is not None
+        else {"provider": "scripted_baseline"}
+    )
     condition = CONDITIONS[effective_perturbation]
     agent, agent_label, selected_model = _build_agent(
         agent_name,
@@ -157,16 +167,7 @@ def run_evaluation(
             _condition: str = effective_perturbation,
             _monitor_mode: str = monitor,
             _model_id: str | None = selected_model,
-            _sampling_settings: dict[str, Any] = (
-                {
-                    "provider": "ollama_local",
-                    "temperature": 0.0,
-                    "inference_seed": None,
-                    "inference_seed_sent": False,
-                }
-                if selected_model is not None
-                else {"provider": "scripted_baseline"}
-            ),
+            _sampling_settings: dict[str, Any] = behavior_sampling_settings,
             _behavior_count: list[int] = behavior_event_count,
         ) -> None:
             _step_events.append(event)
@@ -235,6 +236,7 @@ def run_evaluation(
                 monitor_mode=monitor,
                 episode_seed=episode_seed,
                 outcome="success" if metrics.success else "failure",
+                sampling_settings=behavior_sampling_settings,
                 metrics={
                     "success": bool(metrics.success),
                     "intended_goal_adherence": bool(metrics.intended_goal_adherence),
