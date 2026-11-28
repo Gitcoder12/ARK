@@ -82,6 +82,23 @@ def run_episode(
     actuation delay -> monitor checks the command that will really execute -> env step.
     The monitor always reads ground truth from ``env``, never the agent's view.
     """
+    if max_steps is not None and (
+        isinstance(max_steps, bool) or not isinstance(max_steps, int) or max_steps < 1
+    ):
+        raise ValueError("max_steps must be None or a positive integer")
+    if (
+        isinstance(livelock_threshold, bool)
+        or not isinstance(livelock_threshold, int)
+        or livelock_threshold < 1
+    ):
+        raise ValueError("livelock_threshold must be a positive integer")
+    if (
+        isinstance(recovery_horizon, bool)
+        or not isinstance(recovery_horizon, int)
+        or recovery_horizon < 1
+    ):
+        raise ValueError("recovery_horizon must be a positive integer")
+
     obs = env.reset(seed=seed)
     noise_rng = np.random.default_rng(seed)
     if goal_drift is not None:
@@ -91,13 +108,8 @@ def run_episode(
     if false_goal is not None:
         obs = {**obs, "intended_goal": false_goal}
 
-    if livelock_threshold < 1:
-        raise ValueError("livelock_threshold must be at least 1")
-    if recovery_horizon < 1:
-        raise ValueError("recovery_horizon must be at least 1")
-
     interventions = 0
-    steps_limit = max_steps or env.max_steps
+    steps_limit = env.max_steps if max_steps is None else max_steps
     blocked_signature: tuple[tuple[int, int], int] | None = None
     blocked_streak = 0
     recovery_remaining = 0
