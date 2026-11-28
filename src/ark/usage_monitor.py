@@ -238,12 +238,16 @@ def event_from_provider_usage(
             "output_tokens", usage.get("completion_tokens", usage.get("eval_count"))
         )
     else:
-        input_tokens = getattr(
-            usage, "input_tokens", getattr(usage, "prompt_tokens", getattr(usage, "prompt_eval_count", None))
-        )
-        output_tokens = getattr(
-            usage, "output_tokens", getattr(usage, "completion_tokens", getattr(usage, "eval_count", None))
-        )
+        input_tokens = getattr(usage, "input_tokens", None)
+        if input_tokens is None:
+            input_tokens = getattr(usage, "prompt_tokens", None)
+        if input_tokens is None:
+            input_tokens = getattr(usage, "prompt_eval_count", None)
+        output_tokens = getattr(usage, "output_tokens", None)
+        if output_tokens is None:
+            output_tokens = getattr(usage, "completion_tokens", None)
+        if output_tokens is None:
+            output_tokens = getattr(usage, "eval_count", None)
     if input_tokens is None or output_tokens is None:
         metadata.setdefault("source", "unknown")
     return UsageEvent(
