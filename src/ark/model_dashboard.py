@@ -390,3 +390,19 @@ def render_model_lab(st: Any) -> None:
         _render_model_audit(st)
     with registry_tab:
         _render_model_registry(st)
+
+
+
+def render_models_box(st: Any) -> None:
+    """Render the standalone ARK Models Box workspace."""
+    st.set_page_config(page_title="ARK Models Box", page_icon="🧠", layout="wide")
+    st.title("ARK Models Box")
+    st.caption(
+        "Discover local models, audit them against ARK's stress matrix, and search "
+        "their saved reliability evidence."
+    )
+    st.info(
+        "This workspace currently connects to local Ollama only. It does not download "
+        "models, call hosted providers, or send model prompts to a remote API."
+    )
+    render_model_lab(st)
