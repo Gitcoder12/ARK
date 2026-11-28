@@ -225,11 +225,19 @@ def save_identity(
     identity = validate_identity(profile)
     target = Path(path).expanduser()
     identities = load_identity_registry(target)
-    key = (identity["model_id"].casefold(), identity["model_version"])
+    key = (
+        identity["provider"].casefold(),
+        identity["model_id"].casefold(),
+        identity["model_version"],
+    )
     replaced = False
     updated: list[dict[str, Any]] = []
     for existing in identities:
-        existing_key = (existing["model_id"].casefold(), existing["model_version"])
+        existing_key = (
+            existing["provider"].casefold(),
+            existing["model_id"].casefold(),
+            existing["model_version"],
+        )
         if existing_key == key:
             updated.append(identity)
             replaced = True
